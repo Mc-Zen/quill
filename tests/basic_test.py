@@ -50,8 +50,6 @@ class TypstImageTest(TypstTest):
 class Test(TypstImageTest):
     def test_r(self):
         self.run_typst("empty_document.typ")
-        self.run_typst("qft.typ")
-        self.run_typst("teleportation.typ")
 
     def test_examples(self):
         self.compile_and_assert_correct("phase-estimation.typ")

@@ -1,45 +1,19 @@
 #import "template.typ": *
 #import "../../quantum-circuit.typ": *
-#import "../../examples/examples.typ": * 
 #show link: underline
 
 #show: project.with(
   title: "Guide for the Quantum-Circuit Package ",
   authors: ("Mc-Zen",),
   abstract: [Quantum-Circuit is a library for creating quantum circuit diagrams in #link("https://typst.app/", [Typst]). ],
-  date: "June 4, 2023", 
+  date: "June 4, 2023",
 )
 
 #show link: set text(fill: purple.darken(30%))
 #show raw.where(block: true) : set par(justify: false)
 
-#let ref-fn(name) = link(label("quantum-circuit:" + name), raw(name))
+#let ref-fn(name) = name // link(label("/quantum-circuit" + name), raw(name))
 
-
-
-#outline(depth: 1, indent: true)
-
-
-
-= Introduction
-
-_@gate-gallery features a gallery of many gates that are possible to use with this library and how to create them. In @demo, you can find a variety of example figures along with the code. _
-
-Would you like to create quantum circuits directly in Typst? Maybe a circuit for quantum teleportation?
-#align(center)[#teleportation]
-
-Or rather for phase estimation (the code for both examples can be found in @demo)?
-#align(center)[#phase-estimation]
-
-This library provides high-level functionality for generating these and more quantum circuit diagrams. 
-
-For those who work with the LaTeX packages `qcircuit` and `quantikz`, the syntax will be somewhat familiar. The wonderful thing about Typst is that the changes can be viewed instantaneously which makes it ever so much easier to design a beautiful quantum circuit. The syntax also has been updated a little bit to fit with concepts of the Typst language and many things like styling content is much simpler than with `quantikz` since it is directly supported in Typst. 
-
-
-
-= Basics
-
-A basic circuit can be created by calling the #ref-fn("quantum-circuit()") command with a number of circuit elements:
 #let makefigure(code, content, vertical: false) = {
   align(center,
     box(fill: gray.lighten(90%), inset: 1em, {
@@ -53,6 +27,39 @@ A basic circuit can be created by calling the #ref-fn("quantum-circuit()") comma
     })
   )
 }
+
+
+#let example-code(filename, fontsize: 1em) = {
+  let content = read(filename)
+  content = content.slice(content.position("*")+1).trim()
+  makefigure(text(size: fontsize, raw(lang: "typ", block: true, content)), [])
+  align(center, include(filename))
+}
+
+#outline(depth: 1, indent: 2em)
+
+
+
+= Introduction
+
+_@gate-gallery features a gallery of many gates that are possible to use with this library and how to create them. In @demo, you can find a variety of example figures along with the code. _
+
+Would you like to create quantum circuits directly in Typst? Maybe a circuit for quantum teleportation?
+#align(center)[#include("../../examples/teleportation.typ")]
+
+Or rather for phase estimation (the code for both examples can be found in @demo)?
+#align(center)[#include("../../examples/phase-estimation.typ")]
+
+This library provides high-level functionality for generating these and more quantum circuit diagrams. 
+
+For those who work with the LaTeX packages `qcircuit` and `quantikz`, the syntax will be somewhat familiar. The wonderful thing about Typst is that the changes can be viewed instantaneously which makes it ever so much easier to design a beautiful quantum circuit. The syntax also has been updated a little bit to fit with concepts of the Typst language and many things like styling content is much simpler than with `quantikz` since it is directly supported in Typst. 
+
+
+
+= Basics
+
+A basic circuit can be created by calling the #ref-fn("quantum-circuit()") command with a number of circuit elements:
+
 
 // #makefigure(
 // ```typ
@@ -94,29 +101,29 @@ A new wire can be created by breaking the current wire with `[\ ]`:
 #makefigure(
 ```typ
 #quantum-circuit(
-  1, gate($H$), control(1), 1, [\ ],
+  1, gate($H$), ctrl(1), 1, [\ ],
   2, targ(), 1
 )
 ```, quantum-circuit(
-  1, gate($H$), control(1), 1, [\ ],
+  1, gate($H$), ctrl(1), 1, [\ ],
   2, targ(), 1
 ))
-We can create a #smallcaps("cx")-gate by calling #ref-fn("control()") and passing the relative distance to the desired wire, e.g., `1` to the next wire, `2` to the second-next one or `-1` to the previous wire. Per default, the end of the vertical wire is  just joined with the target wire without any decoration at all. Here, we make the gate a #smallcaps("cx")-gate by adding a #ref-fn("targ()") symbol on the second wire. 
+We can create a #smallcaps("cx")-gate by calling #ref-fn("ctrl(0)") and passing the relative distance to the desired wire, e.g., `1` to the next wire, `2` to the second-next one or `-1` to the previous wire. Per default, the end of the vertical wire is  just joined with the target wire without any decoration at all. Here, we make the gate a #smallcaps("cx")-gate by adding a #ref-fn("targ()") symbol on the second wire. 
 
 Let's look at a quantum bit-flipping error correction circuit. Here we encounter our first multi-qubit gate as well as wire labels:
 #makefigure(vertical: true,
 ```typ
 #quantum-circuit(
-  lstick($|psi〉$), control(1), control(2), mqgate($E_"bit"$, 3), control(1), control(2), 
+  lstick($|psi〉$), ctrl(1), ctrl(2), mqgate($E_"bit"$, 3), ctrl(1), ctrl(2), 
     targ(), rstick($|psi〉$), [\ ],
-  lstick($|0〉$), targ(), 2, targ(), 1, control(-1), 1, [\ ],
-  lstick($|0〉$), 1, targ(), 2, targ(), control(-1), 1
+  lstick($|0〉$), targ(), 2, targ(), 1, ctrl(-1), 1, [\ ],
+  lstick($|0〉$), 1, targ(), 2, targ(), ctrl(-1), 1
 )
 ```, quantum-circuit(
   scale-factor: 80%,
-  lstick($|psi〉$), control(1), control(2), mqgate($E_"bit"$, 3), control(1), control(2), targ(), rstick($|psi〉$), [\ ],
-  lstick($|0〉$), targ(), 2, targ(), 1, control(-1), 1, [\ ],
-  lstick($|0〉$), 1, targ(), 2, targ(), control(-1), 1
+  lstick($|psi〉$), ctrl(1), ctrl(2), mqgate($E_"bit"$, 3), ctrl(1), ctrl(2), targ(), rstick($|psi〉$), [\ ],
+  lstick($|0〉$), targ(), 2, targ(), 1, ctrl(-1), 1, [\ ],
+  lstick($|0〉$), 1, targ(), 2, targ(), ctrl(-1), 1
 ))
 
 Multi-qubit gates have a dedicated command #ref-fn("mqgate()") which takes the content as well as the number of qubits. Wires can be labelled at the beginning or the end with the #ref-fn("lstick()") and #ref-fn("rstick()") commands respectively. 
@@ -128,13 +135,13 @@ In many circuits, we need classical wires. This library generalizes the concept 
 ```typ
 #quantum-circuit(
   1, gate($A$), meter(target: 1), [\ ],
-  setwire(2), 2, ctrl(), 2, [\ ],
+  setwire(2), 2, ctrl(0), 2, [\ ],
   1, gate($X$), setwire(0), 1, lstick($|0〉$), 
     setwire(1), gate($Y$),
 )
 ```, quantum-circuit(
   1, gate($A$), meter(target: 1), [\ ],
-  setwire(2), 2, ctrl(), 2, [\ ],
+  setwire(2), 2, ctrl(0), 2, [\ ],
   1, gate($X$), setwire(0), 1, lstick($|0〉$), setwire(1), gate($Y$),
 ))
 
@@ -179,14 +186,14 @@ The `wire`, `color` and `fill` options provide means to customize line strokes a
   wire: .7pt + white, // Wire and stroke color
   color: white,       // Default foreground and text color
   fill: black,        // Gate fill color
-  1, gate($X$), control(1), rstick([*?*]), [\ ],
+  1, gate($X$), ctrl(1), rstick([*?*]), [\ ],
   1,1, targ(), meter(), 
 ))
 ```, box(fill: black, quantum-circuit(
   wire: .7pt + white, // Wire and stroke color
   color: white,       // Default foreground and text color
   fill: black,        // Gate fill color
-  1, gate($X$), control(1), rstick([*?*]), [\ ],
+  1, gate($X$), ctrl(1), rstick([*?*]), [\ ],
   1,1, targ(), meter(), 
 )))
 
@@ -196,12 +203,12 @@ Furthermore, a common task is changing the total size of a circuit by scaling it
 ```typ
 #quantum-circuit(
   scale-factor: 60%,
-  1, gate($H$), control(1), gate($H$), 1, [\ ],
+  1, gate($H$), ctrl(1), gate($H$), 1, [\ ],
   1, 1, targ(), 2
 )
 ```, quantum-circuit(
   scale-factor: 60%,
-  1, gate($H$), control(1), gate($H$), 1, [\ ],
+  1, gate($H$), ctrl(1), gate($H$), 1, [\ ],
   1, 1, targ(), 2
 ))
 
@@ -213,17 +220,17 @@ For an optimally layout, the height for each row is determined by the gates on t
 ```typ
 #quantum-circuit(
     row-spacing: 2pt, min-row-height: 4pt,
-    1, gate($H$), control(1), gate($H$), 1, [\ ],
+    1, gate($H$), ctrl(1), gate($H$), 1, [\ ],
     1, gate($H$), targ(), gate($H$), 1, [\ ],
-    2, control(1), 2, [\ ],
+    2, ctrl(1), 2, [\ ],
     1, gate($H$), targ(), gate($H$), 1
 )
 ```, quantum-circuit(
     row-spacing: 2pt,
     min-row-height: 0pt,
-    1, gate($H$), control(1), gate($H$), 1, [\ ],
+    1, gate($H$), ctrl(1), gate($H$), 1, [\ ],
     1, gate($H$), targ(), gate($H$), 1, [\ ],
-    2, control(1), 2, [\ ],
+    2, ctrl(1), 2, [\ ],
     1, gate($H$), targ(), gate($H$), 1
   ))
 
@@ -234,18 +241,18 @@ Setting the option `equal-row-heights` to `true` solves this problem (manually s
 #quantum-circuit(
     equal-row-heights: true,
     row-spacing: 2pt, min-row-height: 4pt,
-    1, gate($H$), control(1), gate($H$), 1, [\ ],
+    1, gate($H$), ctrl(1), gate($H$), 1, [\ ],
     1, gate($H$), targ(), gate($H$), 1, [\ ],
-    2, control(1), 2, [\ ],
+    2, ctrl(1), 2, [\ ],
     1, gate($H$), targ(), gate($H$), 1
 )
 ```, quantum-circuit(
     equal-row-heights: true,
     row-spacing: 2pt,
     min-row-height: 4pt,
-    1, gate($H$), control(1), gate($H$), 1, [\ ],
+    1, gate($H$), ctrl(1), gate($H$), 1, [\ ],
     1, gate($H$), targ(), gate($H$), 1, [\ ],
-    2, control(1), 2, [\ ],
+    2, ctrl(1), 2, [\ ],
     1, gate($H$), targ(), gate($H$), 1
   ))
 
@@ -253,19 +260,19 @@ Setting the option `equal-row-heights` to `true` solves this problem (manually s
 // ```typ
 // #quantum-circuit(
 //   scale-factor: 60%,
-//   1, gate($H$), control(1), gate($H$), 1, [\ ],
+//   1, gate($H$), ctrl(1), gate($H$), 1, [\ ],
 //   1, 1, targ(), 2
 // )
 // ```, [
 //   #quantum-circuit(
 //     baseline: "=",
-//     2, control(1), 2, [\ ],
+//     2, ctrl(1), 2, [\ ],
 //     1, gate($H$), targ(), gate($H$), 1
 //   ) =
 //   #quantum-circuit(
 //     baseline: "=",
-//     phantom(), control(1),  1, [\ ],
-//      phantom(content: $H$), ctrl(), phantom(content: $H$),
+//     phantom(), ctrl(1),  1, [\ ],
+//      phantom(content: $H$), ctrl(0), phantom(content: $H$),
 //   )
 // ])
 
@@ -277,17 +284,17 @@ There is another option for #ref-fn("quantum-circuit()") that has a lot of impac
 #quantum-circuit(
     gate-padding: 2pt,
     row-spacing: 5pt, column-spacing: 7pt,
-    lstick($|0〉$, num-qubits: 3), gate($H$), control(1), 
-      control(2), 1, rstick("GHZ", num-qubits: 3), [\ ],
-    1, gate($H$), ctrl(), 1, gate($H$), 1, [\ ],
-    1, gate($H$), 1, ctrl(), gate($H$), 1, [\ ],
+    lstick($|0〉$, num-qubits: 3), gate($H$), ctrl(1), 
+      ctrl(2), 1, rstick("GHZ", num-qubits: 3), [\ ],
+    1, gate($H$), ctrl(0), 1, gate($H$), 1, [\ ],
+    1, gate($H$), 1, ctrl(0), gate($H$), 1, [\ ],
 )
 ```, quantum-circuit(
     gate-padding: 2pt,
     row-spacing: 5pt, column-spacing: 7pt,
-    lstick($|0〉$, num-qubits: 3), gate($H$), control(1), control(2), 1, rstick("GHZ", num-qubits: 3), [\ ],
-    1, gate($H$), ctrl(), 1, gate($H$), 1, [\ ],
-    1, gate($H$), 1, ctrl(), gate($H$), 1, [\ ],
+    lstick($|0〉$, num-qubits: 3), gate($H$), ctrl(1), ctrl(2), 1, rstick("GHZ", num-qubits: 3), [\ ],
+    1, gate($H$), ctrl(0), 1, gate($H$), 1, [\ ],
+    1, gate($H$), 1, ctrl(0), gate($H$), 1, [\ ],
   )
 )
 
@@ -304,23 +311,23 @@ There is another option for #ref-fn("quantum-circuit()") that has a lot of impac
   [Meter], quantum-circuit(1, meter(), 1), raw(lang: "typc", "meter()"), 
   [Meter with \ label], quantum-circuit(circuit-padding: (top: 1em), 1, meter(label: $lr(|±〉)$), 1), raw(lang: "typc", "meter(label: \n$lr(|±〉)$)"), 
   [Phase gate], quantum-circuit(1, phase($α$), 1), raw(lang: "typc", "phase($α$)"), 
-  [Control], quantum-circuit(1, ctrl(), 1), raw(lang: "typc", "ctrl()"), 
-  [Open control], quantum-circuit(1, ctrl(open: true), 1), raw(lang: "typc", "ctrl(open: true)"), 
+  [Control], quantum-circuit(1, ctrl(0), 1), raw(lang: "typc", "ctrl(0)"), 
+  [Open control], quantum-circuit(1, ctrl(0, open: true), 1), raw(lang: "typc", "ctrl(0, open: true)"), 
   [Target], quantum-circuit(1, targ(), 1), raw(lang: "typc", "targ()"), 
   [Swap target], quantum-circuit(1, targX(), 1), raw(lang: "typc", "targX()"), 
   [Permutation \ gate], quantum-circuit(1, permute(2,0,1), 1, [\ ], 3, [\ ], 3), raw(lang: "typc", "permute(2,0,1)"), 
   [Multiqubit \ gate], quantum-circuit(1, mqgate($U$, 3), 1, [\ ], 3, [\ ], 3), raw(lang: "typc", "mqgate($U$, 3)"), 
   [lstick], quantum-circuit(lstick($|psi〉$), 2), raw(lang: "typc", "lstick($|psi〉$)"), 
   [rstick], quantum-circuit(2, rstick($|psi〉$)), raw(lang: "typc", "rstick($|psi〉$)"), 
-  [Multi-qubit \ lstick], quantum-circuit(lstick($|psi〉$, num-qubits: 2), 2,[\ ], 3), raw(lang: "typc", "lstick($|psi〉$, \nnum-qubits: 2)"), 
-  [Multi-qubit \ rstick], quantum-circuit(2, rstick($|psi〉$, num-qubits: 2, brace: "]"),[\ ], 3), raw(lang: "typc", "rstick($|psi〉$, \nnum-qubits: 2, \nbrace: \"]\")"), 
+  [Multi-qubit \ lstick], quantum-circuit(row-spacing: 10pt, lstick($|psi〉$, num-qubits: 2), 2, [\ ], 3), raw(lang: "typc", "lstick($|psi〉$, \nnum-qubits: 2)"), 
+  [Multi-qubit \ rstick], quantum-circuit(row-spacing: 10pt,2, rstick($|psi〉$, num-qubits: 2, brace: "]"),[\ ], 3), raw(lang: "typc", "rstick($|psi〉$, \nnum-qubits: 2, \nbrace: \"]\")"), 
   [midstick], quantum-circuit(1, midstick("yeah"),1), raw(lang: "typc", "midstick(\"yeah\")"), 
   [Wire bundle], quantum-circuit(1, nwire(5), 1), raw(lang: "typc", "nwire(5)"), 
-  [Controlled \  #smallcaps("z")-gate], quantum-circuit(1, control(1), 1, [\ ], 1, ctrl(), 1), [#raw(lang: "typc", "control(1)") \ + \ #raw(lang: "typc", "ctrl()")], 
-  [Controlled \  #smallcaps("x")-gate], quantum-circuit(1, control(1), 1, [\ ], 1, targ(), 1), [#raw(lang: "typc", "control(1)") \ + \ #raw(lang: "typc", "targ()")], 
+  [Controlled \  #smallcaps("z")-gate], quantum-circuit(1, ctrl(1), 1, [\ ], 1, ctrl(0), 1), [#raw(lang: "typc", "ctrl(1)") \ + \ #raw(lang: "typc", "ctrl(0)")], 
+  [Controlled \  #smallcaps("x")-gate], quantum-circuit(1, ctrl(1), 1, [\ ], 1, targ(), 1), [#raw(lang: "typc", "ctrl(1)") \ + \ #raw(lang: "typc", "targ()")], 
   [Swap \  gate], quantum-circuit(1, swap(1), 1, [\ ], 1, targX(), 1), [#raw(lang: "typc", "swap(1)") \ + \ #raw(lang: "typc", "targX()")], 
-  [Controlled \ Hadamard], quantum-circuit(1, controlled($H$, 1), 1, [\ ], 1, ctrl(), 1), [#raw(lang: "typc", "controlled($H$, 1)") \ + \ #raw(lang: "typc", "ctrl()")], 
-  [Meter to \ classical], quantum-circuit(1, meter(target: 1), 1, [\ ], setwire(2), 1, ctrl(), 1), [#raw(lang: "typc", "meter(target: 1)") \ + \ #raw(lang: "typc", "ctrl()")],   
+  [Controlled \ Hadamard], quantum-circuit(1, controlled($H$, 1), 1, [\ ], 1, ctrl(0), 1), [#raw(lang: "typc", "controlled($H$, 1)") \ + \ #raw(lang: "typc", "ctrl(0)")], 
+  [Meter to \ classical], quantum-circuit(1, meter(target: 1), 1, [\ ], setwire(2), 1, ctrl(0), 1), [#raw(lang: "typc", "meter(target: 1)") \ + \ #raw(lang: "typc", "ctrl(0)")],   
 )
 #pagebreak()
 
@@ -372,7 +379,7 @@ Let's look at an example:
 #makefigure(vertical: false,
 text(size: .8em, ```typ
 #quantum-circuit(
-  1, control(1), gate($H$), meter(), [\ ],
+  1, ctrl(1), gate($H$), meter(), [\ ],
   1, targ(), 1, meter(),
   annotate(0, (2, 4), 
     (y, (x1, x2)) => { 
@@ -386,7 +393,7 @@ text(size: .8em, ```typ
   })
 )
 ```), quantum-circuit(
-  1, control(1), gate($H$), meter(), [\ ],
+  1, ctrl(1), gate($H$), meter(), [\ ],
   1, targ(), 1, meter(),
   annotate(0, (2, 4),
     (y, (x1, x2)) => { 
@@ -442,9 +449,9 @@ text(```typ
   // gate-padding: 30pt,
   circuit-padding: (top: 1.5em, bottom: 1.5em),
   scale-factor: scale-factor,
-  lstick($|psi〉_C$), control(1), gate($H$), meter(), setwire(2), control(2, wire-count:2), [\ ],
-  lstick($|Phi〉_A^+$), targ(), meter(), setwire(2), control(1, wire-count:2), [\ ],
-  lstick($|Phi〉_B^+$),1,nwire(2), targ(fill: true), ctrl(),1, rstick($|psi〉_B$), 
+  lstick($|psi〉_C$), ctrl(1), gate($H$), meter(), setwire(2), ctrl(2, wire-count:2), [\ ],
+  lstick($|Phi〉_A^+$), targ(), meter(), setwire(2), ctrl(1, wire-count:2), [\ ],
+  lstick($|Phi〉_B^+$),1,nwire(2), targ(fill: true), ctrl(0),1, rstick($|psi〉_B$), 
   annotate(0, (2, 4), (y, cols) => { 
     let (x1, x2) = cols
     place(dx: x1, dy: y, rotate(math.lr($#box(height: x2 - x1)}$), -90deg, origin: top))
@@ -633,7 +640,7 @@ This section contains a complete reference for every function in *quantum-circui
 
 #set heading(numbering: none)
 #{
-  let docs = parse-module("/../../quantum-circuit.typ", name: "Quantum-Circuit", label-prefix: "quantum-circuit:")
+  let docs = parse-module("/../../quantum-circuit.typ")
 
   let gates = docs
   gates.functions = gates.functions.filter(
@@ -668,62 +675,19 @@ This section demonstrates the use of the *quantum-circuit* library by reproducin
 
 == Quantum teleportation
 Quantum teleportation circuit reproducing the Figure 4.15 in #cite("nielsen_2022_quantum"). 
-#makefigure(
-  ```typ
-#quantum-circuit(
-  lstick($|psi〉$),  control(1), gate($H$), 1, ctrl(), meter(), [\ ],
-  lstick($|beta_00〉$, num-qubits: 2), targ(), 1, ctrl(), 1, meter(), [\ ],
-  3, controlled($X$, -1), controlled($Z$, -2),  midstick($|psi〉$)
-)```
-,[])
-#align(center, teleportation)
+#example-code("../../examples/teleportation.typ")
 
 
 == Quantum phase estimation
 Quantum phase estimation circuit reproducing the Figure 5.2 in #cite("nielsen_2022_quantum"). 
-#makefigure(
-  ```typ
-#quantum-circuit(
-  setwire(0), lstick(align(center)[First register\ $t$ qubits], num-qubits: 4), lstick($|0〉$), 
-    setwire(1), gate($H$), 4, midstick($ dots $), control(4), rstick($|0〉$), [\ ], 10pt,
-  setwire(0), phantom(width: 13pt), lstick($|0〉$), setwire(1), gate($H$), 2, control(3), 1, 
-    midstick($ dots $), 1, rstick($|0〉$), [\ ],
-  setwire(0), 1, lstick($|0〉$), setwire(1), gate($H$), 1, control(2), 2, 
-    midstick($ dots $), 1, rstick($|0〉$), [\ ],
-  setwire(0), 1, lstick($|0〉$), setwire(1), gate($H$), control(1), 3, midstick($ dots $), 1, 
-    rstick($|0〉$), [\ ],
-  setwire(0), lstick([Second register], num-qubits: 1, brace: "{"), lstick($|u〉$), 
-    setwire(4, wire-distance: 1.3pt), 1, gate($ U^2^0 $, -1), gate($ U^2^1 $, -2), gate($ U^2^2 $, -3), 
-    1, midstick($ dots $), gate($ U^2^(t-1) $, -5), rstick($|u〉$)
-)```
-,[])
-#align(center, phase-estimation)
+#example-code("../../examples/phase-estimation.typ")
 
 #pagebreak()
 
+
 == Quantum Fourier transform:
 Circuit for performing the quantum Fourier transform, reproducing the Figure 5.1 in #cite("nielsen_2022_quantum"). 
-#makefigure(
-  ```typ
-#quantum-circuit(
-  scale-factor: 85%,
-  row-spacing: 5pt,
-  column-spacing: 8pt,
-  lstick($|j_1〉$), gate($H$), controlled($R_2$, 1), midstick($ dots $), 
-    controlled($R_(n-1)$, 3), controlled($R_n$, 4), 8, rstick($|0〉+e^(2pi i 0.j_1 dots j_n)|1〉$),[\ ],
-  lstick($|j_2〉$), 1, ctrl(), midstick($ dots $), 2, gate($H$), midstick($ dots $), 
-    controlled($R_(n-2)$, 2), controlled($R_(n-1)$, 3), midstick($ dots $), 3, 
-    rstick($|0〉+e^(2pi i 0.j_2 dots j_n)|1〉$), [\ ],
-  
-  setwire(0),  midstick($dots.v$), 1, midstick($dots.v$), [\ ],
-  
-  lstick($|j_(n-1)〉$), 3, ctrl(), 3, ctrl(), 1, midstick($ dots $), gate($H$), controlled($R_(2)$, 1), 
-    1, rstick($|0〉+e^(2pi i 0.j_(n-1)j_n)|1〉$), [\ ],
-  lstick($|j_n〉$), 4, ctrl(), 3, ctrl(), midstick($ dots $), 1, ctrl(), gate($H$), 
-    rstick($|0〉+e^(2pi i 0.j_n)|1〉$)
-)```
-, none)
-#align(center, qft)
+#example-code("../../examples/qft.typ")
 
 
 == Shor Nine Qubit Code
@@ -737,13 +701,13 @@ setwire(0), 5, lstick($|0〉$), setwire(1), 1, targ(), 1, [\ ])
 
 #quantum-circuit(
   scale-factor: 80%,
-  lstick($|ψ〉$), 1, 10pt, control(3), control(6), gate($H$), 1, 15pt, 
-    control(1), control(2), 1, [\ ],
+  lstick($|ψ〉$), 1, 10pt, ctrl(3), ctrl(6), gate($H$), 1, 15pt, 
+    ctrl(1), ctrl(2), 1, [\ ],
   ..ancillas,
-  lstick($|0〉$), 1, targ(), 1, gate($H$), 1, control(1), control(2), 
+  lstick($|0〉$), 1, targ(), 1, gate($H$), 1, ctrl(1), ctrl(2), 
     1, [\ ],
   ..ancillas,
-  lstick($|0〉$), 2, targ(),  gate($H$), 1, control(1), control(2), 
+  lstick($|0〉$), 2, targ(),  gate($H$), 1, ctrl(1), ctrl(2), 
     1, [\ ],
   ..ancillas
 )```), {
@@ -754,11 +718,11 @@ setwire(0), 5, lstick($|0〉$), setwire(1), 1, targ(), 1, [\ ])
   
   quantum-circuit(
   scale-factor: 80%,
-  lstick($|ψ〉$), 1, control(3), control(6), gate($H$), 1, 15pt, control(1), control(2), 1, [\ ],
+  lstick($|ψ〉$), 1, ctrl(3), ctrl(6), gate($H$), 1, 15pt, ctrl(1), ctrl(2), 1, [\ ],
   ..ancillas,
-  lstick($|0〉$), 1, targ(), 1, gate($H$), 1, control(1), control(2), 1, [\ ],
+  lstick($|0〉$), 1, targ(), 1, gate($H$), 1, ctrl(1), ctrl(2), 1, [\ ],
   ..ancillas,
-  lstick($|0〉$), 2, targ(),  gate($H$), 1, control(1), control(2), 1, [\ ],
+  lstick($|0〉$), 2, targ(),  gate($H$), 1, ctrl(1), ctrl(2), 1, [\ ],
   ..ancillas
 )}
 )
@@ -768,88 +732,15 @@ setwire(0), 5, lstick($|0〉$), setwire(1), 1, targ(), 1, [\ ])
 
 == Fault-Tolerant Measurement
 
-Circuit for performing the quantum Fourier transform, reproducing the Figure 10.28 in #cite("nielsen_2022_quantum"). 
-#makefigure(
-  ```typ
-#let mark(text, col1, col2) = annotate(0, (col1, col2), 
-  (y, (x1, x2)) => style(styles => {
-    let size = measure(text, styles)
-    place(dx: x1 + (x2 - x1)/2 - size.width/2, dy: y - .6em - size.height, text)
-  })
-)
-#let group = gategroup.with(stroke: (dash: "dotted", thickness: .5pt))
-
-#quantum-circuit(
-  row-spacing: 6pt,
-  circuit-padding: (top: 2em),
-  lstick($|0〉$), 10pt, group(3, 2), gate($H$), control(2), 3pt, group(4, 2), 3, group(7, 3), 
-    control(4), 2, 10pt, group(3, 2), control(2), gate($H$), meter(), [\ ],  
-  lstick($|0〉$), 1, targ(), 1, control(2), 2, control(4), 1, targ(), 2, [\ ], 
-  lstick($|0〉$), 1, targ(), control(1), 4, control(4), targ(), 2, [\ ],  
-  setwire(0), 2, lstick($|0〉$), setwire(1), targ(), targ(), 1, [\ ], 10pt,
-  setwire(0), 4, lstick(align(center)[Encoded\ Data], num-qubits: 3), setwire(1), 1, 
-    gate($M'$), 3, [\ ],
-  setwire(0), 5,  setwire(1), 2, gate($M'$), 2, [\ ],
-  setwire(0), 5,  setwire(1), 3, gate($M'$), 1,
-  mark("Prepare", 1, 3),
-  mark("Verify", 3, 5),
-  mark([Controlled-$M$], 5, 9),
-  mark("Decode", 9, 11)
-)```
-, none)
-#align(center, fault-tolerant-measurement)
-
+Circuit for performing fault-tolerant measurement (as Figure 10.28 in #cite("nielsen_2022_quantum")). 
+#example-code("../../examples/fault-tolerant-measurement.typ")
 
 
 == Fault-Tolerant Gate Construction
 The following two circuits reproduce figures from Exercise 10.66 and 10.68 on construction fault-tolerant $pi/8$ and Toffoli gates in #cite("nielsen_2022_quantum").
-
-
-#makefigure(
-  ```typ
-#let group = gategroup.with(stroke: (dash: "dotted", thickness: .5pt))
-
-#quantum-circuit(
-  group(1, 4, padding: (left: 1.5em)), lstick($|0〉$), nwire(""), gate($H$), gate($T$), 
-    control(1), gate($S X$), rstick($T|ψ〉$), [\ ],
-  lstick($|ψ〉$), nwire(""), 2, targ(), meter(target: -1), 
-)```
-, none)
-
-#align(center, fault-tolerant-pi8)
-
-#makefigure(
-  ```typ
-#quantum-circuit(
-  lstick($|0〉$), gate($H$), control(3), 5, gate($X$), control(2), rstick($|x〉$), [\ ],
-  lstick($|0〉$), gate($H$), 1, control(3), 3, gate($X$), 1, ctrl(), rstick($|y〉$), [\ ],
-  lstick($|0〉$), 3, targ(), 1, gate($Z$), 2, targ(), rstick($|z plus.circle x y〉$), [\ ],
-  lstick($|x〉$), 1, targ(), 5, meter(target: -3), [\ ],
-  lstick($|y〉$), 2, targ(), 3, meter(target: -3), [\ ],
-  lstick($|z〉$), 3, control(-3), gate($H$), meter(target: -3)
-)```
-, none)
-
-#align(center, fault-tolerant-toffoli1)
-
-#makefigure(
-  ```typ
-#let group = gategroup.with(stroke: (dash: "dotted", thickness: .5pt))
-
-#quantum-circuit(
-  group(3, 3, padding: (left: 1.5em)), lstick($|0〉$), gate($H$), control(2), control(3), 3, 
-    group(2, 1),control(1), 1, group(3, 1), control(2), gate($X$), 1, rstick($|x〉$), [\ ],
-  lstick($|0〉$), gate($H$), ctrl(), 1, control(3), 2, gate($Z$), gate($X$), 2, group(2, 1),
-    control(1), rstick($|y〉$), [\ ],
-  lstick($|0〉$), 1, targ(), 2, targ(), 1, gate($Z$), 1, targ(fill: true), 1, targ(fill: true), 
-    rstick($|z plus.circle x y〉$), [\ ],
-  lstick($|x〉$), 2, targ(), 6, meter(target: -3), setwire(2), control(-1, wire-count: 2), [\ ],
-  lstick($|y〉$), 3, targ(), 3, meter(target: -3), setwire(2), control(-2, wire-count: 2), [\ ],
-  lstick($|z〉$), 4, control(-3), gate($H$), meter(target: -4)
-)
-```
-, none)
-#align(center, fault-tolerant-toffoli2)
+#example-code("../../examples/fault-tolerant-pi8.typ")
+#example-code("../../examples/fault-tolerant-toffoli1.typ")
+#example-code("../../examples/fault-tolerant-toffoli2.typ")
 
 
 // #pagebreak()

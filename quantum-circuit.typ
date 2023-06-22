@@ -285,12 +285,11 @@
 ///             wire will be drawn all through the gate (box: false) or not).
 /// - floating (boolean): Whether the content for this gate will be shown floating 
 ///             (i.e. no width is reserved).
-/// - wire-count (integer): Wire count for control wires.
 /// - multi (dictionary): Information for multi-qubit and controlled gates (see @@mqgate()).
 /// - size-hint (function): Size hint function. 
 /// - draw-function (function): Drawing function that produces the displayed content.
 ///             Signature: (gate, draw-params).
-/// - ..args (array): Optional additional arguments. When using a custom 
+/// - args (dictionary): Optional additional arguments. When using a custom 
   ///           `draw-function`, you may store extra information here.
 #let gate(
   content,
@@ -302,7 +301,7 @@
   size-hint: default-size-hint,
   draw-function: draw-boxed-gate,
   gate-type: "",
-  ..args
+  args: (:)
 ) = (
   gate-type: gate-type, 
   content: if type(content) == "content" {content} else { content }, 
@@ -313,12 +312,12 @@
   size-hint: size-hint,
   multi: multi,
   radius: radius,
-  ..args.named()
+  ..args
 )
 
 
 
-/// Basic command for creating multi-qubit or controlled gates. For the latter, you usually want to go for something like @@control, @@swap, or @@controlled.
+/// Basic command for creating multi-qubit or controlled gates. For the latter, you usually want to go for something like @@ctrl, @@swap, or @@controlled.
 ///
 /// - content (content):
 /// - num-qubits (integer): Number of qubits (or relative wire count for 
@@ -331,6 +330,7 @@
 ///          or not)
 /// - label (content): Optional label on the vertical wire. 
 /// - control (boolean): If true, this gate draws a vertical control wire. 
+/// - wire-count (integer): Wire count for control wires.
 /// - extent (auto, length): How much to extent the gate beyond the first and 
 ///     last wire, default is to make it align with an X gate (so [size of x gate] / 2). 
 /// - size-all-wires (none, boolean): A single-qubit gate affects the height of the row
@@ -352,7 +352,7 @@
   extent: auto, 
   size-all-wires: false,
   draw-function: draw-boxed-multigate, 
-  ..args
+  args: (:),
 ) = gate(
   content, 
   fill: fill, box: box, 
@@ -365,7 +365,7 @@
     extent: extent,
     size-all-wires: size-all-wires
   ),
-  ..args
+  args: args
 )
 
 
@@ -377,7 +377,6 @@
   // size-hint: lrstick-size-hint,
   box: false, 
   floating: true,
-  brace: brace, 
   multi: if num-qubits == 1 { none } else { 
    (
     control: false,
@@ -385,7 +384,8 @@
     wire-count: 0, 
     label: label,
     size-all-wires: if num-qubits > 1 { none } else { false }
-  )}
+  )},
+  args: (brace: brace), 
 )
 
 
@@ -398,9 +398,9 @@
 /// - label (content):        Label to show above the meter. 
 #let meter(target: none, wire-count: 2, label: none) = {
   if target == none {
-    gate(none, draw-function: draw-meter, meter-label: label)
+    gate(none, draw-function: draw-meter, args: (meter-label: label))
   } else {
-     mqgate(none, target, box: true, wire-count: wire-count, draw-function: draw-meter, control: true, meter-label: label)
+     mqgate(none, target, box: true, wire-count: wire-count, draw-function: draw-meter, control: true, args: (meter-label: label))
   }
 }
 
@@ -421,7 +421,7 @@
 /// - width (length): Width of the permutation gate. 
 /// 
 #let permute(..qubits, width: 30pt) = {
-  mqgate(none, qubits.pos().len(), qubits: qubits.pos(), draw-function: draw-permutation-gate, extent: 2pt, width: width)
+  mqgate(none, qubits.pos().len(), draw-function: draw-permutation-gate, args: (qubits: qubits.pos(), extent: 2pt, width: width))
 }
 
 /// Create an invisible (phantom) gate for reserving space. If `content` 
@@ -447,7 +447,7 @@
 /// - fill (none, color, boolean): Fill color for the target circle. If set 
 ///        to `true`, the target is filled with the circuits background color.
 /// - size (length): Size of the target symbol. 
-#let targ(fill: none, size: 4.3pt) = gate(none, box: false, draw-function: draw-targ, fill: fill, size: size)
+#let targ(fill: none, size: 4.3pt) = gate(none, box: false, draw-function: draw-targ, fill: fill, args: (size: size))
 
 /// Target element for controlled #smallcaps("z") operations (#sym.bullet). 
 ///
@@ -455,11 +455,11 @@
 /// - fill (none, color): Fill color for the circle or stroke color if
 ///        `open: true`. 
 /// - size (length): Size of the control circle. 
-#let ctrl(open: false, fill: none, size: 2.3pt) = gate(none, draw-function: draw-ctrl, fill: fill, size: size, box: false, open: open)
+// #let ctrl(open: false, fill: none, size: 2.3pt) = gate(none, draw-function: draw-ctrl, fill: fill, size: size, box: false, open: open)
 
 /// Target element for #smallcaps("swap") operations (#sym.times) without vertical wire). 
 /// - size (length): Size of the target symbol. 
-#let targX(size: 7pt) = gate(none, box: false, draw-function: draw-swap, size: size)
+#let targX(size: 7pt) = gate(none, box: false, draw-function: draw-swap, args: (size: size))
 
 /// Create a phase gate shown as a point on the wire together with a label. 
 ///
@@ -471,13 +471,12 @@
 #let phase(label, open: false, fill: none, size: 2.3pt) = gate(
   none, 
   box: false,
-  open: open,
-  size: size,
   draw-function: (gate, draw-params) => {
       box(inset: (x: .6em), draw-ctrl(gate, draw-params))
       place(label, dy: -1.2em, dx: 1.2em)
     },
-  fill: fill
+  fill: fill,
+  args: (open: open, size: size)
 )
 
 
@@ -511,7 +510,7 @@
 /// - n(integer):
 #let nwire(n) = gate([#n], draw-function: draw-nwire, box: false)
 
-/// Create a controlled gate. See also @@control. This function however
+/// Create a controlled gate. See also @@ctrl. This function however
 /// may be used to create controlled gates where a gate box is at both ends
 /// of the control wire. 
 /// 
@@ -529,7 +528,7 @@
 /// 
 /// - relative-qubit (integer): Target qubit relative to this one. 
 /// - size (length): Size of the target symbol. 
-#let swap(relative-qubit, size: 7pt) = controlled(none, relative-qubit, box: false, draw-function: draw-swap, size: size)
+#let swap(relative-qubit, size: 7pt) = controlled(none, relative-qubit, box: false, draw-function: draw-swap, args: (size: size))
 
 /// Creates a control with a vertical wire to another qubit. 
 /// 
@@ -539,7 +538,7 @@
 /// - fill (none, color): Fill color for the circle or stroke color if
 ///        `open: true`. 
 /// - size (length): Size of the control circle. 
-#let control(relative-qubit, wire-count: 1, open: false, fill: none, size: 2.3pt) = controlled(none, relative-qubit, draw-function: draw-ctrl, wire-count: wire-count, open: open, fill: fill, size: size)
+#let ctrl(relative-qubit, wire-count: 1, open: false, fill: none, size: 2.3pt) = controlled(none, relative-qubit, draw-function: draw-ctrl, wire-count: wire-count, fill: fill, args: (open: open, size: size))
 
 
 
@@ -770,7 +769,7 @@
   row-spacing: 12pt,
   column-spacing: 12pt,
   min-row-height: 10pt, 
-  min-column-width: 10pt, 
+  min-column-width: 0pt, 
   gate-padding: .4em, 
   equal-row-heights: false, 
   color: black,
@@ -816,8 +815,6 @@
         rowheights.push(min-row-height)
         row-gutter.push(0pt)
       }
-      // rowheights.push(min-row-height)
-      // row-gutter.push(0pt)
       row += 1; col = 0
       wire-ended = true
     } else if is-circuit-meta-instruction(item) { 
@@ -827,8 +824,8 @@
       let ismulti = isgate and item.multi != none
       let size = get-size-hint(item, draw-params)
       
-      let width = size.width + column-spacing
-      let height = size.height + row-spacing
+      let width = size.width 
+      let height = size.height
       if is-gate(item) and item.floating { width = 0pt }
 
       if colwidths.len() < col + 1 { 
@@ -840,7 +837,8 @@
       if not (ismulti and item.multi.size-all-wires == none) {
         // e.g. l, rsticks
         rowheights.at(row) = calc.max(rowheights.at(row), height)
-      }
+      } 
+      
       if ismulti and not item.multi.control and item.multi.size-all-wires != none { 
         let start = row
         if not item.multi.size-all-wires {
@@ -848,7 +846,8 @@
         }
         for qubit in range(start, row + item.multi.num-qubits) {
           while rowheights.len() < qubit + 1 { 
-            rowheights.push(min-row-height);row-gutter.push(0pt)
+            rowheights.push(min-row-height)
+            row-gutter.push(0pt)
           }
           rowheights.at(qubit) = calc.max(rowheights.at(qubit), height)
         }
@@ -856,7 +855,7 @@
       col += 1
       wire-ended = false
     } else if type(item) == "integer" {
-      for _ in range(colwidths.len(), col+item) { 
+      for _ in range(colwidths.len(), col + item) { 
         colwidths.push(min-column-width)
         col-gutter.push(0pt) 
       }
@@ -872,6 +871,9 @@
   }
   /////////// END First pass: Layout (spacing)   ///////////
 
+  rowheights = rowheights.map(x => x + row-spacing)
+  colwidths = colwidths.map(x => x + column-spacing)
+
   if equal-row-heights {
     let max-row-height = calc.max(..rowheights)
     rowheights = rowheights.map(x => max-row-height)
@@ -882,7 +884,7 @@
   
   (row, col) = (0, 0)
   let (x, y) = (0pt, 0pt) // current cell top-left coordinates
-  let center-y = y + rowheights.at(row)/2 // current cell center y-coordinate
+  let center-y = y + rowheights.at(row) / 2 // current cell center y-coordinate
   let circuit-width = colwidths.sum() + col-gutter.slice(0, -1).sum(default: 0pt)
   let circuit-height = rowheights.sum() + row-gutter.sum()
 
