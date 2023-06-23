@@ -1,4 +1,5 @@
 #import "template.typ": *
+#import "typst-doc.typ": parse-module, show-module, show-outline
 #import "../../quantum-circuit.typ": *
 #show link: underline
 
@@ -16,7 +17,7 @@
 
 #let makefigure(code, content, vertical: false) = {
   align(center,
-    box(fill: gray.lighten(90%), inset: 1em, {
+    box(fill: gray.lighten(90%), inset: .8em, {
       table(
         align: center + horizon, 
         columns: if vertical { 1 } else { 2 }, 
@@ -472,204 +473,62 @@ text(```typ
   }) 
 )
 
-// #annotate-circuit()
 
 #pagebreak()
 = Function Documentation
 
-
-
-#set text(size: 9pt)
-
-#show raw.where(block: false): box.with(
-  fill: luma(240),
-  inset: (x: 3pt, y: 0pt),
-  outset: (y: 3pt),
-  radius: 2pt,
-)
-// // Display block code in a larger block
-// // with more padding.
-// #show raw.where(block: true): block.with(
-//   fill: luma(240),
-//   inset: 10pt,
-//   radius: 4pt,
-// )
-
-
-// #let type-colors = (
-//   "content": rgb("#a6ebe6"),
-//   "color": rgb("#a6ebe6"),
-//   "string": rgb("#d1ffe2"),
-//   "none": rgb("#ffcbc4"),
-//   "auto": rgb("#ffcbc4"),
-//   "boolean": rgb("#ffedc1"),
-//   "integer": rgb("#e7d9ff"),
-//   "float": rgb("#e7d9ff"),
-//   "ratio": rgb("#e7d9ff"),
-//   "length": rgb("#e7d9ff"),
-//   "angle": rgb("#e7d9ff"),
-//   "relative-length": rgb("#e7d9ff"),
-//   "fraction": rgb("#e7d9ff"),
-//   "symbol": rgb("#eff0f3"),
-//   "array": rgb("#eff0f3"),
-//   "dictionary": rgb("#eff0f3"),
-//   "arguments": rgb("#eff0f3"),
-//   "selector": rgb("#eff0f3"),
-//   "module": rgb("#eff0f3"),
-//   "stroke": rgb("#eff0f3"),
-//   "function": rgb("#f9dfff"),
-// )
-
-#show raw.where(lang: "typ-doc"): it => {
-  // set text(bottom-edge: "descender")
-  // let start = 
-  set text(size: .9em)
-  // set par(leading: .7em)
-  // show par: set block(spacing: )
-  let pos = it.text.position("(")
-  if pos == none { pos = 0}
-  text(it.text.slice(0, pos), fill: blue.darken(30%).lighten(20%))
-  let arg-box(content, color) = { style(styles => {
-    h(2pt)
-    box(outset: 2pt, fill: color, radius: 2pt, content)
-    h(2pt)
-    })
-  }
-  // show "content-type": arg-box("content", rgb("#a6ebe6"))
-  show "color-type": arg-box("color", rgb("#a6ebe6"))
-  show "string-type": arg-box("string", rgb("#d1ffe2"))
-  show "none-type": arg-box("none", rgb("#ffcbc4"))
-  show "auto-type": arg-box("auto", rgb("#ffcbc4"))
-  show "boolean-type": arg-box("boolean", rgb("#ffedc1"))
-  show "integer-type": arg-box("integer", rgb("#e7d9ff"))
-  show "float-type": arg-box("float", rgb("#e7d9ff"))
-  show "ratio-type": arg-box("ratio", rgb("#e7d9ff"))
-  show "length-type": arg-box("length", rgb("#e7d9ff"))
-  show "angle-type": arg-box("angle", rgb("#e7d9ff"))
-  show "relative-length-type": arg-box("relative-length", rgb("#e7d9ff"))
-  show "fraction-type": arg-box("fraction", rgb("#e7d9ff"))
-  show "symbol-type": arg-box("symbol", rgb("#eff0f3"))
-  show "array-type": arg-box("array", rgb("#eff0f3"))
-  show "dictionary-type": arg-box("dictionary", rgb("#eff0f3"))
-  show "arguments-type": arg-box("arguments", rgb("#eff0f3"))
-  show "selector-type": arg-box("selector", rgb("#eff0f3"))
-  show "module-type": arg-box("module", rgb("#eff0f3"))
-  show "stroke-type": arg-box("stroke", rgb("#eff0f3"))
-  show "function-type": arg-box("function", rgb("#f9dfff"))
-  it.text.slice(pos)
-}
-
-```typ-doc
-gate(
-  content-type string-type,
-  arg: string-type none-type auto-type boolean-type
-  a: integer-type symbol-type
-  function-type float-type
-)
-```
-
-// ```typ-doc
-// gate(
-//   fill: none-type color-type,
-//   radius: length-type,
-//   box: boolean-type,
-//   floating: boolean-type,
-//   wire-count: integer-type,
-//   multi: none-type dictionary-type,
-//   size-hint: function-type,
-//   draw-function: function-type,
-//   gate-type: string-type, 
-//   content-type,
-//   ..args array-type
-// ) -> dictionary-type
-// ```
-
-
-
-
-// #let param-block(name, types, content, default: "?") = block(
-//   inset: 10pt, fill: luma(98%), width: 100%,
-//   breakable: false,
-//   [
-//   #text(weight: "bold", size: 1.2em, name) #h(.5cm) #types.map(x => raw(lang: "typ-doc", x)).join([ #text("or",size:.6em) ])
-
-//   #content
+#[
   
-//   #if default != "?" [
-//     Default: #raw(lang: "typc", repr(default))
-//   ]
-// ])
-
-// #param-block("wire", ("stroke-type",), [The wire style], default: 0.7pt + black)
-// #param-block("fill", ("none-type","color-type"), [The fill color for the gate], default: none)
-
-
-
-
-// ```typ-doc
-// quantum-circuit(
-//   wire: stroke-type,
-//   row-spacing: length-type,
-//   column-spacing: length-type,
-//   min-row-height: length-type,
-//   min-column-width: length-type
-//   gate-padding: .length-type,
-//   equal-row-heights: boolean-type,
-//   color: color-type,
-//   fill: color-type,
-//   background: color-type,
-//   fontsize: length-type,
-//   scale-factor: ratio-type,
-//   circuit-padding: dictionary-type,
-//   ..content array-type
-// ) -> content-type
-// ```
-
-
-#import "typst-doc.typ": parse-module, show-module, show-outline
-
-#show heading.where(level: 3): it => {
-  align(center, it)
-}
-#show heading: set text(size: 1.2em)
-
-#columns(2,[
+  #set text(size: 9pt)
   
-This section contains a complete reference for every function in *quantum-circuit*. 
+  #show raw.where(block: false): box.with(
+    fill: luma(240),
+    inset: (x: 3pt, y: 0pt),
+    outset: (y: 3pt),
+    radius: 2pt,
+  )
+  
+  
+  #show heading: set text(size: 1.2em)
+  #show heading.where(level: 3): it => { align(center, it) }
+  
+  #columns(2,[      
+    This section contains a complete reference for every function in *quantum-circuit*. 
+    
+    
+    #set heading(numbering: none)
+    #{
+      let docs = parse-module("/../../quantum-circuit.typ")
+    
+      let gates = docs
+      gates.functions = gates.functions.filter(
+        x => x.name in ("gate", "mqgate", "meter", "permute", "phantom", "ctrl", "targ", "targX", "swap", "control", "phase", "controlled"))
+    
+      let decorations = docs
+      decorations.functions = decorations.functions.filter(
+        x => x.name in ("lstick", "rstick", "midstick", "nwire", "slice", "annotate", "gategroup", "setwire"))
+    
+      let circuit = docs
+      circuit.functions = circuit.functions.filter(
+        x => x.name in ("quantum-circuit"))
+    
+      [*Gates*]
+      show-outline(gates)
+      [*Decorations*]
+      show-outline(decorations)
+      [*Quantum Circuit*]
+      show-outline(circuit)
+      show-module(docs, show-module-name: false, first-heading-level: 2)
+    }
+  ])
 
-
-#set heading(numbering: none)
-#{
-  let docs = parse-module("/../../quantum-circuit.typ")
-
-  let gates = docs
-  gates.functions = gates.functions.filter(
-    x => x.name in ("gate", "mqgate", "meter", "permute", "phantom", "ctrl", "targ", "targX", "swap", "control", "phase", "controlled"))
-
-  let decorations = docs
-  decorations.functions = decorations.functions.filter(
-    x => x.name in ("lstick", "rstick", "midstick", "nwire", "slice", "annotate", "gategroup", "setwire"))
-
-  let circuit = docs
-  circuit.functions = circuit.functions.filter(
-    x => x.name in ("quantum-circuit"))
-
-  [*Gates*]
-  show-outline(gates)
-  [*Decorations*]
-  show-outline(decorations)
-  [*Quantum Circuit*]
-  show-outline(circuit)
-  show-module(docs, show-module-name: false, first-heading-level: 2)
-}
-])
-
-
-
-
+]
 
 #pagebreak()
 = Demo <demo>
+
+#show raw.where(block: true): set text(size: 0.9em)
+
 
 This section demonstrates the use of the *quantum-circuit* library by reproducing some figures from the famous book _Quantum Computation and Quantum Information_ by Nielsen and Chuang #cite("nielsen_2022_quantum").
 
@@ -695,9 +554,10 @@ Circuit for performing the quantum Fourier transform, reproducing the Figure 5.1
 Encoding circuit for the Shor nine qubit code. This diagram repdoduces Figure 10.4 in #cite("nielsen_2022_quantum")
 
 #table(columns: (2fr, 1fr), align: horizon, stroke: none,
-makefigure(text(size: .9em, ```typ
-#let ancillas = (setwire(0), 5, lstick($|0〉$), setwire(1), targ(), 2, [\ ],
-setwire(0), 5, lstick($|0〉$), setwire(1), 1, targ(), 1, [\ ])
+makefigure(```typ
+#let ancillas = (setwire(0), 5, lstick($|0〉$), setwire(1), 
+  targ(), 2, [\ ], setwire(0), 5, lstick($|0〉$), setwire(1), 
+  1, targ(), 1, [\ ])
 
 #quantum-circuit(
   scale-factor: 80%,
@@ -710,7 +570,7 @@ setwire(0), 5, lstick($|0〉$), setwire(1), 1, targ(), 1, [\ ])
   lstick($|0〉$), 2, targ(),  gate($H$), 1, ctrl(1), ctrl(2), 
     1, [\ ],
   ..ancillas
-)```), {
+)```, {
   }
 ), {
   let ancillas = (setwire(0), 5, lstick($|0〉$), setwire(1), targ(), 2, [\ ],

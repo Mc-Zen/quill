@@ -273,25 +273,28 @@
 }
 
 
-/// Basic command for creating gates. Use this to create a simple gate, e.g. `gate($X$)`. 
+/// This is the basic command for creating gates. Use this to create a simple gate, e.g., `gate($X$)`. 
 /// For special gates, many other dedicated gate commands exist. 
 ///
 /// Note, that most of the parameters listed here are mostly used for derived gate 
 /// functions and do not need to be touched in all but very few cases. 
 ///
-/// - content (content): What to show in the gate (none for special gates).
+/// - content (content): What to show in the gate (may be none for special gates like @@ctrl).
 /// - fill (none, color): Gate backgrond fill color.
 /// - radius (length, dictionary): Gate rectangle border radius. 
-///             Allows values like the builtin `rect()` function.
+///             Allows the same values as the builtin `rect()` function.
 /// - width (auto, length): The width of the gate can be specified manually with this property. 
 /// - box (boolean): Whether this is a boxed gate (determines whether the outgoing 
 ///             wire will be drawn all through the gate (`box: false`) or not).
 /// - floating (boolean): Whether the content for this gate will be shown floating 
 ///             (i.e. no width is reserved).
-/// - multi (dictionary): Information for multi-qubit and controlled gates (see @@mqgate()).
-/// - size-hint (function): Size hint function. 
+/// - multi (dictionary): Information for multi-qubit and controlled gates (see @@mqgate() ).
+/// - size-hint (function): Size hint function. This function should return a dictionary
+///             containing the keys `width` and `height`. The result is used to determine 
+///             the gates position and cell sizes of the grid. 
+///             Signature: `(gate, draw-params).`
 /// - draw-function (function): Drawing function that produces the displayed content.
-///             Signature: (gate, draw-params).
+///             Signature: `(gate, draw-params).`
 /// - data (any): Optional additional gate data. This can for example be a dictionary
 ///             storing extra information that may be used for instance in a custom
 ///             `draw-function`.
@@ -329,16 +332,16 @@
 /// - n (integer): Number of wires (or relative wire count for controlled gates). 
 /// - fill (none, color): Gate backgrond fill color.
 /// - radius (length, dictionary): Gate rectangle border radius. 
-///        Allows values like the builtin `rect()` function.
+///        Allows the same values as the builtin `rect()` function.
 /// - box (boolean): Whether this is a boxed gate (determines whether the 
-///        outgoing wire will be drawn all through the gate (box: false) or not)
+///        outgoing wire will be drawn all through the gate (`box: false`) or not).
 /// - label (content): Optional label on the vertical wire. 
 /// - control (boolean): If true, this gate draws a vertical control wire. 
 /// - wire-count (integer): Wire count for control wires.
 /// - extent (auto, length): How much to extent the gate beyond the first and 
 ///        last wire, default is to make it align with an X gate (so [size of x gate] / 2). 
 /// - size-all-wires (none, boolean): A single-qubit gate affects the height of the row
-///         it's being put on. For multi-qubit gate there are different possible 
+///         it is being put on. For multi-qubit gate there are different possible 
 ///         behaviours:
 ///           - Affect height on only the first and last wire (`false`)
 ///           - Affect the height of all wires (`true`)
@@ -400,9 +403,9 @@
 // SPECIAL GATES
 
 /// Draw a meter box representing a measurement. 
-/// - n (none, integer): Draw a control wire to the given target qubit 
-///                           relative to this qubit if not `none`. 
-/// - wire-count (integer):   Wire count for the control wire. 
+/// - n (none, integer): If given, draw a control wire to the given target qubit `n` wires up or down
+///                           relative to this qubit. 
+/// - wire-count (integer):   Wire count for the (optional) control wire. 
 /// - label (content):        Label to show above the meter. 
 #let meter(n: none, wire-count: 2, label: none) = {
   if n == none {
@@ -412,17 +415,17 @@
   }
 }
 
-/// Create a viualized permutation gate which maps the qubits $q_k, q_(k+1), ... $ to  
-/// the qubits $q_(p(k)), q_(p(k+1)), ...$ when placed on qubit $k$. The permutation 
-/// map is given by the `qubits` argument. 
+/// Create a visualized permutation gate which maps the qubits $q_k, q_(k+1), ... $ to  
+/// the qubits $q_(p(k)), q_(p(k+1)), ...$ when placed on the qubit $k$. The permutation 
+/// map is given by the `qubits` argument. Note, that qubit indices start with 0. 
 /// 
 /// *Example:*
 ///
 ///  `permute(1, 0)` when placed on the second wire swaps the second and third wire. 
 /// 
-///  `permute(2, 0, 1)` when placed on wire 0 maps $(0,1,2) arrow.bar (2,0,1)$
+///  `permute(2, 0, 1)` when placed on wire 0 maps $(0,1,2) arrow.bar (2,0,1)$.
 /// 
-/// Note, that the wiring is not very sophisticated and will probably look best for 
+/// Note also, that the wiring is not very sophisticated and will probably look best for 
 /// relatively simple permutations. Furthermore, it only works with quantum wires. 
 ///  
 /// - ..qubits (array): Qubit permutation specification. 
@@ -491,32 +494,33 @@
 
 
 /// Basic command for labelling a wire at the start. 
-/// - label (content): Label to display, e.g. `$|0〉$`.
+/// - content (content): Label to display, e.g., `$|0〉$`.
 /// - n (content): How many wires the `lstick` should span. 
 /// - brace (auto, none, string): If `brace` is `auto`, then a default `{` brace
 ///      is shown only if `n > 1`. A brace is always shown when 
 ///      explicitly given, e.g., `"}"`, `"["` or `"|"`. No brace is shown for 
 ///      `brace: none`. 
-#let lstick(label, n: 1, brace: auto) = lrstick(label, n, "right", brace)
+#let lstick(content, n: 1, brace: auto) = lrstick(content, n, "right", brace)
 
 
 /// Basic command for labelling a wire at the end. 
-/// - label (content): Label to display, e.g. `$|0〉$`.
+/// - content (content): Label to display, e.g., `$|0〉$`.
 /// - n (content): How many wires the `rstick` should span. 
 /// - brace (auto, none, string): If `brace` is `auto`, then a default `}` brace
 ///      is shown only if `n > 1`. A brace is always shown when 
 ///      explicitly given, e.g., `"}"`, `"["` or `"|"`. No brace is shown for 
 ///      `brace: none`. 
-#let rstick(label, n: 1, brace: auto) = lrstick(label, n, "left", brace)
+#let rstick(content, n: 1, brace: auto) = lrstick(content, n, "left", brace)
 
+/// Create a midstick
 #let midstick(content) = gate(content, draw-function: draw-unboxed-gate)
 
 
 
 /// Creates a symbol similar to `\qwbundle` on `quantikz`. Annotates a wire to 
 /// be a bundle of quantum or classical wires. 
-/// - n(integer):
-#let nwire(n) = gate([#n], draw-function: draw-nwire, box: false)
+/// - label (integer, content): 
+#let nwire(label) = gate([#label], draw-function: draw-nwire, box: false)
 
 /// Create a controlled gate. See also @@ctrl. This function however
 /// may be used to create controlled gates where a gate box is at both ends
@@ -700,7 +704,7 @@
 // center-coords: List of center coordinates for each index
 // cell-sizes: List of cell sizes for each index
 // cells: Indices of cell for which to retrieve coordinates
-// These may also be floats. In this case, the integer part determines the cell index and the fractional part a percentage of the cell width. e.g. passing 2.5 would return the center coordinate of the cell
+// These may also be floats. In this case, the integer part determines the cell index and the fractional part a percentage of the cell width. e.g., passing 2.5 would return the center coordinate of the cell
 #let obtain-cell-coords1(center-coords, cell-sizes, cells) = {
   let last = center-coords.at(-1) + cell-sizes.at(-1) / 2
   let get(x) = { 
@@ -738,17 +742,17 @@
 /// - Integers for creating cells filled with the current wire setting 
 /// - Lengths for creating space between rows or columns 
 /// - Plain content or strings to be placed on the wire 
-/// - `lstick`, `midstick` or `rstick` for placement next to the wire 
+/// - @@lstick, @@midstick or @@rstick for placement next to the wire 
 ///
 /// - wire (stroke): Style for drawing the circuit wires. This can take anything 
-///            that is valid for the stroke of the builtin `line` function. 
+///            that is valid for the stroke of the builtin `line()` function. 
 /// - row-spacing (length): Spacing between rows.
 /// - column-spacing (length): Spacing between columns.
-/// - min-row-height (length): Minimum height of a row (e.g. when no 
+/// - min-row-height (length): Minimum height of a row (e.g., when no 
 ///             gates are given).
 /// - min-column-width (length): Minimum width of a column.
 /// - gate-padding (length): General padding setting including the inset for 
-///            gate boxes and the distance of `lstick` and co. to the wire. 
+///            gate boxes and the distance of @@lstick and co. to the wire. 
 /// - equal-row-heights (boolean): If true, then all rows will have the same 
 ///            height and the wires will have equal distances orienting on the
 ///            highest row. 
@@ -843,7 +847,7 @@
       colwidths.at(col) = calc.max(colwidths.at(col), width)
       
       if not (ismulti and item.multi.size-all-wires == none) {
-        // e.g. l, rsticks
+        // e.g., l, rsticks
         rowheights.at(row) = calc.max(rowheights.at(row), height)
       } 
       
