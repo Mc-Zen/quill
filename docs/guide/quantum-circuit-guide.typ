@@ -134,13 +134,13 @@ In many circuits, we need classical wires. This library generalizes the concept 
 #makefigure(vertical: false,
 ```typ
 #quantum-circuit(
-  1, gate($A$), meter(target: 1), [\ ],
+  1, gate($A$), meter(n: 1), [\ ],
   setwire(2), 2, ctrl(0), 2, [\ ],
   1, gate($X$), setwire(0), 1, lstick($|0〉$), 
     setwire(1), gate($Y$),
 )
 ```, quantum-circuit(
-  1, gate($A$), meter(target: 1), [\ ],
+  1, gate($A$), meter(n: 1), [\ ],
   setwire(2), 2, ctrl(0), 2, [\ ],
   1, gate($X$), setwire(0), 1, lstick($|0〉$), setwire(1), gate($Y$),
 ))
@@ -284,15 +284,15 @@ There is another option for #ref-fn("quantum-circuit()") that has a lot of impac
 #quantum-circuit(
     gate-padding: 2pt,
     row-spacing: 5pt, column-spacing: 7pt,
-    lstick($|0〉$, num-qubits: 3), gate($H$), ctrl(1), 
-      ctrl(2), 1, rstick("GHZ", num-qubits: 3), [\ ],
+    lstick($|0〉$, n: 3), gate($H$), ctrl(1), 
+      ctrl(2), 1, rstick("GHZ", n: 3), [\ ],
     1, gate($H$), ctrl(0), 1, gate($H$), 1, [\ ],
     1, gate($H$), 1, ctrl(0), gate($H$), 1, [\ ],
 )
 ```, quantum-circuit(
     gate-padding: 2pt,
     row-spacing: 5pt, column-spacing: 7pt,
-    lstick($|0〉$, num-qubits: 3), gate($H$), ctrl(1), ctrl(2), 1, rstick("GHZ", num-qubits: 3), [\ ],
+    lstick($|0〉$, n: 3), gate($H$), ctrl(1), ctrl(2), 1, rstick("GHZ", n: 3), [\ ],
     1, gate($H$), ctrl(0), 1, gate($H$), 1, [\ ],
     1, gate($H$), 1, ctrl(0), gate($H$), 1, [\ ],
   )
@@ -319,15 +319,15 @@ There is another option for #ref-fn("quantum-circuit()") that has a lot of impac
   [Multiqubit \ gate], quantum-circuit(1, mqgate($U$, 3), 1, [\ ], 3, [\ ], 3), raw(lang: "typc", "mqgate($U$, 3)"), 
   [lstick], quantum-circuit(lstick($|psi〉$), 2), raw(lang: "typc", "lstick($|psi〉$)"), 
   [rstick], quantum-circuit(2, rstick($|psi〉$)), raw(lang: "typc", "rstick($|psi〉$)"), 
-  [Multi-qubit \ lstick], quantum-circuit(row-spacing: 10pt, lstick($|psi〉$, num-qubits: 2), 2, [\ ], 3), raw(lang: "typc", "lstick($|psi〉$, \nnum-qubits: 2)"), 
-  [Multi-qubit \ rstick], quantum-circuit(row-spacing: 10pt,2, rstick($|psi〉$, num-qubits: 2, brace: "]"),[\ ], 3), raw(lang: "typc", "rstick($|psi〉$, \nnum-qubits: 2, \nbrace: \"]\")"), 
+  [Multi-qubit \ lstick], quantum-circuit(row-spacing: 10pt, lstick($|psi〉$, n: 2), 2, [\ ], 3), raw(lang: "typc", "lstick($|psi〉$, \nn: 2)"), 
+  [Multi-qubit \ rstick], quantum-circuit(row-spacing: 10pt,2, rstick($|psi〉$, n: 2, brace: "]"),[\ ], 3), raw(lang: "typc", "rstick($|psi〉$, \nn: 2, brace: \"]\")"), 
   [midstick], quantum-circuit(1, midstick("yeah"),1), raw(lang: "typc", "midstick(\"yeah\")"), 
   [Wire bundle], quantum-circuit(1, nwire(5), 1), raw(lang: "typc", "nwire(5)"), 
   [Controlled \  #smallcaps("z")-gate], quantum-circuit(1, ctrl(1), 1, [\ ], 1, ctrl(0), 1), [#raw(lang: "typc", "ctrl(1)") \ + \ #raw(lang: "typc", "ctrl(0)")], 
   [Controlled \  #smallcaps("x")-gate], quantum-circuit(1, ctrl(1), 1, [\ ], 1, targ(), 1), [#raw(lang: "typc", "ctrl(1)") \ + \ #raw(lang: "typc", "targ()")], 
   [Swap \  gate], quantum-circuit(1, swap(1), 1, [\ ], 1, targX(), 1), [#raw(lang: "typc", "swap(1)") \ + \ #raw(lang: "typc", "targX()")], 
   [Controlled \ Hadamard], quantum-circuit(1, controlled($H$, 1), 1, [\ ], 1, ctrl(0), 1), [#raw(lang: "typc", "controlled($H$, 1)") \ + \ #raw(lang: "typc", "ctrl(0)")], 
-  [Meter to \ classical], quantum-circuit(1, meter(target: 1), 1, [\ ], setwire(2), 1, ctrl(0), 1), [#raw(lang: "typc", "meter(target: 1)") \ + \ #raw(lang: "typc", "ctrl(0)")],   
+  [Meter to \ classical], quantum-circuit(1, meter(n: 1), 1, [\ ], setwire(2), 1, ctrl(0), 1), [#raw(lang: "typc", "meter(target: 1)") \ + \ #raw(lang: "typc", "ctrl(0)")],   
 )
 #pagebreak()
 

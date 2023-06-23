@@ -16,7 +16,7 @@
   lstick($|0〉$), 1, targ(), 1, ctrl(2), 2, ctrl(4), 1, targ(), 2, [\ ], 
   lstick($|0〉$), 1, targ(), ctrl(1), 4, ctrl(4), targ(), 2, [\ ],  
   setwire(0), 2, lstick($|0〉$), setwire(1), targ(), targ(), 1, [\ ], 10pt,
-  setwire(0), 4, lstick(align(center)[Encoded\ Data], num-qubits: 3), setwire(1), 1, 
+  setwire(0), 4, lstick(align(center)[Encoded\ Data], n: 3), setwire(1), 1, 
     gate($M'$), 3, [\ ],
   setwire(0), 5,  setwire(1), 2, gate($M'$), 2, [\ ],
   setwire(0), 5,  setwire(1), 3, gate($M'$), 1,

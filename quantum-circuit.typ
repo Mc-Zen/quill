@@ -29,7 +29,7 @@
 // INTERNAL GATE DRAW FUNCTIONS
 
 #let draw-targ(item, draw-params) = {
-  let size = item.size
+  let size = item.data.size
   box[
     #circle(
       radius: size, 
@@ -48,17 +48,17 @@
 #let draw-ctrl(gate, draw-params) = {
   let clr = draw-params.wire
   let color = b-if-a-is-none(gate.fill, draw-params.color)
-  if gate.open {
+  if gate.data.open {
     let stroke = b-if-a-is-none(gate.fill, draw-params.wire)
-    box(circle(stroke: stroke, fill: draw-params.background, radius: gate.size))
+    box(circle(stroke: stroke, fill: draw-params.background, radius: gate.data.size))
   } else {
-    box(circle(fill: color, radius: gate.size))
+    box(circle(fill: color, radius: gate.data.size))
   }
 }
 
 #let draw-swap(gate, draw-params) = {
   box({
-    let d = gate.size
+    let d = gate.data.size
     let stroke = draw-params.wire
     box(width: d, height: d, {
       place(line(start: (-0pt,-0pt), end: (d,d), stroke: stroke))
@@ -71,14 +71,14 @@
 // Default gate draw function. Draws a box with global padding
 // and the gates content. Stroke and default fill are only applied if 
 // gate.box is true
-#let draw-boxed-gate(gate, draw-params) = box(
+#let draw-boxed-gate(gate, draw-params) = align(center, box(
   inset: draw-params.padding, 
+  width: gate.width,
   stroke: if gate.box { draw-params.wire }, 
   fill: if gate.fill != none {gate.fill} else if gate.box {draw-params.background}, 
   gate.content,
   radius: gate.radius,
-  // if draw-params.roman-gates { math.upright(gate.content) } else{ gate.content }
-)
+))
 
 // Same but without displaying a box
 #let draw-unboxed-gate(gate, draw-params) = box(
@@ -102,7 +102,7 @@
 #let draw-lrstick(gate, draw-params, align: none) = {
   assert(align in ("left", "right"), message: "Only left and right are allowed")
   let isleftstick = (align == "right")
-  let draw-brace = gate.brace != none
+  let draw-brace = gate.data.brace != none
     
   let content = box(inset: draw-params.padding, gate.content)
   let size = measure(content, draw-params.styles)
@@ -111,9 +111,9 @@
   let brace = none
   
   if draw-brace {
-   let brace-symbol = if gate.brace == auto {
+   let brace-symbol = if gate.data.brace == auto {
         if gate.multi != none { if isleftstick {"{"} else {"}"} }
-        } else { gate.brace }
+        } else { gate.data.brace }
     let brace-height
     if gate.multi == none {
       brace-height = 1em + 2 * draw-params.padding
@@ -167,7 +167,7 @@
   })
 }
 
-// Draw a gate spanning multiple qubits
+// Draw a gate spanning multiple wires
 #let draw-boxed-multigate(gate, draw-params) = {
   let dy = draw-params.multi.wire-distance
   let extent = if gate.multi.extent == auto {draw-params.x-gate-size.height/2}  else {gate.multi.extent}
@@ -194,14 +194,14 @@
 
 #let draw-permutation-gate(gate, draw-params) = {
   let dy = draw-params.multi.wire-distance
-  let width = gate.width
+  let width = gate.data.width
   if dy == 0pt { return box(width: width, height: 4pt) }
   box(
     height: dy + 4pt,
     inset: (y: 2pt),
     fill: draw-params.background,
     width: width, {
-      let qubits = gate.qubits
+      let qubits = gate.data.qubits
       let y0 = draw-params.center-y-coords.at(gate.qubit)
       for from in range(qubits.len()) {
         let to = qubits.at(from)
@@ -256,11 +256,11 @@
       // place(path((75%, 17%), (86%, -0%), (82%, 26%), closed: true, stroke: stroke))
       draw-arrow((center-x, height*.58), (width*.6, height*.2), length: 3.8pt, width: 2.8pt, stroke: stroke, arrow-color: draw-params.color)
   })
-  if gate.meter-label != none {
-    let label-size = measure(gate.meter-label, draw-params.styles)
+  if gate.data.meter-label != none {
+    let label-size = measure(gate.data.meter-label, draw-params.styles)
     place(
       dx: width/2 - label-size.width/2,
-      dy: -label-size.height -height - .6em, gate.meter-label
+      dy: -label-size.height -height - .6em, gate.data.meter-label
     )
   }  
 }
@@ -273,46 +273,52 @@
 }
 
 
-/// Basic command for creating gates. Use this to create a simple gate, e.g. `gate($X$)`. For special gates, many other dedicated gate commands exist. 
+/// Basic command for creating gates. Use this to create a simple gate, e.g. `gate($X$)`. 
+/// For special gates, many other dedicated gate commands exist. 
 ///
-/// Note, that many of the parameters listed here are mostly used for derived gate function and do not need to be touched in all but very few cases. 
+/// Note, that most of the parameters listed here are mostly used for derived gate 
+/// functions and do not need to be touched in all but very few cases. 
 ///
 /// - content (content): What to show in the gate (none for special gates).
 /// - fill (none, color): Gate backgrond fill color.
 /// - radius (length, dictionary): Gate rectangle border radius. 
 ///             Allows values like the builtin `rect()` function.
+/// - width (auto, length): The width of the gate can be specified manually with this property. 
 /// - box (boolean): Whether this is a boxed gate (determines whether the outgoing 
-///             wire will be drawn all through the gate (box: false) or not).
+///             wire will be drawn all through the gate (`box: false`) or not).
 /// - floating (boolean): Whether the content for this gate will be shown floating 
 ///             (i.e. no width is reserved).
 /// - multi (dictionary): Information for multi-qubit and controlled gates (see @@mqgate()).
 /// - size-hint (function): Size hint function. 
 /// - draw-function (function): Drawing function that produces the displayed content.
 ///             Signature: (gate, draw-params).
-/// - args (dictionary): Optional additional arguments. When using a custom 
-  ///           `draw-function`, you may store extra information here.
+/// - data (any): Optional additional gate data. This can for example be a dictionary
+///             storing extra information that may be used for instance in a custom
+///             `draw-function`.
 #let gate(
   content,
   fill: none,
   radius: 0pt,
+  width: auto,
   box: true,
   floating: false,
   multi: none,
   size-hint: default-size-hint,
   draw-function: draw-boxed-gate,
   gate-type: "",
-  args: (:)
+  data: none
 ) = (
-  gate-type: gate-type, 
   content: if type(content) == "content" {content} else { content }, 
-  box: box,
   fill: fill,
-  floating: floating,
-  draw-function: draw-function,
-  size-hint: size-hint,
-  multi: multi,
   radius: radius,
-  ..args
+  width: width,
+  box: box,
+  floating: floating,
+  multi: multi,
+  size-hint: size-hint,
+  draw-function: draw-function,
+  gate-type: gate-type, 
+  data: data
 )
 
 
@@ -320,87 +326,89 @@
 /// Basic command for creating multi-qubit or controlled gates. For the latter, you usually want to go for something like @@ctrl, @@swap, or @@controlled.
 ///
 /// - content (content):
-/// - num-qubits (integer): Number of qubits (or relative wire count for 
-///          controlled gates). 
+/// - n (integer): Number of wires (or relative wire count for controlled gates). 
 /// - fill (none, color): Gate backgrond fill color.
 /// - radius (length, dictionary): Gate rectangle border radius. 
-///          Allows values like the builtin `rect()` function.
+///        Allows values like the builtin `rect()` function.
 /// - box (boolean): Whether this is a boxed gate (determines whether the 
-///          outgoing wire will be drawn all through the gate (box: false) 
-///          or not)
+///        outgoing wire will be drawn all through the gate (box: false) or not)
 /// - label (content): Optional label on the vertical wire. 
 /// - control (boolean): If true, this gate draws a vertical control wire. 
 /// - wire-count (integer): Wire count for control wires.
 /// - extent (auto, length): How much to extent the gate beyond the first and 
-///     last wire, default is to make it align with an X gate (so [size of x gate] / 2). 
+///        last wire, default is to make it align with an X gate (so [size of x gate] / 2). 
 /// - size-all-wires (none, boolean): A single-qubit gate affects the height of the row
-///     it's being put on. For multi-qubit gate there are different possible 
-///     behaviours:
-///       - Affect size on only the first and last qubit (`false`)
-///       - Affect the size of all qubits (`true`)
-///       - Affect the size on no qubit (`none`)
-///     
+///         it's being put on. For multi-qubit gate there are different possible 
+///         behaviours:
+///           - Affect height on only the first and last wire (`false`)
+///           - Affect the height of all wires (`true`)
+///           - Affect the height on no wire (`none`)
+/// - data (any): Optional additional gate data. This can for example be a dictionary
+///         storing extra information that may be used for instance in a custom
+///         `draw-function`.
 #let mqgate(
   content,
-  num-qubits, 
+  n, 
   fill: none, 
   radius: 0pt,
   box: true, 
   label: none, 
+  width: auto,
   control: false, 
   wire-count: 1,
   extent: auto, 
   size-all-wires: false,
   draw-function: draw-boxed-multigate, 
-  args: (:),
+  data: none,
 ) = gate(
   content, 
   fill: fill, box: box, 
+  width: width,
   draw-function: draw-function,
   multi: (
     control: control,
-    num-qubits: num-qubits, 
+    num-qubits: n, 
     wire-count: wire-count, 
     label: label,
     extent: extent,
     size-all-wires: size-all-wires
   ),
-  args: args
+  data: data
 )
 
 
 // align: "left" (for rstick) or "right" (for lstick)
 // brace: auto, none, "{", "}", "|", "[", ...
-#let lrstick(content, num-qubits, align, brace) = gate(
+#let lrstick(content, n, align, brace) = gate(
   content, 
   draw-function: draw-lrstick.with(align: align), 
   // size-hint: lrstick-size-hint,
   box: false, 
   floating: true,
-  multi: if num-qubits == 1 { none } else { 
+  multi: if n == 1 { none } else { 
    (
     control: false,
-    num-qubits: num-qubits, 
+    num-qubits: n, 
     wire-count: 0, 
     label: label,
-    size-all-wires: if num-qubits > 1 { none } else { false }
+    size-all-wires: if n > 1 { none } else { false }
   )},
-  args: (brace: brace), 
+  data: (brace: brace), 
 )
 
 
 // SPECIAL GATES
 
 /// Draw a meter box representing a measurement. 
-/// - target (none, integer): Draw a control wire to the given target qubit 
+/// - n (none, integer): Draw a control wire to the given target qubit 
 ///                           relative to this qubit if not `none`. 
 /// - wire-count (integer):   Wire count for the control wire. 
 /// - label (content):        Label to show above the meter. 
-#let meter(target: none, wire-count: 2, label: none) = {
-  if target == none {
-    gate(none, draw-function: draw-meter, args: (meter-label: label))
+#let meter(n: none, wire-count: 2, label: none) = {
+  if n == none {
+    gate(none, draw-function: draw-meter, data: (meter-label: label))
   } else {
-     mqgate(none, target, box: true, wire-count: wire-count, draw-function: draw-meter, control: true, args: (meter-label: label))
+     mqgate(none, n, box: true, wire-count: wire-count, draw-function: draw-meter, control: true, data: (meter-label: label))
   }
 }
 
@@ -421,7 +429,7 @@
 /// - width (length): Width of the permutation gate. 
 /// 
 #let permute(..qubits, width: 30pt) = {
-  mqgate(none, qubits.pos().len(), draw-function: draw-permutation-gate, args: (qubits: qubits.pos(), extent: 2pt, width: width))
+  mqgate(none, qubits.pos().len(), draw-function: draw-permutation-gate, data: (qubits: qubits.pos(), extent: 2pt, width: width))
 }
 
 /// Create an invisible (phantom) gate for reserving space. If `content` 
@@ -447,7 +455,7 @@
 /// - fill (none, color, boolean): Fill color for the target circle. If set 
 ///        to `true`, the target is filled with the circuits background color.
 /// - size (length): Size of the target symbol. 
-#let targ(fill: none, size: 4.3pt) = gate(none, box: false, draw-function: draw-targ, fill: fill, args: (size: size))
+#let targ(fill: none, size: 4.3pt) = gate(none, box: false, draw-function: draw-targ, fill: fill, data: (size: size))
 
 /// Target element for controlled #smallcaps("z") operations (#sym.bullet). 
 ///
@@ -459,7 +467,7 @@
 
 /// Target element for #smallcaps("swap") operations (#sym.times) without vertical wire). 
 /// - size (length): Size of the target symbol. 
-#let targX(size: 7pt) = gate(none, box: false, draw-function: draw-swap, args: (size: size))
+#let targX(size: 7pt) = gate(none, box: false, draw-function: draw-swap, data: (size: size))
 
 /// Create a phase gate shown as a point on the wire together with a label. 
 ///
@@ -476,7 +484,7 @@
       place(label, dy: -1.2em, dx: 1.2em)
     },
   fill: fill,
-  args: (open: open, size: size)
+  data: (open: open, size: size)
 )
 
 
@@ -484,22 +492,22 @@
 
 /// Basic command for labelling a wire at the start. 
 /// - label (content): Label to display, e.g. `$|0〉$`.
-/// - num-qubits (content): How many qubits the `lstick` should span. 
+/// - n (content): How many wires the `lstick` should span. 
 /// - brace (auto, none, string): If `brace` is `auto`, then a default `{` brace
-///      is shown only if `num-qubits > 1`. A brace is always shown when 
+///      is shown only if `n > 1`. A brace is always shown when 
 ///      explicitly given, e.g., `"}"`, `"["` or `"|"`. No brace is shown for 
 ///      `brace: none`. 
-#let lstick(label, num-qubits: 1, brace: auto) = lrstick(label, num-qubits, "right", brace)
+#let lstick(label, n: 1, brace: auto) = lrstick(label, n, "right", brace)
 
 
 /// Basic command for labelling a wire at the end. 
 /// - label (content): Label to display, e.g. `$|0〉$`.
-/// - num-qubits (content): How many qubits the `rstick` should span. 
+/// - n (content): How many wires the `rstick` should span. 
 /// - brace (auto, none, string): If `brace` is `auto`, then a default `}` brace
-///      is shown only if `num-qubits > 1`. A brace is always shown when 
+///      is shown only if `n > 1`. A brace is always shown when 
 ///      explicitly given, e.g., `"}"`, `"["` or `"|"`. No brace is shown for 
 ///      `brace: none`. 
-#let rstick(label, num-qubits: 1, brace: auto) = lrstick(label, num-qubits, "left", brace)
+#let rstick(label, n: 1, brace: auto) = lrstick(label, n, "left", brace)
 
 #let midstick(content) = gate(content, draw-function: draw-unboxed-gate)
 
@@ -518,27 +526,27 @@
 /// `controlled($H$, 2)`. 
 /// 
 /// - content (content): Gate content to display.
-/// - relative-qubit (integer): Target qubit relative to this one. 
+/// - n (integer): How many wires up or down the target wire lives. 
 /// - wire-count (integer): Wire count for the control wire.  
 /// - draw-function (function). See @@gate. 
 /// - ..args (array): Optional, additional arguments to be stored in the gate. 
-#let controlled(content, relative-qubit, wire-count: 1, draw-function: draw-boxed-gate, ..args) = mqgate(content, relative-qubit,  wire-count: wire-count, draw-function: draw-function, control: true, ..args)
+#let controlled(content, n, wire-count: 1, draw-function: draw-boxed-gate, ..args) = mqgate(content, n,  wire-count: wire-count, draw-function: draw-function, control: true, ..args)
 
 /// Creates a #smallcaps("swap") operation with another qubit. 
 /// 
-/// - relative-qubit (integer): Target qubit relative to this one. 
+/// - n (integer): How many wires up or down the target wire lives. 
 /// - size (length): Size of the target symbol. 
-#let swap(relative-qubit, size: 7pt) = controlled(none, relative-qubit, box: false, draw-function: draw-swap, args: (size: size))
+#let swap(n, size: 7pt) = controlled(none, n, box: false, draw-function: draw-swap, data: (size: size))
 
 /// Creates a control with a vertical wire to another qubit. 
 /// 
-/// - relative-qubit (integer): Target qubit relative to this one. 
+/// - n (integer): How many wires up or down the target wire lives. 
 /// - wire-count (integer): Wire count for the control wire.  
 /// - open (boolean): Whether to draw an open dot. 
 /// - fill (none, color): Fill color for the circle or stroke color if
 ///        `open: true`. 
 /// - size (length): Size of the control circle. 
-#let ctrl(relative-qubit, wire-count: 1, open: false, fill: none, size: 2.3pt) = controlled(none, relative-qubit, draw-function: draw-ctrl, wire-count: wire-count, fill: fill, args: (open: open, size: size))
+#let ctrl(n, wire-count: 1, open: false, fill: none, size: 2.3pt) = controlled(none, n, draw-function: draw-ctrl, wire-count: wire-count, fill: fill, data: (open: open, size: size))
 
 
 
