@@ -135,13 +135,13 @@ In many circuits, we need classical wires. This library generalizes the concept 
 #makefigure(vertical: false,
 ```typ
 #quantum-circuit(
-  1, gate($A$), meter(n: 1), [\ ],
+  1, gate($A$), meter(target: 1), [\ ],
   setwire(2), 2, ctrl(0), 2, [\ ],
   1, gate($X$), setwire(0), 1, lstick($|0〉$), 
     setwire(1), gate($Y$),
 )
 ```, quantum-circuit(
-  1, gate($A$), meter(n: 1), [\ ],
+  1, gate($A$), meter(target: 1), [\ ],
   setwire(2), 2, ctrl(0), 2, [\ ],
   1, gate($X$), setwire(0), 1, lstick($|0〉$), setwire(1), gate($Y$),
 ))
@@ -328,7 +328,7 @@ There is another option for #ref-fn("quantum-circuit()") that has a lot of impac
   [Controlled \  #smallcaps("x")-gate], quantum-circuit(1, ctrl(1), 1, [\ ], 1, targ(), 1), [#raw(lang: "typc", "ctrl(1)") \ + \ #raw(lang: "typc", "targ()")], 
   [Swap \  gate], quantum-circuit(1, swap(1), 1, [\ ], 1, targX(), 1), [#raw(lang: "typc", "swap(1)") \ + \ #raw(lang: "typc", "targX()")], 
   [Controlled \ Hadamard], quantum-circuit(1, controlled($H$, 1), 1, [\ ], 1, ctrl(0), 1), [#raw(lang: "typc", "controlled($H$, 1)") \ + \ #raw(lang: "typc", "ctrl(0)")], 
-  [Meter to \ classical], quantum-circuit(1, meter(n: 1), 1, [\ ], setwire(2), 1, ctrl(0), 1), [#raw(lang: "typc", "meter(target: 1)") \ + \ #raw(lang: "typc", "ctrl(0)")],   
+  [Meter to \ classical], quantum-circuit(1, meter(target: 1), 1, [\ ], setwire(2), 1, ctrl(0), 1), [#raw(lang: "typc", "meter(target: 1)") \ + \ #raw(lang: "typc", "ctrl(0)")],   
 )
 #pagebreak()
 

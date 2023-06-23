@@ -170,7 +170,7 @@
 // Draw a gate spanning multiple wires
 #let draw-boxed-multigate(gate, draw-params) = {
   let dy = draw-params.multi.wire-distance
-  let extent = if gate.multi.extent == auto {draw-params.x-gate-size.height/2}  else {gate.multi.extent}
+  let extent = if gate.multi.extent == auto {draw-params.x-gate-size.height/2} else {gate.multi.extent}
   let layout-version = box(
       inset: draw-params.padding, 
       stroke: draw-params.wire, 
@@ -194,7 +194,7 @@
 
 #let draw-permutation-gate(gate, draw-params) = {
   let dy = draw-params.multi.wire-distance
-  let width = gate.data.width
+  let width = gate.width
   if dy == 0pt { return box(width: width, height: 4pt) }
   box(
     height: dy + 4pt,
@@ -326,38 +326,40 @@
 
 
 
-/// Basic command for creating multi-qubit or controlled gates. For the latter, you usually want to go for something like @@ctrl, @@swap, or @@controlled.
+/// Basic command for creating multi-qubit or controlled gates. For the latter,  
+/// you usually want to go for something like @@ctrl, @@swap, or @@controlled.
 ///
 /// - content (content):
-/// - n (integer): Number of wires (or relative wire count for controlled gates). 
+/// - n (integer): Number of wires the multi-qubit gate spans. 
+/// - target (none, integer): If specified, a control wire is drawn from the gate up 
+///        or down this many wires counted from the wire this `mqgate()` is placed on. 
 /// - fill (none, color): Gate backgrond fill color.
 /// - radius (length, dictionary): Gate rectangle border radius. 
 ///        Allows the same values as the builtin `rect()` function.
 /// - box (boolean): Whether this is a boxed gate (determines whether the 
 ///        outgoing wire will be drawn all through the gate (`box: false`) or not).
 /// - label (content): Optional label on the vertical wire. 
-/// - control (boolean): If true, this gate draws a vertical control wire. 
 /// - wire-count (integer): Wire count for control wires.
 /// - extent (auto, length): How much to extent the gate beyond the first and 
 ///        last wire, default is to make it align with an X gate (so [size of x gate] / 2). 
 /// - size-all-wires (none, boolean): A single-qubit gate affects the height of the row
-///         it is being put on. For multi-qubit gate there are different possible 
-///         behaviours:
-///           - Affect height on only the first and last wire (`false`)
-///           - Affect the height of all wires (`true`)
-///           - Affect the height on no wire (`none`)
+///        it is being put on. For multi-qubit gate there are different possible 
+///        behaviours:
+///          - Affect height on only the first and last wire (`false`)
+///          - Affect the height of all wires (`true`)
+///          - Affect the height on no wire (`none`)
 /// - data (any): Optional additional gate data. This can for example be a dictionary
-///         storing extra information that may be used for instance in a custom
-///         `draw-function`.
+///        storing extra information that may be used for instance in a custom
+///        `draw-function`.
 #let mqgate(
   content,
   n, 
+  target: none,
   fill: none, 
   radius: 0pt,
   box: true, 
   label: none, 
   width: auto,
-  control: false, 
   wire-count: 1,
   extent: auto, 
   size-all-wires: false,
@@ -369,7 +371,7 @@
   width: width,
   draw-function: draw-function,
   multi: (
-    control: control,
+    target: target,
     num-qubits: n, 
     wire-count: wire-count, 
     label: label,
@@ -390,7 +392,7 @@
   floating: true,
   multi: if n == 1 { none } else { 
    (
-    control: false,
+    target: none,
     num-qubits: n, 
     wire-count: 0, 
     label: label,
@@ -403,15 +405,16 @@
 // SPECIAL GATES
 
 /// Draw a meter box representing a measurement. 
-/// - n (none, integer): If given, draw a control wire to the given target qubit `n` wires up or down
-///                           relative to this qubit. 
+/// - target (none, integer): If given, draw a control wire to the given target
+///                           qubit the specified number of wires up or down.
 /// - wire-count (integer):   Wire count for the (optional) control wire. 
+/// - n (integer):            Number of wires to span this meter across. 
 /// - label (content):        Label to show above the meter. 
-#let meter(n: none, wire-count: 2, label: none) = {
-  if n == none {
+#let meter(target: none, n: 1, wire-count: 2, label: none) = {
+  if target == none {
     gate(none, draw-function: draw-meter, data: (meter-label: label))
   } else {
-     mqgate(none, n, box: true, wire-count: wire-count, draw-function: draw-meter, control: true, data: (meter-label: label))
+     mqgate(none, n, target: target, box: true, wire-count: wire-count, draw-function: draw-meter, data: (meter-label: label))
   }
 }
 
@@ -432,7 +435,7 @@
 /// - width (length): Width of the permutation gate. 
 /// 
 #let permute(..qubits, width: 30pt) = {
-  mqgate(none, qubits.pos().len(), draw-function: draw-permutation-gate, data: (qubits: qubits.pos(), extent: 2pt, width: width))
+  mqgate(none, qubits.pos().len(), width: width, draw-function: draw-permutation-gate, data: (qubits: qubits.pos(), extent: 2pt))
 }
 
 /// Create an invisible (phantom) gate for reserving space. If `content` 
@@ -534,7 +537,7 @@
 /// - wire-count (integer): Wire count for the control wire.  
 /// - draw-function (function). See @@gate. 
 /// - ..args (array): Optional, additional arguments to be stored in the gate. 
-#let controlled(content, n, wire-count: 1, draw-function: draw-boxed-gate, ..args) = mqgate(content, n,  wire-count: wire-count, draw-function: draw-function, control: true, ..args)
+#let controlled(content, n, wire-count: 1, draw-function: draw-boxed-gate, ..args) = mqgate(content, 1, target: n, wire-count: wire-count, draw-function: draw-function, ..args)
 
 /// Creates a #smallcaps("swap") operation with another qubit. 
 /// 
@@ -720,7 +723,7 @@
 
 
 #let draw-horizontal-wire(x1, x2, y, stroke, wire-count, wire-distance: 1pt) = {
-  if x1 == x2 {  return }
+  if x1 == x2 { return }
   for i in range(wire-count) {
     place(line(start: (x1, y), end: (x2, y), stroke: stroke), 
       dy: (2*i - (wire-count - 1)) * wire-distance)
@@ -851,7 +854,7 @@
         rowheights.at(row) = calc.max(rowheights.at(row), height)
       } 
       
-      if ismulti and not item.multi.control and item.multi.size-all-wires != none { 
+      if ismulti and item.multi.num-qubits > 1 and item.multi.size-all-wires != none { 
         let start = row
         if not item.multi.size-all-wires {
           start = calc.max(0, row + item.multi.num-qubits - 1)
@@ -990,18 +993,19 @@
             top = center-y
           }
           if item.multi != none {
-            let nq = item.multi.num-qubits
-            if item.multi.control {
-              let target-qubit = row + nq
+            if item.multi.target != none {
+              let target-qubit = row + item.multi.target
               assert(center-y-coords.len() > target-qubit, message: "Target qubit for controlled gate is out of range")
-              let (y1, y2) = ((bottom, top).at(int(nq < 1)), center-y-coords.at(target-qubit))
+              let (y1, y2) = ((bottom, top).at(int(item.multi.target < 1)), center-y-coords.at(target-qubit))
               draw-vertical-wire(
                 y1, 
                 y2, 
                 center-x, 
                 wire, 
                 wire-count: item.multi.wire-count)
-            } else {
+            } 
+            let nq = item.multi.num-qubits
+            if nq > 1 {
               assert(row + nq -1 < center-y-coords.len(), message: "Target 
               qubit for multi qubit gate does not exist")
               let y1 = center-y-coords.at(row + nq - 1)

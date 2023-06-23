@@ -9,7 +9,7 @@
     ctrl(1), rstick($|y〉$), [\ ],
   lstick($|0〉$), 1, targ(), 2, targ(), 1, gate($Z$), 1, targ(fill: true), 1, targ(fill: true), 
     rstick($|z plus.circle x y〉$), [\ ],
-  lstick($|x〉$), 2, targ(), 6, meter(n: -3), setwire(2), ctrl(-1, wire-count: 2), [\ ],
-  lstick($|y〉$), 3, targ(), 3, meter(n: -3), setwire(2), ctrl(-2, wire-count: 2), [\ ],
-  lstick($|z〉$), 4, ctrl(-3), gate($H$), meter(n: -4)
+  lstick($|x〉$), 2, targ(), 6, meter(target: -3), setwire(2), ctrl(-1, wire-count: 2), [\ ],
+  lstick($|y〉$), 3, targ(), 3, meter(target: -3), setwire(2), ctrl(-2, wire-count: 2), [\ ],
+  lstick($|z〉$), 4, ctrl(-3), gate($H$), meter(target: -4)
 )
