@@ -1,5 +1,5 @@
 <h1 align="center">
-  <img alt="Quantum Circuit" src="docs/images/logo.svg" style="max-width: 100%; width: 300pt; padding: 10px 20px; box-shadow: 1pt 1pt 10pt 0pt #AAAAAA; border-radius: 4pt">
+  <img alt="Quantum Circuit" src="docs/images/logo.svg" style="max-width: 100%; width: 300pt; padding: 10px 20px; box-shadow: 1pt 1pt 10pt 0pt #AAAAAA; border-radius: 4pt;box-sizing: border-box;">
 </h1>
 
 
@@ -12,9 +12,9 @@
 **Quill** is a package for creating quantum circuit diagrams in [Typst](https://typst.app/). 
 
 
-Note, that this package is in beta and may still be undergoing breaking changes. As new features like data types and scoped functions will be added to Typst, this package will be adapted to profit from the new paradigms. 
+_Note, that this package is in beta and may still be undergoing breaking changes. As new features like data types and scoped functions will be added to Typst, this package will be adapted to profit from the new paradigms._
 
-Meanwhile, we suggest importing everything from `quill.typ` in a local scope to avoid polluting the global namespace (see example below). 
+_Meanwhile, we suggest importing everything from `quill.typ` in a local scope to avoid polluting the global namespace (see example below)._
 
 <!-- ## Setup
 
@@ -33,9 +33,9 @@ Create circuit diagrams by calling the function `quantum-circuit()` with any num
   )
 }
 ```
-<p align="center">
+<h3 align="center">
   <img alt="Quantum Circuit" src="docs/images/bell.svg" style="max-width: 100%; padding: 10px 10px; box-shadow: 1pt 1pt 10pt 0pt #AAAAAA; border-radius: 4pt">
-</p>
+</h3>
 
 Refer to the [user guide](https://github.com/Mc-Zen/quill/blob/main/docs/guide/quill-guide.pdf) for full documentation.
 
