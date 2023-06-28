@@ -9,10 +9,10 @@
   </a>
 </p> -->
 
-**Quill** is a library for creating quantum circuit diagrams in [Typst](https://typst.app/). 
+**Quill** is a package for creating quantum circuit diagrams in [Typst](https://typst.app/). 
 
 
-Note, that this library is still in beta and may still be undergoing breaking changes. As new features like data types and scoped functions will be added to Typst, this library will be adapted to profit from the new paradigms. 
+Note, that this package is in beta and may still be undergoing breaking changes. As new features like data types and scoped functions will be added to Typst, this package will be adapted to profit from the new paradigms. 
 
 Meanwhile, we suggest importing everything from `quill.typ` in a local scope to avoid polluting the global namespace (see example below). 
 
@@ -33,9 +33,11 @@ Create circuit diagrams by calling the function `quantum-circuit()` with any num
   )
 }
 ```
-![Bell circuit example](docs/images/bell.png)
+<p align="center">
+  <img alt="Quantum Circuit" src="docs/images/bell.svg" style="max-width: 100%; padding: 10px 10px; box-shadow: 1pt 1pt 10pt 0pt #AAAAAA; border-radius: 4pt">
+</p>
 
-Refer to the [user guide](docs/guide/quill-guide.pdf) for full documentation.
+Refer to the [user guide](https://github.com/Mc-Zen/quill/blob/main/docs/guide/quill-guide.pdf) for full documentation.
 
 ## Gallery
 
@@ -45,8 +47,12 @@ Refer to the [user guide](docs/guide/quill-guide.pdf) for full documentation.
 
 Some show-off examples, loosely replicating figures from [Quantum Computation and Quantum Information by M. Nielsen and I. Chuang](https://www.cambridge.org/highereducation/books/quantum-computation-and-quantum-information/01E10196D0A682A6AEFFEA52D53BE9AE#overview).
 
-![phase estimation](tests/references/phase-estimation.png)
-![qft](tests/references/qft.png)
-![teleportation](tests/references/teleportation.png)
-
-<!-- <img src="tests/references/phase-estimation.png" alt="isolated" width="200"/> -->
+<p align="center">
+  <img alt="Quantum teleportation circuit" src="docs/images/teleportation.svg" style="max-width: 100%; padding: 10px 10px; box-shadow: 1pt 1pt 10pt 0pt #AAAAAA; border-radius: 4pt">
+</p>
+<p align="center">
+  <img alt="Quantum circuit for phase estimation" src="docs/images/phase-estimation.svg" style="max-width: 100%; padding: 10px 10px; box-shadow: 1pt 1pt 10pt 0pt #AAAAAA; border-radius: 4pt">
+</p>
+<p align="center">
+  <img alt="Quantum fourier transformation circuit" src="docs/images/qft.svg" style="max-width: 100%; padding: 10px 10px; box-shadow: 1pt 1pt 10pt 0pt #AAAAAA; border-radius: 4pt">
+</p>

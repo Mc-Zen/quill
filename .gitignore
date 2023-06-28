@@ -9,4 +9,4 @@ __pycache__/
 
 *.pdf
 *.exe
-!quantum-circuit-guide.pdf
+!quill-guide.pdf
