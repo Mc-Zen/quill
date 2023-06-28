@@ -3,10 +3,12 @@
 #import "../../quantum-circuit.typ": *
 #show link: underline
 
+#let package-name = "Qutie"
+#show "Quantum-Circuit": "Qutie"
 #show: project.with(
   title: "Guide for the Quantum-Circuit Package ",
   authors: ("Mc-Zen",),
-  abstract: [Quantum-Circuit is a library for creating quantum circuit diagrams in #link("https://typst.app/", [Typst]). ],
+  abstract: [#package-name is a library for creating quantum circuit diagrams in #link("https://typst.app/", [Typst]). ],
   date: "June 4, 2023",
 )
 
@@ -116,14 +118,14 @@ Let's look at a quantum bit-flipping error correction circuit. Here we encounter
 #makefigure(vertical: true,
 ```typ
 #quantum-circuit(
-  lstick($|psi〉$), ctrl(1), ctrl(2), mqgate($E_"bit"$, 3), ctrl(1), ctrl(2), 
+  lstick($|psi〉$), ctrl(1), ctrl(2), mqgate($E_"bit"$, n: 3), ctrl(1), ctrl(2), 
     targ(), rstick($|psi〉$), [\ ],
   lstick($|0〉$), targ(), 2, targ(), 1, ctrl(-1), 1, [\ ],
   lstick($|0〉$), 1, targ(), 2, targ(), ctrl(-1), 1
 )
 ```, quantum-circuit(
   scale-factor: 80%,
-  lstick($|psi〉$), ctrl(1), ctrl(2), mqgate($E_"bit"$, 3), ctrl(1), ctrl(2), targ(), rstick($|psi〉$), [\ ],
+  lstick($|psi〉$), ctrl(1), ctrl(2), mqgate($E_"bit"$, n: 3), ctrl(1), ctrl(2), targ(), rstick($|psi〉$), [\ ],
   lstick($|0〉$), targ(), 2, targ(), 1, ctrl(-1), 1, [\ ],
   lstick($|0〉$), 1, targ(), 2, targ(), ctrl(-1), 1
 ))
@@ -536,20 +538,20 @@ Encoding circuit for the Shor nine qubit code. This diagram repdoduces Figure 10
 
 #table(columns: (2fr, 1fr), align: horizon, stroke: none,
 makefigure(```typ
-#let ancillas = (setwire(0), 5, lstick($|0〉$), setwire(1), 
-  targ(), 2, [\ ], setwire(0), 5, lstick($|0〉$), setwire(1), 
-  1, targ(), 1, [\ ])
+#let ancillas = (setwire(0), 5, lstick($|0〉$), 
+  setwire(1), targ(), 2, [\ ], setwire(0), 5, 
+  lstick($|0〉$), setwire(1), 1, targ(), 1, [\ ])
 
 #quantum-circuit(
   scale-factor: 80%,
-  lstick($|ψ〉$), 1, 10pt, ctrl(3), ctrl(6), gate($H$), 1, 15pt, 
-    ctrl(1), ctrl(2), 1, [\ ],
+  lstick($|ψ〉$), 1, 10pt, ctrl(3), ctrl(6), gate($H$),
+    1, 15pt, ctrl(1), ctrl(2), 1, [\ ],
   ..ancillas,
-  lstick($|0〉$), 1, targ(), 1, gate($H$), 1, ctrl(1), ctrl(2), 
-    1, [\ ],
+  lstick($|0〉$), 1, targ(), 1, gate($H$), 1, ctrl(1),
+    ctrl(2), 1, [\ ],
   ..ancillas,
-  lstick($|0〉$), 2, targ(),  gate($H$), 1, ctrl(1), ctrl(2), 
-    1, [\ ],
+  lstick($|0〉$), 2, targ(),  gate($H$), 1, ctrl(1),
+    ctrl(2), 1, [\ ],
   ..ancillas
 )```, {
   }

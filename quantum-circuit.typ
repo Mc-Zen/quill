@@ -48,6 +48,7 @@
 #let draw-ctrl(gate, draw-params) = {
   let clr = draw-params.wire
   let color = b-if-a-is-none(gate.fill, draw-params.color)
+  if "show-dot" in gate.data and not gate.data.show-dot { return none }
   if gate.data.open {
     let stroke = b-if-a-is-none(gate.fill, draw-params.wire)
     box(circle(stroke: stroke, fill: draw-params.background, radius: gate.data.size))
@@ -245,29 +246,29 @@
 }
 
 #let draw-meter(gate, draw-params) = {
-  let stroke = draw-params.wire
-  let fill = if gate.fill != none {gate.fill} else {draw-params.background} 
-  let height = draw-params.x-gate-size.height
-  let width = 1.5 * height
-  rect(
+    let stroke = draw-params.wire
+    let fill = if gate.fill != none {gate.fill} else {draw-params.background} 
+    let height = draw-params.x-gate-size.height 
+    let width = 1.5 * height
+    rect(
     width: width, height: height, 
     radius: gate.radius,
     stroke: stroke, fill: fill, 
     inset: 0.22 * height, {
       let center-x = width/2 -.22*height
       place(path((0%,100%), ((50%,40%), (-40%, 0pt)), (100%, 100%), stroke: stroke))
-      // place(line(start: (50%, 100%), length: 100%, angle: -70deg, stroke: stroke))
-      // place(path((75%, 17%), (86%, -0%), (82%, 26%), closed: true, stroke: stroke))
+        // place(line(start: (50%, 100%), length: 100%, angle: -70deg, stroke: stroke))
+        // place(path((75%, 17%), (86%, -0%), (82%, 26%), closed: true, stroke: stroke))
       draw-arrow((center-x, height*.58), (width*.6, height*.2), length: 3.8pt, width: 2.8pt, stroke: stroke, arrow-color: draw-params.color)
-  })
-  if gate.data.meter-label != none {
-    let label-size = measure(gate.data.meter-label, draw-params.styles)
-    place(
+    })
+    if gate.data.meter-label != none {
+      let label-size = measure(gate.data.meter-label, draw-params.styles)
+      place(
       dx: width/2 - label-size.width/2,
       dy: -label-size.height -height - .6em, gate.data.meter-label
-    )
-  }  
-}
+      )
+    }  
+  }
 
 #let default-size-hint(item, draw-params) = {
   let func = item.draw-function
@@ -330,8 +331,7 @@
 
 
 
-/// Basic command for creating multi-qubit or controlled gates. For the latter,  
-/// you usually want to go for something like @@ctrl, @@swap, or @@controlled.
+/// Basic command for creating multi-qubit or controlled gates. See also @@ctrl and @@swap. 
 ///
 /// - content (content):
 /// - n (integer): Number of wires the multi-qubit gate spans. 
@@ -357,7 +357,7 @@
 ///        `draw-function`.
 #let mqgate(
   content,
-  n, 
+  n: 1, 
   target: none,
   fill: none, 
   radius: 0pt,
@@ -418,10 +418,10 @@
 #let meter(target: none, n: 1, wire-count: 2, label: none,
   fill: none, 
   radius: 0pt) = {
-  if target == none {
+  if target == none and n == 1 {
     gate(none, fill: fill, radius: radius, draw-function: draw-meter, data: (meter-label: label))
   } else {
-     mqgate(none, n, target: target, fill: fill, radius: radius, box: true, wire-count: wire-count, draw-function: draw-meter, data: (meter-label: label))
+     mqgate(none, n: n, target: target, fill: fill, radius: radius, box: true, wire-count: wire-count, draw-function: draw-meter, data: (meter-label: label))
   }
 }
 
@@ -442,7 +442,7 @@
 /// - width (length): Width of the permutation gate. 
 /// 
 #let permute(..qubits, width: 30pt) = {
-  mqgate(none, qubits.pos().len(), width: width, draw-function: draw-permutation-gate, data: (qubits: qubits.pos(), extent: 2pt))
+  mqgate(none, n: qubits.pos().len(), width: width, draw-function: draw-permutation-gate, data: (qubits: qubits.pos(), extent: 2pt))
 }
 
 /// Create an invisible (phantom) gate for reserving space. If `content` 
@@ -544,13 +544,13 @@
 /// - wire-count (integer): Wire count for the control wire.  
 /// - draw-function (function). See @@gate. 
 /// - ..args (array): Optional, additional arguments to be stored in the gate. 
-#let controlled(content, n, wire-count: 1, draw-function: draw-boxed-gate, ..args) = mqgate(content, 1, target: n, wire-count: wire-count, draw-function: draw-function, ..args)
+// #let controlled(content, n, wire-count: 1, draw-function: draw-boxed-gate, ..args) = mqgate(content, target: n, wire-count: wire-count, draw-function: draw-function, ..args)
 
 /// Creates a #smallcaps("swap") operation with another qubit. 
 /// 
 /// - n (integer): How many wires up or down the target wire lives. 
 /// - size (length): Size of the target symbol. 
-#let swap(n, size: 7pt) = controlled(none, n, box: false, draw-function: draw-swap, data: (size: size))
+#let swap(n, size: 7pt) = mqgate(none, target: n, box: false, draw-function: draw-swap, data: (size: size))
 
 /// Creates a control with a vertical wire to another qubit. 
 /// 
@@ -560,7 +560,9 @@
 /// - fill (none, color): Fill color for the circle or stroke color if
 ///        `open: true`. 
 /// - size (length): Size of the control circle. 
-#let ctrl(n, wire-count: 1, open: false, fill: none, size: 2.3pt) = controlled(none, n, draw-function: draw-ctrl, wire-count: wire-count, fill: fill, data: (open: open, size: size))
+/// - show-dot (boolean): Whether to show the control dot. Set this to 
+///        false to obtain a vertical wire with no dots at all. 
+#let ctrl(n, wire-count: 1, open: false, fill: none, size: 2.3pt, show-dot: true) = mqgate(none, target: n, draw-function: draw-ctrl, wire-count: wire-count, fill: fill, data: (open: open, size: size, show-dot: show-dot))
 
 
 
