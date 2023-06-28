@@ -13,7 +13,8 @@
 #show link: set text(fill: purple.darken(30%))
 #show raw.where(block: true) : set par(justify: false)
 
-#let ref-fn(name) = name // link(label("/quantum-circuit" + name), raw(name))
+#let ref-fn(name) = link(label("/../../quantum-circuit" + name), raw(name))
+
 
 #let makefigure(code, content, vertical: false) = {
   align(center,
@@ -109,7 +110,7 @@ A new wire can be created by breaking the current wire with `[\ ]`:
   1, gate($H$), ctrl(1), 1, [\ ],
   2, targ(), 1
 ))
-We can create a #smallcaps("cx")-gate by calling #ref-fn("ctrl(0)") and passing the relative distance to the desired wire, e.g., `1` to the next wire, `2` to the second-next one or `-1` to the previous wire. Per default, the end of the vertical wire is  just joined with the target wire without any decoration at all. Here, we make the gate a #smallcaps("cx")-gate by adding a #ref-fn("targ()") symbol on the second wire. 
+We can create a #smallcaps("cx")-gate by calling #ref-fn("ctrl()") and passing the relative distance to the desired wire, e.g., `1` to the next wire, `2` to the second-next one or `-1` to the previous wire. Per default, the end of the vertical wire is  just joined with the target wire without any decoration at all. Here, we make the gate a #smallcaps("cx")-gate by adding a #ref-fn("targ()") symbol on the second wire. 
 
 Let's look at a quantum bit-flipping error correction circuit. Here we encounter our first multi-qubit gate as well as wire labels:
 #makefigure(vertical: true,
@@ -135,13 +136,13 @@ In many circuits, we need classical wires. This library generalizes the concept 
 #makefigure(vertical: false,
 ```typ
 #quantum-circuit(
-  1, gate($A$), meter(target: 1), [\ ],
+  1, gate($A$), meter(n: 1), [\ ],
   setwire(2), 2, ctrl(0), 2, [\ ],
   1, gate($X$), setwire(0), 1, lstick($|0〉$), 
     setwire(1), gate($Y$),
 )
 ```, quantum-circuit(
-  1, gate($A$), meter(target: 1), [\ ],
+  1, gate($A$), meter(n: 1), [\ ],
   setwire(2), 2, ctrl(0), 2, [\ ],
   1, gate($X$), setwire(0), 1, lstick($|0〉$), setwire(1), gate($Y$),
 ))
@@ -305,31 +306,11 @@ There is another option for #ref-fn("quantum-circuit()") that has a lot of impac
 = Gate Gallery <gate-gallery>
 
 
-#table(align: center + horizon, columns: 6, column-gutter: (0pt, 0pt, 2.5pt, 0pt, 0pt),
-  [Normal gate], quantum-circuit(1, gate($H$), 1), raw(lang: "typc", "gate($H$)"), 
-  [Round gate], quantum-circuit(1, gate($X$, radius: 100%), 1), raw(lang: "typc", "gate($X$, \nradius: 100%)"), 
-  [D gate], quantum-circuit(1, gate($Y$, radius: (right: 100%)), 1), raw(lang: "typc", "gate($Y$, radius: \n(right: 100%))"), 
-  [Meter], quantum-circuit(1, meter(), 1), raw(lang: "typc", "meter()"), 
-  [Meter with \ label], quantum-circuit(circuit-padding: (top: 1em), 1, meter(label: $lr(|±〉)$), 1), raw(lang: "typc", "meter(label: \n$lr(|±〉)$)"), 
-  [Phase gate], quantum-circuit(1, phase($α$), 1), raw(lang: "typc", "phase($α$)"), 
-  [Control], quantum-circuit(1, ctrl(0), 1), raw(lang: "typc", "ctrl(0)"), 
-  [Open control], quantum-circuit(1, ctrl(0, open: true), 1), raw(lang: "typc", "ctrl(0, open: true)"), 
-  [Target], quantum-circuit(1, targ(), 1), raw(lang: "typc", "targ()"), 
-  [Swap target], quantum-circuit(1, targX(), 1), raw(lang: "typc", "targX()"), 
-  [Permutation \ gate], quantum-circuit(1, permute(2,0,1), 1, [\ ], 3, [\ ], 3), raw(lang: "typc", "permute(2,0,1)"), 
-  [Multiqubit \ gate], quantum-circuit(1, mqgate($U$, 3), 1, [\ ], 3, [\ ], 3), raw(lang: "typc", "mqgate($U$, 3)"), 
-  [lstick], quantum-circuit(lstick($|psi〉$), 2), raw(lang: "typc", "lstick($|psi〉$)"), 
-  [rstick], quantum-circuit(2, rstick($|psi〉$)), raw(lang: "typc", "rstick($|psi〉$)"), 
-  [Multi-qubit \ lstick], quantum-circuit(row-spacing: 10pt, lstick($|psi〉$, n: 2), 2, [\ ], 3), raw(lang: "typc", "lstick($|psi〉$, \nn: 2)"), 
-  [Multi-qubit \ rstick], quantum-circuit(row-spacing: 10pt,2, rstick($|psi〉$, n: 2, brace: "]"),[\ ], 3), raw(lang: "typc", "rstick($|psi〉$, \nn: 2, brace: \"]\")"), 
-  [midstick], quantum-circuit(1, midstick("yeah"),1), raw(lang: "typc", "midstick(\"yeah\")"), 
-  [Wire bundle], quantum-circuit(1, nwire(5), 1), raw(lang: "typc", "nwire(5)"), 
-  [Controlled \  #smallcaps("z")-gate], quantum-circuit(1, ctrl(1), 1, [\ ], 1, ctrl(0), 1), [#raw(lang: "typc", "ctrl(1)") \ + \ #raw(lang: "typc", "ctrl(0)")], 
-  [Controlled \  #smallcaps("x")-gate], quantum-circuit(1, ctrl(1), 1, [\ ], 1, targ(), 1), [#raw(lang: "typc", "ctrl(1)") \ + \ #raw(lang: "typc", "targ()")], 
-  [Swap \  gate], quantum-circuit(1, swap(1), 1, [\ ], 1, targX(), 1), [#raw(lang: "typc", "swap(1)") \ + \ #raw(lang: "typc", "targX()")], 
-  [Controlled \ Hadamard], quantum-circuit(1, controlled($H$, 1), 1, [\ ], 1, ctrl(0), 1), [#raw(lang: "typc", "controlled($H$, 1)") \ + \ #raw(lang: "typc", "ctrl(0)")], 
-  [Meter to \ classical], quantum-circuit(1, meter(target: 1), 1, [\ ], setwire(2), 1, ctrl(0), 1), [#raw(lang: "typc", "meter(target: 1)") \ + \ #raw(lang: "typc", "ctrl(0)")],   
-)
+#[
+  #set par(justify: false)
+  #import "gallery.typ": gallery
+  #gallery
+]
 #pagebreak()
 
 
