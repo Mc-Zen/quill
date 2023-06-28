@@ -47,12 +47,12 @@ Refer to the [user guide](https://github.com/Mc-Zen/quill/blob/main/docs/guide/q
 
 Some show-off examples, loosely replicating figures from [Quantum Computation and Quantum Information by M. Nielsen and I. Chuang](https://www.cambridge.org/highereducation/books/quantum-computation-and-quantum-information/01E10196D0A682A6AEFFEA52D53BE9AE#overview).
 
-<p align="center">
+<h3 align="center">
   <img alt="Quantum teleportation circuit" src="docs/images/teleportation.svg" style="max-width: 100%; padding: 10px 10px; box-shadow: 1pt 1pt 10pt 0pt #AAAAAA; border-radius: 4pt">
-</p>
-<p align="center">
+</h3>
+<h3 align="center">
   <img alt="Quantum circuit for phase estimation" src="docs/images/phase-estimation.svg" style="max-width: 100%; padding: 10px 10px; box-shadow: 1pt 1pt 10pt 0pt #AAAAAA; border-radius: 4pt">
-</p>
-<p align="center">
+</h3>
+<h3 align="center">
   <img alt="Quantum fourier transformation circuit" src="docs/images/qft.svg" style="max-width: 100%; padding: 10px 10px; box-shadow: 1pt 1pt 10pt 0pt #AAAAAA; border-radius: 4pt">
-</p>
+</h3>
