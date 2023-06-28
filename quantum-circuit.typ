@@ -172,6 +172,7 @@
   let dy = draw-params.multi.wire-distance
   let extent = if gate.multi.extent == auto {draw-params.x-gate-size.height/2} else {gate.multi.extent}
   let layout-version = box(
+      width: gate.width,
       inset: draw-params.padding, 
       stroke: draw-params.wire, 
       fill: if gate.fill != none {gate.fill} else {draw-params.background}, 
@@ -182,13 +183,15 @@
     layout-version
   } else {
     let size = measure(gate.content, draw-params.styles)
-    box(
+    align(center, box(
+      width: gate.width,
       height: dy + 2 * extent,
       inset: (x: draw-params.padding, y: dy/2 + extent - size.height/2), 
+      radius: gate.radius,
       stroke: draw-params.wire, 
       fill: if gate.fill != none {gate.fill} else {draw-params.background}, 
       gate.content
-    )
+    ))
   }
 }
 
@@ -243,12 +246,13 @@
 
 #let draw-meter(gate, draw-params) = {
   let stroke = draw-params.wire
-  let fill = draw-params.background
+  let fill = if gate.fill != none {gate.fill} else {draw-params.background} 
   let height = draw-params.x-gate-size.height
   let width = 1.5 * height
   rect(
     width: width, height: height, 
-    stroke: stroke, fill: if fill != none { fill } else { white }, 
+    radius: gate.radius,
+    stroke: stroke, fill: fill, 
     inset: 0.22 * height, {
       let center-x = width/2 -.22*height
       place(path((0%,100%), ((50%,40%), (-40%, 0pt)), (100%, 100%), stroke: stroke))
@@ -369,6 +373,7 @@
   content, 
   fill: fill, box: box, 
   width: width,
+  radius: radius,
   draw-function: draw-function,
   multi: (
     target: target,
@@ -410,11 +415,13 @@
 /// - wire-count (integer):   Wire count for the (optional) control wire. 
 /// - n (integer):            Number of wires to span this meter across. 
 /// - label (content):        Label to show above the meter. 
-#let meter(target: none, n: 1, wire-count: 2, label: none) = {
+#let meter(target: none, n: 1, wire-count: 2, label: none,
+  fill: none, 
+  radius: 0pt) = {
   if target == none {
-    gate(none, draw-function: draw-meter, data: (meter-label: label))
+    gate(none, fill: fill, radius: radius, draw-function: draw-meter, data: (meter-label: label))
   } else {
-     mqgate(none, n, target: target, box: true, wire-count: wire-count, draw-function: draw-meter, data: (meter-label: label))
+     mqgate(none, n, target: target, fill: fill, radius: radius, box: true, wire-count: wire-count, draw-function: draw-meter, data: (meter-label: label))
   }
 }
 
@@ -940,7 +947,7 @@
           let y1 = obtain-cell-coords1(center-y-coords, rowheights, row)
           let y2 = obtain-cell-coords1(center-y-coords, rowheights, row + item.wires)
           let x1 = obtain-cell-coords1(center-x-coords, colwidths, col)
-          let x2 = obtain-cell-coords1(center-x-coords, colwidths, col + item.steps)
+          let x2 = obtain-cell-coords1(center-x-coords, colwidths, col + item.steps - 1e-9)
           // let y1 = rowheights.slice(0, row).sum(default: 0pt)
           // let y2 = rowheights.slice(0, row + item.wires).sum(default: 0pt)
           // let x1 = colwidths.slice(0, col).sum(default: 0pt)
