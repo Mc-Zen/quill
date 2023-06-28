@@ -1,4 +1,4 @@
-#import "../quantum-circuit.typ": *
+#import "../quill.typ": *
 
 #let group = gategroup.with(stroke: (dash: "dotted", thickness: .5pt))
 

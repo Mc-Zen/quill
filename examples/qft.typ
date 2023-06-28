@@ -1,4 +1,4 @@
-#import "../quantum-circuit.typ": *
+#import "../quill.typ": *
 
 #quantum-circuit(
   scale-factor: 85%,

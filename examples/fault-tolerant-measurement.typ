@@ -1,4 +1,4 @@
-#import "../quantum-circuit.typ": *
+#import "../quill.typ": *
 
 #let mark(text, col1, col2) = annotate(0, (col1, col2), 
   (y, (x1, x2)) => style(styles => {

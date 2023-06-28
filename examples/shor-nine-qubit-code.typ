@@ -1,4 +1,4 @@
-#import "../quantum-circuit.typ": *
+#import "../quill.typ": *
 
 #let ancillas = (setwire(0), 5, lstick($|0〉$), setwire(1), targ(), 2, [\ ],
 setwire(0), 5, lstick($|0〉$), setwire(1), 1, targ(), 1, [\ ])

@@ -1,21 +1,19 @@
 #import "template.typ": *
 #import "typst-doc.typ": parse-module, show-module, show-outline
-#import "../../quantum-circuit.typ": *
+#import "../../quill.typ": *
 #show link: underline
 
-#let package-name = "Qutie"
-#show "Quantum-Circuit": "Qutie"
 #show: project.with(
-  title: "Guide for the Quantum-Circuit Package ",
+  title: "Guide for the Quill Package ",
   authors: ("Mc-Zen",),
-  abstract: [#package-name is a library for creating quantum circuit diagrams in #link("https://typst.app/", [Typst]). ],
+  abstract: [Quill is a library for creating quantum circuit diagrams in #link("https://typst.app/", [Typst]). ],
   date: "June 4, 2023",
 )
 
 #show link: set text(fill: purple.darken(30%))
 #show raw.where(block: true) : set par(justify: false)
 
-#let ref-fn(name) = link(label("/../../quantum-circuit" + name), raw(name))
+#let ref-fn(name) = link(label("/../../quill" + name), raw(name))
 
 
 #let makefigure(code, content, vertical: false) = {
@@ -353,7 +351,7 @@ text(size: .8em, ```typ
 
 = Annotations
 
-*Quantum-Circuit* provides a way of making custom annotations through the #ref-fn("annotate()") interface. An `annotate()` object may be placed anywhere in the circuit, the position only matters for the draw order in case several annotations would overlap. 
+*Quill* provides a way of making custom annotations through the #ref-fn("annotate()") interface. An `annotate()` object may be placed anywhere in the circuit, the position only matters for the draw order in case several annotations would overlap. 
 
 
 The `annotate()` command allows for querying cell coordinates of the circuit and passing in a custom draw function to draw globally in the circuit diagram. // This way, basically any decoration
@@ -481,7 +479,7 @@ text(```typ
     
     #set heading(numbering: none)
     #{
-      let docs = parse-module("/../../quantum-circuit.typ")
+      let docs = parse-module("/../../quill.typ")
     
       let gates = docs
       gates.functions = gates.functions.filter(

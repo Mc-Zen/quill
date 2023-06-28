@@ -4,21 +4,21 @@
 
 
 <!-- <p align="center">
-  <a href="https://github.com/Mc-Zen/typst-quantum-circuit/blob/main/LICENSE">
+  <a href="https://github.com/Mc-Zen/quill/blob/main/LICENSE">
     <img alt="MIT License" src="https://img.shields.io/badge/license-MIT-blue"/>
   </a>
 </p> -->
 
-**Quantum-Circuit** is a library for creating quantum circuit diagrams in [Typst](https://typst.app/). 
+**Quill** is a library for creating quantum circuit diagrams in [Typst](https://typst.app/). 
 
 
 Note, that this library is still in beta and may still be undergoing breaking changes. As new features like data types and scoped functions will be added to Typst, this library will be adapted to profit from the new paradigms. 
 
-Meanwhile, we suggest importing everything from `quantum-circuit.typ` in a local scope to avoid polluting the global namespace (see example below). 
+Meanwhile, we suggest importing everything from `quill.typ` in a local scope to avoid polluting the global namespace (see example below). 
 
 <!-- ## Setup
 
-Since there is no package manager for Typst yet, in order to use this library, download the [quantum-circuit.typ](./qcircuit.typ) file and place it in your Typst project.  -->
+Since there is no package manager for Typst yet, in order to use this library, download the [quill.typ](./qcircuit.typ) file and place it in your Typst project.  -->
 
 ## Usage
 
@@ -26,7 +26,7 @@ Create circuit diagrams by calling the function `quantum-circuit()` with any num
 
 ```java
 #{
-  import "quantum-circuit.typ" : *
+  import "quill.typ" : *
   quantum-circuit(
     lstick($|0〉$), gate($H$), control(1), rstick($(|00〉+|11〉)/√2$, n: 2), [\ ],
     lstick($|0〉$), 1, targ(), 1
@@ -35,7 +35,7 @@ Create circuit diagrams by calling the function `quantum-circuit()` with any num
 ```
 ![Bell circuit example](docs/images/bell.png)
 
-Refer to the [user guide](docs/guide/quantum-circuit-guide.pdf) for full documentation.
+Refer to the [user guide](docs/guide/quill-guide.pdf) for full documentation.
 
 ## Gallery
 
