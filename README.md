@@ -1,5 +1,5 @@
 <h1 align="center">
-  <img alt="Quantum Circuit" src="docs/images/logo.svg" style="max-width: 100%; width: 300pt; padding: 10px 20px; box-shadow: 1pt 1pt 10pt 0pt #AAAAAA; border-radius: 4pt;box-sizing: border-box;">
+  <img alt="Quantum Circuit" src="docs/images/logo.svg" style="max-width: 100%; width: 300pt; padding: 10px 20px; box-shadow: 1pt 1pt 10pt 0pt #AAAAAA; border-radius: 4pt;box-sizing: border-box; background: white">
 </h1>
 
 
@@ -14,7 +14,7 @@
 
 _Note, that this package is in beta and may still be undergoing breaking changes. As new features like data types and scoped functions will be added to Typst, this package will be adapted to profit from the new paradigms._
 
-_Meanwhile, we suggest importing everything from `quill.typ` in a local scope to avoid polluting the global namespace (see example below)._
+_Meanwhile, we suggest importing everything from the package in a local scope to avoid polluting the global namespace (see example below)._
 
 <!-- ## Setup
 
@@ -26,33 +26,35 @@ Create circuit diagrams by calling the function `quantum-circuit()` with any num
 
 ```java
 #{
-  import "quill.typ" : *
+  import "@preview/quill:0.1.0": *
   quantum-circuit(
-    lstick($|0〉$), gate($H$), control(1), rstick($(|00〉+|11〉)/√2$, n: 2), [\ ],
+    lstick($|0〉$), gate($H$), ctrl(1), rstick($(|00〉+|11〉)/√2$, n: 2), [\ ],
     lstick($|0〉$), 1, targ(), 1
   )
 }
 ```
 <h3 align="center">
-  <img alt="Quantum Circuit" src="docs/images/bell.svg" style="max-width: 100%; padding: 10px 10px; box-shadow: 1pt 1pt 10pt 0pt #AAAAAA; border-radius: 4pt">
+  <img alt="Quantum Circuit" src="docs/images/bell.svg" style="max-width: 100%; padding: 10px 10px; box-shadow: 1pt 1pt 10pt 0pt #AAAAAA; border-radius: 4pt; background: white">
 </h3>
 
 Refer to the [user guide](https://github.com/Mc-Zen/quill/blob/main/docs/guide/quill-guide.pdf) for full documentation.
 
 ## Gallery
 
-![gallery](docs/images/gallery.svg)
+<h3 align="center">
+  <img alt="Gallery" src="docs/images/gallery.svg" style="background: white; padding: 10pt; box-sizing: border-box" />
+</h3>
 
 ## Examples
 
 Some show-off examples, loosely replicating figures from [Quantum Computation and Quantum Information by M. Nielsen and I. Chuang](https://www.cambridge.org/highereducation/books/quantum-computation-and-quantum-information/01E10196D0A682A6AEFFEA52D53BE9AE#overview).
 
 <h3 align="center">
-  <img alt="Quantum teleportation circuit" src="docs/images/teleportation.svg" style="max-width: 100%; padding: 10px 10px; box-shadow: 1pt 1pt 10pt 0pt #AAAAAA; border-radius: 4pt">
+  <img alt="Quantum teleportation circuit" src="docs/images/teleportation.svg" style="max-width: 100%; padding: 10px 10px; box-shadow: 1pt 1pt 10pt 0pt #AAAAAA; border-radius: 4pt; background: white; box-sizing: border-box">
 </h3>
 <h3 align="center">
-  <img alt="Quantum circuit for phase estimation" src="docs/images/phase-estimation.svg" style="max-width: 100%; padding: 10px 10px; box-shadow: 1pt 1pt 10pt 0pt #AAAAAA; border-radius: 4pt">
+  <img alt="Quantum circuit for phase estimation" src="docs/images/phase-estimation.svg" style="max-width: 100%; padding: 10px 10px; box-shadow: 1pt 1pt 10pt 0pt #AAAAAA; border-radius: 4pt; background: white; box-sizing: border-box">
 </h3>
 <h3 align="center">
-  <img alt="Quantum fourier transformation circuit" src="docs/images/qft.svg" style="max-width: 100%; padding: 10px 10px; box-shadow: 1pt 1pt 10pt 0pt #AAAAAA; border-radius: 4pt">
+  <img alt="Quantum fourier transformation circuit" src="docs/images/qft.svg" style="max-width: 100%; padding: 10px 10px; box-shadow: 1pt 1pt 10pt 0pt #AAAAAA; border-radius: 4pt; background: white; box-sizing: border-box">
 </h3>
