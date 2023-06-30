@@ -214,7 +214,7 @@ Furthermore, a common task is changing the total size of a circuit by scaling it
   1, 1, targ(), 2
 ))
 
-Note, that this is different than calling Typst's builtin `scale()` function on the circuit which would scale it without affecting the layout, thus still reserving the same space as if unscaled!
+Note, that this is different than calling Typst's built-in `scale()` function on the circuit which would scale it without affecting the layout, thus still reserving the same space as if unscaled!
 
 For an optimally layout, the height for each row is determined by the gates on that wire. For this reason, the wires can have different distances. To better see the effect, let's decrease the `row-spacing`:
 
@@ -454,6 +454,59 @@ text(```typ
   }) 
 )
 
+
+#pagebreak()
+= Custom Gates
+
+Quill allows you to create totally customized gates by specifying the `draw-function` argument in #ref-fn("gate()") or #ref-fn("mqgate()"). You will not need to do this however if you just want to change the color of the gate or make it round. For these tasks you can just use the appropriate arguments of the #ref-fn("gate()") command. 
+
+Note, that the interface for custom gates might still change a bit. 
+
+When the circuit is layed out, the draw function is called with two (read-only) arguments: the gate itself and a dictionary that contains information about the circuit style and more. 
+
+Let us look at a little example for a custom gate that just shows the vertical lines of the box but not the horizontal ones. 
+
+#box(inset: 1em, ```typ
+#let draw-par-gate(gate, draw-params) = {
+  let stroke = draw-params.wire
+  let fill = if gate.fill != none { gate.fill } else { draw-params.background }
+
+  box(
+    gate.content, 
+    fill: fill, stroke: (left: stroke, right: stroke), 
+    inset: draw-params.padding
+  )
+}
+```)
+
+We can now use it like this:
+
+#makefigure(vertical: false,
+text(```typ
+#quantum-circuit(
+  1, gate("Quill", draw-function: draw-par-gate), 1, 
+)
+```), [
+  #let draw-par-gate(gate, draw-params) = {
+    let stroke = draw-params.wire
+    let fill = if gate.fill != none { gate.fill } else { draw-params.background }
+    box(
+      gate.content, 
+      fill: fill, stroke: (left: stroke, right: stroke), 
+      inset: draw-params.padding
+    )
+  }
+  #quantum-circuit(
+    1, gate("Quill", draw-function: draw-par-gate), 1, 
+  )
+])
+
+
+The first argument for the draw function contains information about the gate. From that we read the gate's `content` (here `"Quill"`). We create a `box()` with the content and only specify the left and right edge stroke. In order for the circuit to look consistent, we read the circuit style from the draw-params. The key `draw-params.wire` contains the (per-circuit) global wire stroke setting as set through `quantum-circuit(wire: ...)`. Additionally, if a fill color has been specified for the gate, we want to use it. Otherwise, we use `draw-params.background` to be conform with for example dark-mode circuits. Finally, to create space, we add some inset to the box. The key `draw-params.padding` holds the (per-circuit) global gate padding length. 
+
+It is generally possible to read any value from a gate that has been provided in the gate's constructor. Currently, `content`, `fill`, `radius`, `width`, `box` and `data` (containing the optional data argument that can be added in the #ref-fn("gate()") function) can be read from the gate. For multi-qubit gates, the key `multi` contains a dictionary with the keys `target` (specifying the relative target qubit for control wires), `num-qubits`, `wire-count` (the wire count for the control wire) and `extent` (the amount of length to extend above the first and below the last wire). 
+
+All built-in gates are drawn with a dedicated `draw-function` and you can also take a look at the source code for ideas and hints. 
 
 #pagebreak()
 = Function Documentation

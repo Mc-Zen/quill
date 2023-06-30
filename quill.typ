@@ -316,7 +316,7 @@
   gate-type: "",
   data: none
 ) = (
-  content: if type(content) == "content" {content} else { content }, 
+  content: content, 
   fill: fill,
   radius: radius,
   width: width,
@@ -340,6 +340,7 @@
 /// - fill (none, color): Gate backgrond fill color.
 /// - radius (length, dictionary): Gate rectangle border radius. 
 ///        Allows the same values as the builtin `rect()` function.
+/// - width (auto, length): The width of the gate can be specified manually with this property. 
 /// - box (boolean): Whether this is a boxed gate (determines whether the 
 ///        outgoing wire will be drawn all through the gate (`box: false`) or not).
 /// - label (content): Optional label on the vertical wire. 
@@ -361,9 +362,9 @@
   target: none,
   fill: none, 
   radius: 0pt,
+  width: auto,
   box: true, 
   label: none, 
-  width: auto,
   wire-count: 1,
   extent: auto, 
   size-all-wires: false,
@@ -805,6 +806,9 @@
   ..content
 ) = { 
   if content.pos().len() == 0 { return }
+  if content.named().len() > 0 { 
+    panic("Unexpected named argument '" + content.named().keys().at(0) + "' for quantum-circuit()")
+  }
   set text(color, size: font-size)
   
   style(styles => {
@@ -824,6 +828,7 @@
   draw-params.x-gate-size = default-size-hint(gate($X$), draw-params)
   
   let items = content.pos()
+  
   /////////// First pass: Layout (spacing)   ///////////
   
   let colwidths = ()

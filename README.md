@@ -34,7 +34,7 @@ Create circuit diagrams by calling the function `quantum-circuit()` with any num
 }
 ```
 <h3 align="center">
-  <img alt="Quantum Circuit" src="docs/images/bell.svg" style="max-width: 100%; padding: 10px 10px; box-shadow: 1pt 1pt 10pt 0pt #AAAAAA; border-radius: 4pt; background: white">
+  <img alt="Bell Circuit" src="docs/images/bell.svg" style="max-width: 100%; padding: 10px 10px; box-shadow: 1pt 1pt 10pt 0pt #AAAAAA; border-radius: 4pt; box-sizing: border-box; background: white">
 </h3>
 
 Refer to the [user guide](https://github.com/Mc-Zen/quill/blob/main/docs/guide/quill-guide.pdf) for full documentation.

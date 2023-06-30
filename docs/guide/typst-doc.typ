@@ -274,7 +274,7 @@
 // Matches the function name (any Typst identifier)
 
 
-#let argument-type-matcher = regex(`[^\S\r\n]*/{3} - ([\w\d\-_]+) \(([\w\d\-_ ,]+)\): ?(.*)`.text)
+#let argument-type-matcher = regex(`[^\S\r\n]*/{3} - ([.\w\d\-_]+) \(([\w\d\-_ ,]+)\): ?(.*)`.text)
 
 #let reference-matcher = regex(`@@([\w\d\-_\)\(]+)`.text)
 
