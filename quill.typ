@@ -246,29 +246,37 @@
 }
 
 #let draw-meter(gate, draw-params) = {
+  let content = {
     let stroke = draw-params.wire
-    let fill = if gate.fill != none {gate.fill} else {draw-params.background} 
+    let padding = draw-params.padding
+    let fill = b-if-a-is-none(gate.fill, draw-params.background)
     let height = draw-params.x-gate-size.height 
     let width = 1.5 * height
-    rect(
-    width: width, height: height, 
-    radius: gate.radius,
-    stroke: stroke, fill: fill, 
-    inset: 0.22 * height, {
-      let center-x = width/2 -.22*height
-      place(path((0%,100%), ((50%,40%), (-40%, 0pt)), (100%, 100%), stroke: stroke))
-        // place(line(start: (50%, 100%), length: 100%, angle: -70deg, stroke: stroke))
-        // place(path((75%, 17%), (86%, -0%), (82%, 26%), closed: true, stroke: stroke))
-      draw-arrow((center-x, height*.58), (width*.6, height*.2), length: 3.8pt, width: 2.8pt, stroke: stroke, arrow-color: draw-params.color)
+    height -= 2 * padding
+    width -= 2 * padding
+    box(
+      width: width, height: height, inset: 0pt, 
+      {
+        let center-x = width / 2
+        place(path((0%, 110%), ((50%, 40%), (-40%, 0pt)), (100%, 110%), stroke: stroke))
+        set align(left)
+        draw-arrow((center-x, height * 1.2), (width * .9, height*.3), length: 3.8pt, width: 2.8pt, stroke: stroke, arrow-color: draw-params.color)
     })
     if gate.data.meter-label != none {
       let label-size = measure(gate.data.meter-label, draw-params.styles)
       place(
-      dx: width/2 - label-size.width/2,
-      dy: -label-size.height -height - .6em, gate.data.meter-label
+        dx: -label-size.width/2,
+        dy: -label-size.height -height - .6em - padding, gate.data.meter-label
       )
     }  
   }
+  gate.content = content
+  if gate.multi != none and gate.multi.num-qubits > 1 {
+    draw-boxed-multigate(gate, draw-params)
+  } else {
+    draw-boxed-gate(gate, draw-params)
+  }
+}
 
 #let default-size-hint(item, draw-params) = {
   let func = item.draw-function
