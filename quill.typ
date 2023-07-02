@@ -75,10 +75,10 @@
 #let draw-boxed-gate(gate, draw-params) = align(center, box(
   inset: draw-params.padding, 
   width: gate.width,
+  radius: gate.radius,
   stroke: if gate.box { draw-params.wire }, 
   fill: if gate.fill != none {gate.fill} else if gate.box {draw-params.background}, 
   gate.content,
-  radius: gate.radius,
 ))
 
 // Same but without displaying a box
@@ -87,6 +87,25 @@
   fill: if gate.fill != none {gate.fill} else {draw-params.background}, 
   gate.content
 )
+
+
+// Draw a gate spanning multiple wires
+#let draw-boxed-multigate(gate, draw-params) = {
+  let dy = draw-params.multi.wire-distance
+  let extent = if gate.multi.extent == auto {draw-params.x-gate-size.height/2} else {gate.multi.extent}
+  let style-params = (
+      width: gate.width,
+      stroke: draw-params.wire, 
+      radius: gate.radius,
+      fill: if gate.fill != none {gate.fill} else {draw-params.background}, 
+      inset: draw-params.padding, 
+  )
+  align(center + horizon, box(
+    ..style-params,
+    gate.content,
+    height: dy + 2 * extent,
+  ))
+}
 
 #let lrstick-size-hint(gate, draw-params) = {
   let content = box(inset: draw-params.padding, gate.content)
@@ -168,33 +187,7 @@
   })
 }
 
-// Draw a gate spanning multiple wires
-#let draw-boxed-multigate(gate, draw-params) = {
-  let dy = draw-params.multi.wire-distance
-  let extent = if gate.multi.extent == auto {draw-params.x-gate-size.height/2} else {gate.multi.extent}
-  let layout-version = box(
-      width: gate.width,
-      inset: draw-params.padding, 
-      stroke: draw-params.wire, 
-      fill: if gate.fill != none {gate.fill} else {draw-params.background}, 
-      gate.content,
-      height: 2 * extent
-    )
-  if dy == 0pt {
-    layout-version
-  } else {
-    let size = measure(gate.content, draw-params.styles)
-    align(center, box(
-      width: gate.width,
-      height: dy + 2 * extent,
-      inset: (x: draw-params.padding, y: dy/2 + extent - size.height/2), 
-      radius: gate.radius,
-      stroke: draw-params.wire, 
-      fill: if gate.fill != none {gate.fill} else {draw-params.background}, 
-      gate.content
-    ))
-  }
-}
+
 
 #let draw-permutation-gate(gate, draw-params) = {
   let dy = draw-params.multi.wire-distance
@@ -247,6 +240,7 @@
 
 #let draw-meter(gate, draw-params) = {
   let content = {
+    set align(top)
     let stroke = draw-params.wire
     let padding = draw-params.padding
     let fill = b-if-a-is-none(gate.fill, draw-params.background)
@@ -265,12 +259,12 @@
     if gate.data.meter-label != none {
       let label-size = measure(gate.data.meter-label, draw-params.styles)
       place(
-        dx: -label-size.width/2,
-        dy: -label-size.height -height - .6em - padding, gate.data.meter-label
+        dx: -label-size.width / 2,
+        dy: -label-size.height - height - .6em - padding, gate.data.meter-label
       )
     }  
   }
-  gate.content = content
+  gate.content = rect(content, inset: 0pt, stroke: none)
   if gate.multi != none and gate.multi.num-qubits > 1 {
     draw-boxed-multigate(gate, draw-params)
   } else {
