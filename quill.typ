@@ -89,6 +89,16 @@
 )
 
 
+// create a sized brace with given length. 
+// `brace` can be auto, defaulting to "{" if alignment is right
+// and "}" if alignment is left. 
+#let create-brace(brace, alignment, length) = {
+  let brace-symbol = if brace == auto {
+      if alignment == right {"{"} else {"}"} 
+    } else { brace }
+  $ lr(#brace-symbol#box(height: length)) $
+}
+
 // Draw a gate spanning multiple wires
 #let draw-boxed-multigate(gate, draw-params) = {
   let dy = draw-params.multi.wire-distance
@@ -102,9 +112,46 @@
   )
   align(center + horizon, box(
     ..style-params,
-    gate.content,
     height: dy + 2 * extent,
+    gate.content
   ))
+  
+  
+  let draw-inouts(inouts, alignment) = {
+    
+    if inouts != none and dy != 0pt {
+      let width = measure(line(length: gate.width), draw-params.styles).width
+      let y0 = -(dy + extent) - draw-params.center-y-coords.at(0)
+      let get-wire-y(qubit) = { draw-params.center-y-coords.at(qubit) + y0 }
+      set text(size: .8em)
+      style(styles => {
+        for input in inouts {
+          let size = measure(input.label, styles)
+          let y = get-wire-y(input.qubit)
+          let label-x = draw-params.padding
+          if "n" in input and input.n > 1 {
+            let y2 = get-wire-y(input.qubit + input.n - 1)
+            let brace = create-brace(auto, alignment, y2 - y + draw-params.padding)
+            let brace-x = 0pt
+            let size = measure(brace, styles)
+            if alignment == right { brace-x += width - size.width }
+            
+            place(brace, dy: y - 0.5 * draw-params.padding, dx: brace-x)
+            label-x = size.width
+            y += 0.5 * (y2 - y)
+          }
+          place(dy: y - size.height / 2, align(
+            alignment, 
+            box(input.label, width: width, inset: (x: label-x))
+          ))
+        }
+      })
+      
+    }
+  
+  }
+  draw-inouts(gate.multi.inputs, left)
+  draw-inouts(gate.multi.outputs, right)
 }
 
 #let lrstick-size-hint(gate, draw-params) = {
@@ -117,6 +164,7 @@
   )
   return hint
 }
+
 
 // Draw an lstick (align: "right") or rstick (align: "left")
 #let draw-lrstick(gate, draw-params, align: none) = {
@@ -141,6 +189,11 @@
       brace-height = draw-params.multi.wire-distance + .5em
     }
     brace = $ lr(#brace-symbol#box(height: brace-height)) $
+    let brace-symbol = gate.data.brace
+    if brace-symbol == auto and gate.multi == none {
+      brace-symbol = none
+    }
+    brace = create-brace(brace-symbol, if isleftstick {right}else{left}, brace-height)
   }
   
   let brace-size = measure(brace, draw-params.styles)
@@ -347,6 +400,13 @@
 ///        outgoing wire will be drawn all through the gate (`box: false`) or not).
 /// - label (content): Optional label on the vertical wire. 
 /// - wire-count (integer): Wire count for control wires.
+/// - inputs (none, array): You can put labels inside the gate to label the input wires with 
+///        this argument. It accepts a list of labels, each of which has to be a dictionary
+///        with the keys `qubit` (denoting the qubit to label, starting at 0) and `content`
+///        (containing the label content). Optionally, providing a value for the key `n` allows
+///        for labelling multiple qubits spanning over `n` wires. These are then grouped by a 
+///        brace. 
+/// - outputs (none, array): Same as `inputs` but for gate outputs. 
 /// - extent (auto, length): How much to extent the gate beyond the first and 
 ///        last wire, default is to make it align with an X gate (so [size of x gate] / 2). 
 /// - size-all-wires (none, boolean): A single-qubit gate affects the height of the row
@@ -368,6 +428,8 @@
   box: true, 
   label: none, 
   wire-count: 1,
+  inputs: none,
+  outputs: none,
   extent: auto, 
   size-all-wires: false,
   draw-function: draw-boxed-multigate, 
@@ -384,7 +446,9 @@
     wire-count: wire-count, 
     label: label,
     extent: extent,
-    size-all-wires: size-all-wires
+    size-all-wires: size-all-wires,
+    inputs: inputs,
+    outputs: outputs,
   ),
   data: data
 )
