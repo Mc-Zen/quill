@@ -96,7 +96,7 @@
   let brace-symbol = if brace == auto {
       if alignment == right {"{"} else {"}"} 
     } else { brace }
-  $ lr(#brace-symbol#box(height: length)) $
+  return $ lr(#brace-symbol#block(height: length)) $
 }
 
 // Draw a gate spanning multiple wires
@@ -188,7 +188,6 @@
     } else {
       brace-height = draw-params.multi.wire-distance + .5em
     }
-    brace = $ lr(#brace-symbol#box(height: brace-height)) $
     let brace-symbol = gate.data.brace
     if brace-symbol == auto and gate.multi == none {
       brace-symbol = none

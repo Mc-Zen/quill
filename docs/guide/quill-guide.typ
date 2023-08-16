@@ -13,7 +13,7 @@
 #show link: set text(fill: purple.darken(30%))
 #show raw.where(block: true) : set par(justify: false)
 
-#let ref-fn(name) = link(label("/../../quill" + name), raw(name))
+#let ref-fn(name) = link(label("quill:" + name), raw(name))
 
 
 #let makefigure(code, content, vertical: false) = {
@@ -313,7 +313,53 @@ There is another option for #ref-fn("quantum-circuit()") that has a lot of impac
 ]
 #pagebreak()
 
+= Tips and Tricks
 
+
+== Circuit Style Template
+If you find yourself setting the same style parameters for the `quantum-circuit()` function over and over again, consider adding an alias with preprended parameter values:
+
+#makefigure(
+```typ
+#let mycircuit = quantum-circuit.with(row-spacing: 5pt, column-spacing: 5pt)
+```, [
+  #let mycircuit = quantum-circuit.with(row-spacing: 5pt, column-spacing: 5pt)
+  #mycircuit(1, gate($X$), 1)
+])
+
+You can then use `mycircuit()` in place of `quantum-circuit()`. This can also be used to create a white-on-black template:
+
+#makefigure(
+```typ
+#let darkcircuit = quantum-circuit.with(
+  wire: .7pt + white, 
+  color: white, 
+  fill: black
+)
+```, [
+  #let darkcircuit = quantum-circuit.with(wire: .7pt + white, color: white, fill: black)
+  #darkcircuit(1, gate($X$), 1)
+])
+
+
+== Gate Templates
+
+It is very easy and often worth to declare a certain gate that is used multiple times in a variable:
+
+#makefigure(
+```typ
+#let noise = gate($cal(E)$, radius: 5pt)
+```, [
+])
+
+Also, the same technique as described in the previous section can be used to add gate "templates". For example, we might want to have a round, blue gate (with different content) at many places in the circuit. We can then write 
+
+#makefigure(
+```typ
+#let noise = gate($cal(E)$, radius: 5pt)
+```, [
+])
+#pagebreak()
 
 = Fine-Tuning <fine-tuning>
 
@@ -365,7 +411,7 @@ text(size: .8em, ```typ
   1, targ(), 1, meter(),
   annotate(0, (2, 4), 
     (y, (x1, x2)) => { 
-      let brace = math.lr($#box(height: x2 - x1)}$)
+      let brace = math.lr($#block(height: x2 - x1)}$)
       place(dx: x1, dy: y, rotate(brace, -90deg, origin: top))
       let content = [Readout circuit]
       style(styles => {
@@ -379,7 +425,7 @@ text(size: .8em, ```typ
   1, targ(), 1, meter(),
   annotate(0, (2, 4),
     (y, (x1, x2)) => { 
-      let brace = math.lr($#box(height: x2 - x1)}$)
+      let brace = math.lr($#block(height: x2 - x1)}$)
       place(dx: x1, dy: y, rotate(brace, -90deg, origin: top))
       let content = [Readout circuit]
       style(styles => {
@@ -532,7 +578,7 @@ All built-in gates are drawn with a dedicated `draw-function` and you can also t
     
     #set heading(numbering: none)
     #{
-      let docs = parse-module("/../../quill.typ")
+      let docs = parse-module("/../../quill.typ", label-prefix: "quill:")
     
       let gates = docs
       gates.functions = gates.functions.filter(
