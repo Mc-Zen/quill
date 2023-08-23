@@ -812,6 +812,12 @@
   }
 }
 
+
+#let convert-em-length(length, styles) = {
+  if length.em == 0pt { return length }
+  measure(line(length: length), styles).width
+}
+
 /// Create a quantum circuit diagram. Content items may be
 /// - Gates created by one of the many gate commands (@@gate, 
 ///   @@mqgate, @@meter, ...)
@@ -895,6 +901,11 @@
   let items = content.pos()
   
   /////////// First pass: Layout (spacing)   ///////////
+  
+  let column-spacing = convert-em-length(column-spacing, styles)
+  let row-spacing = convert-em-length(row-spacing, styles)
+  let min-row-height = convert-em-length(min-row-height, styles)
+  let min-column-width = convert-em-length(min-column-width, styles)
   
   let colwidths = ()
   let rowheights = (min-row-height,)
