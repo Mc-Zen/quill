@@ -5,6 +5,18 @@
 #let is-circuit-meta-instruction(item) = { type(item) == "dictionary" and "qc-instr" in item }
 
 
+#let convert-em-length(length, styles) = {
+  if length.em == 0pt { return length }
+  let em = measure(line(length: 1em), styles).width
+  return length.abs + length.em / 1em * em
+}
+
+#let get-length(length, container-length) = {
+  if type(length) == "length" { return length }
+  if type(length) == "ratio" { return length * container-length}
+  if type(length) == "relative length" { return length.length + length.ratio * container-length}
+}
+
 #let draw-arrow(start, end, length: 5pt, width: 2.5pt, stroke: 1pt + black, arrow-color: black) = {
   place(line(start: start, end: end, stroke: stroke))
   let dir = (end.at(0) - start.at(0), end.at(1) - start.at(1))
@@ -32,11 +44,11 @@
 /// Update bounds to contain the given rectangle
 /// - bounds (array): Current bound coordinates x0, y0, x1, y1
 /// - rect (array): Bounds rectangle x0, y0, x1, y1
-#let update-bounds(bounds, rect) = (
-  calc.min(bounds.at(0), rect.at(0).abs), 
-  calc.min(bounds.at(1), rect.at(1).abs),
-  calc.max(bounds.at(2), rect.at(2).abs),
-  calc.max(bounds.at(3), rect.at(3).abs),
+#let update-bounds(bounds, rect, styles) = (
+  calc.min(bounds.at(0), convert-em-length(rect.at(0), styles)), 
+  calc.min(bounds.at(1), convert-em-length(rect.at(1), styles)),
+  calc.max(bounds.at(2), convert-em-length(rect.at(2), styles)),
+  calc.max(bounds.at(3), convert-em-length(rect.at(3), styles)),
 )
 
 #let offset-bounds(bounds, offset) = (
@@ -108,13 +120,13 @@
 }
 
 #let place-label(label, draw-params) = {
-  let (x, y) = make-2d-alignment2(label.position)
+  let (x, y) = make-2d-alignment2(label.pos)
   let size = measure(label.content, draw-params.styles)
-  let (dx, dy) = label.offset
+  let (dx, dy) = (label.dx, label.dy)
   dx += size.width * x
   dy += size.height * y
   let content = place(
-    label.position, 
+    label.pos, 
     label.content,
     dx: dx,
     dy: dy,
@@ -142,8 +154,52 @@
     box(width: size.width, height: size.height, {
       for label in labels {
         let (label, label-bounds) = place-label(label, (styles: styles))
-        bounds = update-bounds(bounds, offset-bounds(label-bounds, (dx, dy)))
+        // bounds = update-bounds(bounds, offset-bounds(label-bounds, (dx, dy)), styles)
         label
+      }
+    })
+  )
+  return (place(content, dx: dx, dy: dy) + result, bounds)
+}
+
+
+#let place-with-labels(
+  content, 
+  dx: 0pt, 
+  dy: 0pt,
+  size: auto,
+  labels: (),
+  styles: none,
+) = {
+  if labels.len() == 0 {
+    return (place(content, dx: dx, dy: dy), (dx, dy, dx, dy))    
+  }
+  if size == auto {
+    size = measure(content, styles)
+  }
+  let bounds = (dx, dy, dx + size.width, dy + size.height)
+  let offset = (dx, dy)
+  let result = place(dx: dx, dy: dy, 
+    box(width: size.width, height: size.height, {
+      for label in labels {
+        let (x, y) = make-2d-alignment2(label.pos)
+        let label-size = measure(label.content, styles)
+        let dxx = get-length(label.dx, size.width)
+        let dyy = get-length(label.dy, size.height)
+        if label.pos.x == left { dxx -= label-size.width }
+        if label.pos.x == center { dxx += 0.5 * (size.width - label-size.width) }
+        if label.pos.x == right { dxx += size.width }
+        if label.pos.y == top { dyy -= label-size.height }
+        if label.pos.y == horizon { dyy += 0.5 * (size.height - label-size.height) }
+        if label.pos.y == bottom { dyy += size.height }
+        let content = place(
+          label.content,
+          dx: dxx,
+          dy: dyy,
+        )
+        let label-bounds = (dxx, dyy, dxx + label-size.width, dyy + label-size.height)
+        bounds = update-bounds(bounds, offset-bounds(label-bounds, offset), styles)
+        content
       }
     })
   )
@@ -420,18 +476,19 @@
 
 /// Process the label argument to `gate`. Allowed input formats are array of dictionaries
 /// or a single dictionary (for just one label). The dictionary needs to contain the key 
-/// content and may optionally have values for the  keys `position` (specifying a 1d or 2d 
-/// alignment) and `offset` (an array of exactly two lengths). 
-#let process-labels-arg(labels, default-position: right) = {
+/// content and may optionally have values for the  keys `pos` (specifying a 1d or 2d 
+/// alignment) and `dx` as well as `dy`
+#let process-labels-arg(labels, default-pos: right) = {
   if type(labels) == "dictionary" { labels = (labels,) } 
   let processed-labels = ()
   for label in labels {
-    let alignment = make-2d-alignment(label.at("position", default: default-position))
+    let alignment = make-2d-alignment(label.at("pos", default: default-pos))
     let (x, y) = make-2d-alignment2(alignment)
     processed-labels.push((
       content: label.content,
-      position: alignment,
-      offset: label.at("offset", default: (.3em * x, .3em * y))
+      pos: alignment,
+      dx: label.at("dx", default: .3em * x),
+      dy: label.at("dy", default: .3em * y)
     ))
   }
   processed-labels
@@ -461,8 +518,8 @@
 ///             Signature: `(gate, draw-params).`
 /// - labels (array, dictionary): One or more labels to add to the gate. A label consists
 ///             of a dictionary with entries for the keys `content` (the label content), 
-///             `position` (2d alignment specifying the position of the label) and 
-///             optionally `offset` (an array of two lengths, ratios or relative 
+///             `pos` (2d alignment specifying the position of the label) and 
+///             optionally `dx` and/or `dy` (lengths, ratios or relative 
 ///             lengths). 
 ///
 /// - data (any): Optional additional gate data. This can for example be a dictionary
@@ -598,7 +655,7 @@
 /// - n (integer):            Number of wires to span this meter across. 
 /// - label (content):        Label to show above the meter. 
 #let meter(target: none, n: 1, wire-count: 2, label: none, fill: none, radius: 0pt) = {
-  let labels = if label != none {(content: label, position: top, offset: (0pt, -.5em))} else { () }
+  let labels = if label != none {(content: label, pos: top, dy: -0.5em)} else { () }
   if target == none and n == 1 {
     gate(none, fill: fill, radius: radius, draw-function: draw-meter, data: (meter-label: label), labels: labels)
   } else {
@@ -678,7 +735,7 @@
     },
   fill: fill,
   data: (open: open, size: size),
-  labels: ((content: label, position: top + right, offset: (-.5em, 0pt)), ) + labels
+  labels: ((content: label, pos: top + right, dx: -.5em), ) + labels
 )
 
 
@@ -793,7 +850,7 @@
   steps: steps,
   padding: padding,
   style: (fill: fill, stroke: stroke, radius: radius),
-  labels: process-labels-arg(labels, default-position: top)
+  labels: process-labels-arg(labels, default-pos: top)
 )
 
 /// Slice the circuit vertically, showing a separation line between columns. 
@@ -809,7 +866,7 @@
   qc-instr: "slice",
   wires: wires,
   style: (stroke: stroke),
-  labels: process-labels-arg(labels, default-position: top)
+  labels: process-labels-arg(labels, default-pos: top)
 )
 
 /// Lower-level interface to the cell coordinates to create an arbitrary
@@ -924,11 +981,6 @@
     place(line(start: (x, y1), end: (x, y2), stroke: stroke), 
       dx: (2*i - int(wire-count/2)) * wire-distance)
   }
-}
-
-#let convert-em-length(length, styles) = {
-  if length.em == 0pt { return length }
-  measure(line(length: length), styles).width
 }
 
 /// Create a quantum circuit diagram. Content items may be
@@ -1147,7 +1199,7 @@
           let x1 = obtain-cell-coords1(center-x-coords, colwidths, col)
           let x2 = obtain-cell-coords1(center-x-coords, colwidths, col + item.steps - 1e-9)
           let (result, b) = draw-gategroup(x1, x2, y1, y2, item, draw-params)
-          bounds = update-bounds(bounds, b)
+          bounds = update-bounds(bounds, b, draw-params.styles)
           result
         } else if item.qc-instr == "slice" {
           assert(item.wires >= 0, message: "slice: wires arg needs to be > 0")
@@ -1157,7 +1209,7 @@
           let y2 = obtain-cell-coords1(center-y-coords, rowheights, end)
           let x = obtain-cell-coords1(center-x-coords, colwidths, col)
           let (result, b) = draw-slice(x, y1, y2, item, draw-params)
-          bounds = update-bounds(bounds, b)
+          bounds = update-bounds(bounds, b, draw-params.styles)
           result
         } else if item.qc-instr == "annotate" {
           let rows = obtain-cell-coords1(center-y-coords, rowheights, item.rows)
@@ -1244,7 +1296,7 @@
             (result, gate-bounds) = place-with-labels(
               content, dx: x-pos, dy: y-pos, labels: item.labels, styles: draw-params.styles
             )
-            bounds = update-bounds(bounds, gate-bounds)
+            bounds = update-bounds(bounds, gate-bounds, draw-params.styles)
           } else {
             result = place(
               dx: x-pos, dy: y-pos, 
@@ -1281,8 +1333,10 @@
 
   
   let scale-float = float(repr(scale-factor).slice(0,-1))  * 0.01
-  // extra-left = calc.min(extra-left, -bounds.at(0))
+  extra-left = calc.max(extra-left, -bounds.at(0))
   extra-top = calc.max(extra-top, -bounds.at(1))
+  extra-right = calc.max(extra-right, bounds.at(2) - circuit-width)
+  extra-bottom = calc.max(extra-bottom, bounds.at(3) - circuit-height)
   if circuit-padding != none {
     extra-left += circuit-padding.at("left", default: 0pt)
     extra-top += circuit-padding.at("top", default: 0pt)
@@ -1299,7 +1353,7 @@
     width: scale-float * (circuit-width + extra-left + extra-right), 
     height: scale-float * (circuit-height + extra-bottom + extra-top), 
     // fill: background,
-    // stroke: 1pt + gray,
+    stroke: 1pt + gray,
     move(dy: scale-float * extra-top, dx: scale-float * extra-left, 
       scale(
         x: scale-factor, 
