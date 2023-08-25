@@ -359,17 +359,30 @@
   return p
 }
 
-#let draw-gate-group(corners, item) = {
+#let draw-gategroup(x1, x2, y1, y2, item, draw-params) = {
   let p = item.padding
   let (pl, pt, pr, pb) = expand-padding-param(p)
-  let (x1, x2, y1, y2) = (corners.x1 - pl, corners.x2 + pr, corners.y1 - pt, corners.y2 + pb)
-  place(dy: y1, dx: x1, rect(
-    width: x2 - x1, height: y2 - y1,
-    stroke: item.style.stroke,
-    fill: item.style.fill,
-    radius: item.style.radius
-  ))
+  let (x1, x2, y1, y2) = (x1 - pl, x2 + pr, y1 - pt, y2 + pb)
+  let size = (width: x2 - x1, height: y2 - y1)
+  place-with-labels(
+    dx: x1, dy: y1, 
+    labels: item.labels, 
+    size: size,
+    styles: draw-params.styles, rect(
+      width: size.width, height: size.height,
+      stroke: item.style.stroke,
+      fill: item.style.fill,
+      radius: item.style.radius
+    )
+  )
 }
+#let draw-slice(x, y1, y2, item, draw-params) = place-with-labels(
+  dx: x, dy: y1, 
+  size: (width: 0pt, height: y2 - y1),
+  labels: item.labels, styles: draw-params.styles, 
+  line(angle: 90deg, length: y2 - y1, stroke: item.style.stroke)
+)
+
 
 #let draw-meter(gate, draw-params) = {
   let content = {
@@ -409,11 +422,11 @@
 /// or a single dictionary (for just one label). The dictionary needs to contain the key 
 /// content and may optionally have values for the  keys `position` (specifying a 1d or 2d 
 /// alignment) and `offset` (an array of exactly two lengths). 
-#let process-labels-arg(labels) = {
+#let process-labels-arg(labels, default-position: right) = {
   if type(labels) == "dictionary" { labels = (labels,) } 
   let processed-labels = ()
   for label in labels {
-    let alignment = make-2d-alignment(label.at("position", default: right))
+    let alignment = make-2d-alignment(label.at("position", default: default-position))
     let (x, y) = make-2d-alignment2(alignment)
     processed-labels.push((
       content: label.content,
@@ -772,32 +785,31 @@
   padding: 0pt, 
   stroke: .7pt, 
   fill: none,
-  radius: 0pt  
+  radius: 0pt,
+  labels: ()
 ) = (
   qc-instr: "gategroup",
   wires: wires,
   steps: steps,
   padding: padding,
-  style: (fill: fill, stroke: stroke, radius: radius)
+  style: (fill: fill, stroke: stroke, radius: radius),
+  labels: process-labels-arg(labels, default-position: top)
 )
 
 /// Slice the circuit vertically, showing a separation line between columns. 
 /// 
 /// - wires (integer): Number of wires to slice.
-/// - label (content): Label for the slice. 
+/// - labels (array, dictionary): Labels for the slice. See @@gate()
 /// - stroke (stroke): Line style for the slice. 
 #let slice(
   wires: 0, 
-  label: none,
   stroke: (paint: red, thickness: .7pt, dash: "dashed"),
-  dx: 0pt,
-  dy: 0pt
+  labels: ()
 ) = (
   qc-instr: "slice",
   wires: wires,
-  label: label,
-  dx: dx, dy: dy,
-  style: (stroke: stroke)
+  style: (stroke: stroke),
+  labels: process-labels-arg(labels, default-position: top)
 )
 
 /// Lower-level interface to the cell coordinates to create an arbitrary
@@ -1107,7 +1119,7 @@
   
   let circuit = block(
     width: circuit-width, height: circuit-height, {
-    set align(top + left) // qcircuit could be called in a scope where these have been changed which would mess up everything
+    set align(top + left) // quantum-circuit could be called in a scope where these have been changed which would mess up everything
 
     let to-be-drawn-later = () // dicts with content, x and y
       
@@ -1131,34 +1143,22 @@
           assert(item.steps > 0, message: "gategroup: steps arg needs to be > 0")
           assert(col+item.steps <= colwidths.len(), message: "gategroup: width exceeds range")
           let y1 = obtain-cell-coords1(center-y-coords, rowheights, row)
-          let y2 = obtain-cell-coords1(center-y-coords, rowheights, row + item.wires)
+          let y2 = obtain-cell-coords1(center-y-coords, rowheights, row + item.wires - 1e-9)
           let x1 = obtain-cell-coords1(center-x-coords, colwidths, col)
           let x2 = obtain-cell-coords1(center-x-coords, colwidths, col + item.steps - 1e-9)
-          // let y1 = rowheights.slice(0, row).sum(default: 0pt)
-          // let y2 = rowheights.slice(0, row + item.wires).sum(default: 0pt)
-          // let x1 = colwidths.slice(0, col).sum(default: 0pt)
-          // let x2 = colwidths.slice(0, col + item.steps).sum(default: 0pt)
-          draw-gate-group((x1: x1, x2: x2, y1: y1, y2: y2), item)
+          let (result, b) = draw-gategroup(x1, x2, y1, y2, item, draw-params)
+          bounds = update-bounds(bounds, b)
+          result
         } else if item.qc-instr == "slice" {
           assert(item.wires >= 0, message: "slice: wires arg needs to be > 0")
           assert(row+item.wires <= rowheights.len(), message: "slice: height exceeds range")
           let end = if item.wires == 0 {rowheights.len()} else {row+item.wires}
           let y1 = obtain-cell-coords1(center-y-coords, rowheights, row)
           let y2 = obtain-cell-coords1(center-y-coords, rowheights, end)
-          let x = obtain-cell-coords1(center-x-coords, colwidths, col)          // let y1 = rowheights.slice(0, row).sum(default: 0pt)
-          // let y2 = rowheights.slice(0, end).sum(default: 0pt)
-          // let x = colwidths.slice(0, col).sum(default: 0pt)
-          place(line(
-            start: (x, y1),
-            end: (x, y2),
-            stroke: item.style.stroke
-          ))
-          if item.label != none {
-            let size = measure(item.label, styles)
-            let y = y1 - (size.height + 5pt)
-            extra-top = calc.max(extra-top, -y)
-            place(dx: x - size.width/2, dy: y, item.label)
-          }
+          let x = obtain-cell-coords1(center-x-coords, colwidths, col)
+          let (result, b) = draw-slice(x, y1, y2, item, draw-params)
+          bounds = update-bounds(bounds, b)
+          result
         } else if item.qc-instr == "annotate" {
           let rows = obtain-cell-coords1(center-y-coords, rowheights, item.rows)
           let cols = obtain-cell-coords1(center-x-coords, colwidths, item.columns)
