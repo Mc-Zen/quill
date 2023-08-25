@@ -26,6 +26,27 @@
 #let test-arrow() = {
   draw-arrow((0pt, 0pt), (20pt, 10pt), stroke: .1pt)
 }
+
+
+
+/// Update bounds to contain the given rectangle
+/// - bounds (array): Current bound coordinates x0, y0, x1, y1
+/// - rect (array): Bounds rectangle x0, y0, x1, y1
+#let update-bounds(bounds, rect) = (
+  calc.min(bounds.at(0), rect.at(0).abs), 
+  calc.min(bounds.at(1), rect.at(1).abs),
+  calc.max(bounds.at(2), rect.at(2).abs),
+  calc.max(bounds.at(3), rect.at(3).abs),
+)
+
+#let offset-bounds(bounds, offset) = (
+  bounds.at(0) + offset.at(0),
+  bounds.at(1) + offset.at(1),
+  bounds.at(2) + offset.at(0),
+  bounds.at(3) + offset.at(1),
+)
+
+
 // INTERNAL GATE DRAW FUNCTIONS
 
 #let draw-targ(item, draw-params) = {
@@ -68,6 +89,66 @@
   })
 }
 
+
+#let make-2d-alignment(alignment) = {
+  if type(alignment).starts-with("2d") { return alignment }
+  if alignment.axis() == "horizontal" { return alignment + horizon }
+  if alignment.axis() == "vertical" { return alignment + center }
+}
+
+#let make-2d-alignment2(alignment) = {
+  let alignment = make-2d-alignment(alignment)
+  let x = 0
+  let y = 0
+  if alignment.x == left { x = -1 }
+  else if alignment.x == right { x = 1 }
+  if alignment.y == top { y = -1 }
+  else if alignment.y == bottom { y = 1 }
+  return (x, y)
+}
+
+#let place-label(label, draw-params) = {
+  let (x, y) = make-2d-alignment2(label.position)
+  let size = measure(label.content, draw-params.styles)
+  let (dx, dy) = label.offset
+  dx += size.width * x
+  dy += size.height * y
+  let content = place(
+    label.position, 
+    label.content,
+    dx: dx,
+    dy: dy,
+  )
+  return (content, (dx, dy, dx + size.width, dy + size.height))
+}
+
+#let place-with-labels(
+  content, 
+  dx: 0pt, 
+  dy: 0pt,
+  size: auto,
+  labels: (),
+  styles: none,
+) = {
+  if labels.len() == 0 {
+    return (place(content, dx: dx, dy: dy), (dx, dy, dx, dy))    
+  }
+  if size == auto {
+    size = measure(content, styles)
+  }
+  let bounds = (dx, dy, dx + size.width, dy + size.height)
+  
+  let result = place(dx: dx, dy: dy, 
+    box(width: size.width, height: size.height, {
+      for label in labels {
+        let (label, label-bounds) = place-label(label, (styles: styles))
+        bounds = update-bounds(bounds, offset-bounds(label-bounds, (dx, dy)))
+        label
+      }
+    })
+  )
+  return (place(content, dx: dx, dy: dy) + result, bounds)
+}
 
 // Default gate draw function. Draws a box with global padding
 // and the gates content. Stroke and default fill are only applied if 
@@ -308,13 +389,6 @@
         set align(left)
         draw-arrow((center-x, height * 1.2), (width * .9, height*.3), length: 3.8pt, width: 2.8pt, stroke: stroke, arrow-color: draw-params.color)
     })
-    if gate.data.meter-label != none {
-      let label-size = measure(gate.data.meter-label, draw-params.styles)
-      place(
-        dx: -label-size.width / 2,
-        dy: -label-size.height - height - .6em - padding, gate.data.meter-label
-      )
-    }  
   }
   gate.content = rect(content, inset: 0pt, stroke: none)
   if gate.multi != none and gate.multi.num-qubits > 1 {
@@ -331,6 +405,24 @@
   return hint
 }
 
+/// Process the label argument to `gate`. Allowed input formats are array of dictionaries
+/// or a single dictionary (for just one label). The dictionary needs to contain the key 
+/// content and may optionally have values for the  keys `position` (specifying a 1d or 2d 
+/// alignment) and `offset` (an array of exactly two lengths). 
+#let process-labels-arg(labels) = {
+  if type(labels) == "dictionary" { labels = (labels,) } 
+  let processed-labels = ()
+  for label in labels {
+    let alignment = make-2d-alignment(label.at("position", default: right))
+    let (x, y) = make-2d-alignment2(alignment)
+    processed-labels.push((
+      content: label.content,
+      position: alignment,
+      offset: label.at("offset", default: (.3em * x, .3em * y))
+    ))
+  }
+  processed-labels
+}
 
 /// This is the basic command for creating gates. Use this to create a simple gate, e.g., `gate($X$)`. 
 /// For special gates, many other dedicated gate commands exist. 
@@ -354,6 +446,12 @@
 ///             Signature: `(gate, draw-params).`
 /// - draw-function (function): Drawing function that produces the displayed content.
 ///             Signature: `(gate, draw-params).`
+/// - labels (array, dictionary): One or more labels to add to the gate. A label consists
+///             of a dictionary with entries for the keys `content` (the label content), 
+///             `position` (2d alignment specifying the position of the label) and 
+///             optionally `offset` (an array of two lengths, ratios or relative 
+///             lengths). 
+///
 /// - data (any): Optional additional gate data. This can for example be a dictionary
 ///             storing extra information that may be used for instance in a custom
 ///             `draw-function`.
@@ -368,7 +466,8 @@
   size-hint: default-size-hint,
   draw-function: draw-boxed-gate,
   gate-type: "",
-  data: none
+  data: none,
+  labels: ()
 ) = (
   content: content, 
   fill: fill,
@@ -380,7 +479,8 @@
   size-hint: size-hint,
   draw-function: draw-function,
   gate-type: gate-type, 
-  data: data
+  data: data,
+  labels: process-labels-arg(labels)
 )
 
 
@@ -414,6 +514,7 @@
 ///          - Affect height on only the first and last wire (`false`)
 ///          - Affect the height of all wires (`true`)
 ///          - Affect the height on no wire (`none`)
+/// - labels (array, dictionary): One or more labels to add to the gate. See @@gate(). 
 /// - data (any): Optional additional gate data. This can for example be a dictionary
 ///        storing extra information that may be used for instance in a custom
 ///        `draw-function`.
@@ -433,6 +534,7 @@
   size-all-wires: false,
   draw-function: draw-boxed-multigate, 
   data: none,
+  labels: (),
 ) = gate(
   content, 
   fill: fill, box: box, 
@@ -449,7 +551,8 @@
     inputs: inputs,
     outputs: outputs,
   ),
-  data: data
+  labels: labels,
+  data: data,
 )
 
 
@@ -481,13 +584,12 @@
 /// - wire-count (integer):   Wire count for the (optional) control wire. 
 /// - n (integer):            Number of wires to span this meter across. 
 /// - label (content):        Label to show above the meter. 
-#let meter(target: none, n: 1, wire-count: 2, label: none,
-  fill: none, 
-  radius: 0pt) = {
+#let meter(target: none, n: 1, wire-count: 2, label: none, fill: none, radius: 0pt) = {
+  let labels = if label != none {(content: label, position: top, offset: (0pt, -.5em))} else { () }
   if target == none and n == 1 {
-    gate(none, fill: fill, radius: radius, draw-function: draw-meter, data: (meter-label: label))
+    gate(none, fill: fill, radius: radius, draw-function: draw-meter, data: (meter-label: label), labels: labels)
   } else {
-     mqgate(none, n: n, target: target, fill: fill, radius: radius, box: true, wire-count: wire-count, draw-function: draw-meter, data: (meter-label: label))
+     mqgate(none, n: n, target: target, fill: fill, radius: radius, box: true, wire-count: wire-count, draw-function: draw-meter, data: (meter-label: label), labels: labels)
   }
 }
 
@@ -534,7 +636,7 @@
 /// - fill (none, color, boolean): Fill color for the target circle. If set 
 ///        to `true`, the target is filled with the circuits background color.
 /// - size (length): Size of the target symbol. 
-#let targ(fill: none, size: 4.3pt) = gate(none, box: false, draw-function: draw-targ, fill: fill, data: (size: size))
+#let targ(fill: none, size: 4.3pt, labels: ()) = gate(none, box: false, draw-function: draw-targ, fill: fill, data: (size: size), labels: labels)
 
 /// Target element for controlled #smallcaps("z") operations (#sym.bullet). 
 ///
@@ -546,7 +648,7 @@
 
 /// Target element for #smallcaps("swap") operations (#sym.times) without vertical wire). 
 /// - size (length): Size of the target symbol. 
-#let targX(size: 7pt) = gate(none, box: false, draw-function: draw-swap, data: (size: size))
+#let targX(size: 7pt, labels: ()) = gate(none, box: false, draw-function: draw-swap, data: (size: size), labels: labels)
 
 /// Create a phase gate shown as a point on the wire together with a label. 
 ///
@@ -555,15 +657,15 @@
 /// - fill (none, color): Fill color for the circle or stroke color if
 ///        `open: true`. 
 /// - size (length): Size of the circle. 
-#let phase(label, open: false, fill: none, size: 2.3pt) = gate(
+#let phase(label, open: false, fill: none, size: 2.3pt, labels: ()) = gate(
   none, 
   box: false,
   draw-function: (gate, draw-params) => {
       box(inset: (x: .6em), draw-ctrl(gate, draw-params))
-      place(label, dy: -1.2em, dx: 1.2em)
     },
   fill: fill,
-  data: (open: open, size: size)
+  data: (open: open, size: size),
+  labels: ((content: label, position: top + right, offset: (-.5em, 0pt)), ) + labels
 )
 
 
@@ -616,7 +718,7 @@
 /// 
 /// - n (integer): How many wires up or down the target wire lives. 
 /// - size (length): Size of the target symbol. 
-#let swap(n, size: 7pt) = mqgate(none, target: n, box: false, draw-function: draw-swap, data: (size: size))
+#let swap(n, size: 7pt, labels: ()) = mqgate(none, target: n, box: false, draw-function: draw-swap, data: (size: size), labels: labels)
 
 /// Creates a control with a vertical wire to another qubit. 
 /// 
@@ -628,7 +730,7 @@
 /// - size (length): Size of the control circle. 
 /// - show-dot (boolean): Whether to show the control dot. Set this to 
 ///        false to obtain a vertical wire with no dots at all. 
-#let ctrl(n, wire-count: 1, open: false, fill: none, size: 2.3pt, show-dot: true) = mqgate(none, target: n, draw-function: draw-ctrl, wire-count: wire-count, fill: fill, data: (open: open, size: size, show-dot: show-dot))
+#let ctrl(n, wire-count: 1, open: false, fill: none, size: 2.3pt, show-dot: true, labels: ()) = mqgate(none, target: n, draw-function: draw-ctrl, wire-count: wire-count, fill: fill, data: (open: open, size: size, show-dot: show-dot), labels: labels)
 
 
 
@@ -750,9 +852,9 @@
   let tmpx = 0pt
   gutter.insert(0, 0pt)
   // assert.eq(cell-lengths.len(), gutter.len())
-  for (cell-length, g) in cell-lengths.zip(gutter) {
-    center-coords.push(tmpx + cell-length / 2 + g)
-    tmpx += cell-length + g
+  for (cell-length, gutter) in cell-lengths.zip(gutter) {
+    center-coords.push(tmpx + cell-length / 2 + gutter)
+    tmpx += cell-length + gutter
   }
   return center-coords
 } 
@@ -811,7 +913,6 @@
       dx: (2*i - int(wire-count/2)) * wire-distance)
   }
 }
-
 
 #let convert-em-length(length, styles) = {
   if length.em == 0pt { return length }
@@ -975,7 +1076,7 @@
     }
   }
   /////////// END First pass: Layout (spacing)   ///////////
-
+  
   rowheights = rowheights.map(x => x + row-spacing)
   colwidths = colwidths.map(x => x + column-spacing)
 
@@ -984,14 +1085,15 @@
     rowheights = rowheights.map(x => max-row-height)
   }
   let center-x-coords = compute-center-coords(colwidths, col-gutter)
-  let center-y-coords = compute-center-coords(rowheights, row-gutter)
+  let center-y-coords = compute-center-coords(rowheights, row-gutter)//.map(x => x - 0.5 * row-spacing)
   draw-params.center-y-coords = center-y-coords
   
   (row, col) = (0, 0)
   let (x, y) = (0pt, 0pt) // current cell top-left coordinates
   let center-y = y + rowheights.at(row) / 2 // current cell center y-coordinate
+  let center-y = center-y-coords.at(0) // current cell center y-coordinate
   let circuit-width = colwidths.sum() + col-gutter.slice(0, -1).sum(default: 0pt)
-  let circuit-height = rowheights.sum() + row-gutter.sum()
+  let circuit-height = rowheights.sum() + row-gutter.sum()// - row-spacing
 
   let wire-count = 1
   let wire-distance = 1pt
@@ -1001,6 +1103,7 @@
   let (extra-left, extra-right) = (0pt, 0pt)
 
   /////////// Second pass: Generation ///////////
+  let bounds = (0pt, 0pt, 0pt, 0pt)
   
   let circuit = block(
     width: circuit-width, height: circuit-height, {
@@ -1126,7 +1229,7 @@
           y-pos -= size.height / 2
         } else if type(offset) == "dictionary" {
           let offset-x = offset.at("x", default: auto)
-          let offset-y = offset.at("x", default: auto)
+          let offset-y = offset.at("y", default: auto)
           if offset-x == auto { x-pos -= size.width / 2}
           else if type(offset-x) == "length" { x-pos -= offset-x }
           if offset-y == auto { y-pos -= size.width / 2}
@@ -1135,7 +1238,20 @@
         
         let content = get-content(item, draw-params)
         if do-draw-later {
-          to-be-drawn-later.push((content: content, x: x-pos, y: y-pos))
+          let result
+          if isgate {
+            let gate-bounds
+            (result, gate-bounds) = place-with-labels(
+              content, dx: x-pos, dy: y-pos, labels: item.labels, styles: draw-params.styles
+            )
+            bounds = update-bounds(bounds, gate-bounds)
+          } else {
+            result = place(
+              dx: x-pos, dy: y-pos, 
+              if isgate { content } else { box(content) }
+            )
+          }
+          to-be-drawn-later.push(result)
         } else {
           place(
             dx: x-pos, dy: y-pos, 
@@ -1156,9 +1272,8 @@
       }
       
     } // end loop over items
-
     for item in to-be-drawn-later {
-      place(dx: item.x, dy: item.y, item.content)
+      item
     }
   }) // end circuit = block(..., {
     
@@ -1166,6 +1281,8 @@
 
   
   let scale-float = float(repr(scale-factor).slice(0,-1))  * 0.01
+  // extra-left = calc.min(extra-left, -bounds.at(0))
+  extra-top = calc.max(extra-top, -bounds.at(1))
   if circuit-padding != none {
     extra-left += circuit-padding.at("left", default: 0pt)
     extra-top += circuit-padding.at("top", default: 0pt)
