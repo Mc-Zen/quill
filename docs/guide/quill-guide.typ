@@ -578,7 +578,7 @@ All built-in gates are drawn with a dedicated `draw-function` and you can also t
     
     #set heading(numbering: none)
     #{
-      let docs = parse-module("/../../quill.typ", label-prefix: "quill:")
+      let docs = parse-module("../../quill.typ", label-prefix: "quill:")
     
       let gates = docs
       gates.functions = gates.functions.filter(
@@ -637,16 +637,16 @@ Encoding circuit for the Shor nine qubit code. This diagram repdoduces Figure 10
 makefigure(```typ
 #let ancillas = (setwire(0), 5, lstick($|0〉$), 
   setwire(1), targ(), 2, [\ ], setwire(0), 5, 
-  lstick($|0〉$), setwire(1), 1, targ(), 1, [\ ])
+  lstick($|0〉$), setwire(1), 1, targ(), 1)
 
 #quantum-circuit(
   scale-factor: 80%,
   lstick($|ψ〉$), 1, 10pt, ctrl(3), ctrl(6), gate($H$),
     1, 15pt, ctrl(1), ctrl(2), 1, [\ ],
-  ..ancillas,
+  ..ancillas, [\ ],
   lstick($|0〉$), 1, targ(), 1, gate($H$), 1, ctrl(1),
     ctrl(2), 1, [\ ],
-  ..ancillas,
+  ..ancillas, [\ ],
   lstick($|0〉$), 2, targ(),  gate($H$), 1, ctrl(1),
     ctrl(2), 1, [\ ],
   ..ancillas
@@ -654,14 +654,14 @@ makefigure(```typ
   }
 ), {
   let ancillas = (setwire(0), 5, lstick($|0〉$), setwire(1), targ(), 2, [\ ],
-  setwire(0), 5, lstick($|0〉$), setwire(1), 1, targ(), 1, [\ ])
+  setwire(0), 5, lstick($|0〉$), setwire(1), 1, targ(), 1)
   
   quantum-circuit(
   scale-factor: 80%,
   lstick($|ψ〉$), 1, ctrl(3), ctrl(6), gate($H$), 1, 15pt, ctrl(1), ctrl(2), 1, [\ ],
-  ..ancillas,
+  ..ancillas, [\ ],
   lstick($|0〉$), 1, targ(), 1, gate($H$), 1, ctrl(1), ctrl(2), 1, [\ ],
-  ..ancillas,
+  ..ancillas, [\ ],
   lstick($|0〉$), 2, targ(),  gate($H$), 1, ctrl(1), ctrl(2), 1, [\ ],
   ..ancillas
 )}

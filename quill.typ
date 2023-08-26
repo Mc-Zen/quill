@@ -5,9 +5,8 @@
 #let is-circuit-meta-instruction(item) = { type(item) == "dictionary" and "qc-instr" in item }
 
 
-#let convert-em-length(length, styles) = {
+#let convert-em-length(length, em) = {
   if length.em == 0pt { return length }
-  let em = measure(line(length: 1em), styles).width
   return length.abs + length.em / 1em * em
 }
 
@@ -44,11 +43,11 @@
 /// Update bounds to contain the given rectangle
 /// - bounds (array): Current bound coordinates x0, y0, x1, y1
 /// - rect (array): Bounds rectangle x0, y0, x1, y1
-#let update-bounds(bounds, rect, styles) = (
-  calc.min(bounds.at(0), convert-em-length(rect.at(0), styles)), 
-  calc.min(bounds.at(1), convert-em-length(rect.at(1), styles)),
-  calc.max(bounds.at(2), convert-em-length(rect.at(2), styles)),
-  calc.max(bounds.at(3), convert-em-length(rect.at(3), styles)),
+#let update-bounds(bounds, rect, em) = (
+  calc.min(bounds.at(0), convert-em-length(rect.at(0), em)), 
+  calc.min(bounds.at(1), convert-em-length(rect.at(1), em)),
+  calc.max(bounds.at(2), convert-em-length(rect.at(2), em)),
+  calc.max(bounds.at(3), convert-em-length(rect.at(3), em)),
 )
 
 #let offset-bounds(bounds, offset) = (
@@ -56,6 +55,13 @@
   bounds.at(1) + offset.at(1),
   bounds.at(2) + offset.at(0),
   bounds.at(3) + offset.at(1),
+)
+
+#let make-bounds(x0: 0pt, y0: 0pt, width: 0pt, height: 0pt, x1: none, y1: none, em) = (
+  convert-em-length(x0, em),
+  convert-em-length(y0, em),
+  convert-em-length(if x1 != none { x1 } else { x0 + width }, em),
+  convert-em-length(if y1 != none { y1 } else { y0 + height }, em),
 )
 
 
@@ -95,20 +101,23 @@
     let d = gate.data.size
     let stroke = draw-params.wire
     box(width: d, height: d, {
-      place(line(start: (-0pt,-0pt), end: (d,d), stroke: stroke))
-      place(line(start: (d,0pt), end: (0pt,d), stroke: stroke))
+      place(line(start: (-0pt, -0pt), end: (d, d), stroke: stroke))
+      place(line(start: (d, 0pt), end: (0pt, d), stroke: stroke))
     })
   })
 }
 
 
-#let make-2d-alignment(alignment) = {
+/// Take an alignment or 2d alignment and return a 2d alignment with the possibly 
+/// unspecified axis set to a default value. 
+#let make-2d-alignment(alignment, default-vertical: horizon, default-horizontal: center) = {
   if type(alignment).starts-with("2d") { return alignment }
-  if alignment.axis() == "horizontal" { return alignment + horizon }
-  if alignment.axis() == "vertical" { return alignment + center }
+  if alignment.axis() == "horizontal" { return alignment + default-vertical }
+  if alignment.axis() == "vertical" { return alignment + default-horizontal }
 }
 
-#let make-2d-alignment2(alignment) = {
+
+#let make-2d-alignment-factor(alignment) = {
   let alignment = make-2d-alignment(alignment)
   let x = 0
   let y = 0
@@ -119,91 +128,66 @@
   return (x, y)
 }
 
-#let place-label(label, draw-params) = {
-  let (x, y) = make-2d-alignment2(label.pos)
-  let size = measure(label.content, draw-params.styles)
-  let (dx, dy) = (label.dx, label.dy)
-  dx += size.width * x
-  dy += size.height * y
-  let content = place(
-    label.pos, 
-    label.content,
-    dx: dx,
-    dy: dy,
-  )
-  return (content, (dx, dy, dx + size.width, dy + size.height))
-}
 
+/// Place some content along with optional labels while computing bounds. 
+/// 
+/// Returns a pair of the placed content and a bounds array. 
+///
+/// - content (content): The content to place. 
+/// - dx (length): Horizontal displacement.
+/// - dy (length): Vertical displacement.
+/// - size (auto, dictionary): For computing bounds, the size of the placed content
+///           is needed. If `auto` is passed, this function computes the size itself
+///           but if it is already known it can be passed through this parameter. 
+/// - labels (array): An array of labels which in turn are dictionaries that must 
+///           specify values for the keys `content` (content), `pos` (strictly 2d 
+///           alignment), `dx` and `dy` (both length, ratio or relative length).
+/// - draw-params (dictionary): Drawing parameters. Must contain a styles object at 
+///           the key `styles` and an absolute length at the key `em`. 
+/// -> pair
 #let place-with-labels(
   content, 
   dx: 0pt, 
   dy: 0pt,
   size: auto,
   labels: (),
-  styles: none,
+  draw-params: none,
 ) = {
+  if size == auto { size = measure(content, draw-params.styles) }
+  let bounds = make-bounds(
+    x0: dx, y0: dy, width: size.width, height: size.height, draw-params.em
+  )
   if labels.len() == 0 {
-    return (place(content, dx: dx, dy: dy), (dx, dy, dx, dy))    
+    return (place(content, dx: dx, dy: dy), bounds)    
   }
-  if size == auto {
-    size = measure(content, styles)
-  }
-  let bounds = (dx, dy, dx + size.width, dy + size.height)
   
-  let result = place(dx: dx, dy: dy, 
-    box(width: size.width, height: size.height, {
-      for label in labels {
-        let (label, label-bounds) = place-label(label, (styles: styles))
-        // bounds = update-bounds(bounds, offset-bounds(label-bounds, (dx, dy)), styles)
-        label
-      }
-    })
-  )
-  return (place(content, dx: dx, dy: dy) + result, bounds)
-}
-
-
-#let place-with-labels(
-  content, 
-  dx: 0pt, 
-  dy: 0pt,
-  size: auto,
-  labels: (),
-  styles: none,
-) = {
-  if labels.len() == 0 {
-    return (place(content, dx: dx, dy: dy), (dx, dy, dx, dy))    
-  }
-  if size == auto {
-    size = measure(content, styles)
-  }
-  let bounds = (dx, dy, dx + size.width, dy + size.height)
   let offset = (dx, dy)
-  let result = place(dx: dx, dy: dy, 
+  let placed-labels = place(dx: dx, dy: dy, 
     box(width: size.width, height: size.height, {
       for label in labels {
-        let (x, y) = make-2d-alignment2(label.pos)
-        let label-size = measure(label.content, styles)
-        let dxx = get-length(label.dx, size.width)
-        let dyy = get-length(label.dy, size.height)
-        if label.pos.x == left { dxx -= label-size.width }
-        if label.pos.x == center { dxx += 0.5 * (size.width - label-size.width) }
-        if label.pos.x == right { dxx += size.width }
-        if label.pos.y == top { dyy -= label-size.height }
-        if label.pos.y == horizon { dyy += 0.5 * (size.height - label-size.height) }
-        if label.pos.y == bottom { dyy += size.height }
-        let content = place(
-          label.content,
-          dx: dxx,
-          dy: dyy,
+        let label-size = measure(label.content, draw-params.styles)
+        let ldx = get-length(label.dx, size.width)
+        let ldy = get-length(label.dy, size.height)
+        
+        if label.pos.x == left { ldx -= label-size.width }
+        else if label.pos.x == center { ldx += 0.5 * (size.width - label-size.width) }
+        else if label.pos.x == right { ldx += size.width }
+        if label.pos.y == top { ldy -= label-size.height }
+        else if label.pos.y == horizon { ldy += 0.5 * (size.height - label-size.height) }
+        else if label.pos.y == bottom { ldy += size.height }
+        
+        let placed-label = place(label.content, dx: ldx, dy: ldy)
+        let label-bounds = make-bounds(
+          x0: ldx + dx, y0: ldy + dy, 
+          width: label-size.width, height: label-size.height, 
+          draw-params.em
         )
-        let label-bounds = (dxx, dyy, dxx + label-size.width, dyy + label-size.height)
-        bounds = update-bounds(bounds, offset-bounds(label-bounds, offset), styles)
-        content
+        bounds = update-bounds(bounds, label-bounds, draw-params.em)
+        placed-label
       }
     })
   )
-  return (place(content, dx: dx, dy: dy) + result, bounds)
+  return (place(content, dx: dx, dy: dy) + placed-labels, bounds)
 }
 
 // Default gate draw function. Draws a box with global padding
@@ -424,7 +408,7 @@
     dx: x1, dy: y1, 
     labels: item.labels, 
     size: size,
-    styles: draw-params.styles, rect(
+    draw-params: draw-params, rect(
       width: size.width, height: size.height,
       stroke: item.style.stroke,
       fill: item.style.fill,
@@ -435,7 +419,7 @@
 #let draw-slice(x, y1, y2, item, draw-params) = place-with-labels(
   dx: x, dy: y1, 
   size: (width: 0pt, height: y2 - y1),
-  labels: item.labels, styles: draw-params.styles, 
+  labels: item.labels, draw-params: draw-params, 
   line(angle: 90deg, length: y2 - y1, stroke: item.style.stroke)
 )
 
@@ -483,7 +467,7 @@
   let processed-labels = ()
   for label in labels {
     let alignment = make-2d-alignment(label.at("pos", default: default-pos))
-    let (x, y) = make-2d-alignment2(alignment)
+    let (x, y) = make-2d-alignment-factor(alignment)
     processed-labels.push((
       content: label.content,
       pos: alignment,
@@ -1058,7 +1042,8 @@
     styles: styles,
     // roman-gates: roman-gates,
     x-gate-size: none,
-    multi: (wire-distance: 0pt)
+    multi: (wire-distance: 0pt),
+    em: measure(line(length: 1em), styles).width
   )
 
   draw-params.x-gate-size = default-size-hint(gate($X$), draw-params)
@@ -1067,10 +1052,10 @@
   
   /////////// First pass: Layout (spacing)   ///////////
   
-  let column-spacing = convert-em-length(column-spacing, styles)
-  let row-spacing = convert-em-length(row-spacing, styles)
-  let min-row-height = convert-em-length(min-row-height, styles)
-  let min-column-width = convert-em-length(min-column-width, styles)
+  let column-spacing = convert-em-length(column-spacing, draw-params.em)
+  let row-spacing = convert-em-length(row-spacing, draw-params.em)
+  let min-row-height = convert-em-length(min-row-height, draw-params.em)
+  let min-column-width = convert-em-length(min-column-width, draw-params.em)
   
   let colwidths = ()
   let rowheights = (min-row-height,)
@@ -1148,8 +1133,8 @@
     let max-row-height = calc.max(..rowheights)
     rowheights = rowheights.map(x => max-row-height)
   }
-  let center-x-coords = compute-center-coords(colwidths, col-gutter)
-  let center-y-coords = compute-center-coords(rowheights, row-gutter)//.map(x => x - 0.5 * row-spacing)
+  let center-x-coords = compute-center-coords(colwidths, col-gutter)//.map(x => x - 0.5 * column-spacing)
+  let center-y-coords = compute-center-coords(rowheights, row-gutter).map(x => x - 0.5 * row-spacing)
   draw-params.center-y-coords = center-y-coords
   
   (row, col) = (0, 0)
@@ -1157,7 +1142,7 @@
   let center-y = y + rowheights.at(row) / 2 // current cell center y-coordinate
   let center-y = center-y-coords.at(0) // current cell center y-coordinate
   let circuit-width = colwidths.sum() + col-gutter.slice(0, -1).sum(default: 0pt)
-  let circuit-height = rowheights.sum() + row-gutter.sum()// - row-spacing
+  let circuit-height = rowheights.sum() + row-gutter.sum() - row-spacing
 
   let wire-count = 1
   let wire-distance = 1pt
@@ -1167,7 +1152,7 @@
   let (extra-left, extra-right) = (0pt, 0pt)
 
   /////////// Second pass: Generation ///////////
-  let bounds = (0pt, 0pt, 0pt, 0pt)
+  let bounds = (0pt, 0pt, circuit-width, circuit-height)
   
   let circuit = block(
     width: circuit-width, height: circuit-height, {
@@ -1199,7 +1184,7 @@
           let x1 = obtain-cell-coords1(center-x-coords, colwidths, col)
           let x2 = obtain-cell-coords1(center-x-coords, colwidths, col + item.steps - 1e-9)
           let (result, b) = draw-gategroup(x1, x2, y1, y2, item, draw-params)
-          bounds = update-bounds(bounds, b, draw-params.styles)
+          bounds = update-bounds(bounds, b, draw-params.em)
           result
         } else if item.qc-instr == "slice" {
           assert(item.wires >= 0, message: "slice: wires arg needs to be > 0")
@@ -1209,7 +1194,7 @@
           let y2 = obtain-cell-coords1(center-y-coords, rowheights, end)
           let x = obtain-cell-coords1(center-x-coords, colwidths, col)
           let (result, b) = draw-slice(x, y1, y2, item, draw-params)
-          bounds = update-bounds(bounds, b, draw-params.styles)
+          bounds = update-bounds(bounds, b, draw-params.em)
           result
         } else if item.qc-instr == "annotate" {
           let rows = obtain-cell-coords1(center-y-coords, rowheights, item.rows)
@@ -1218,15 +1203,11 @@
         }
       // ---------------------------- Gates & Co. ------------------------------
       } else if is-circuit-drawable(item) {
-        let center-x = center-x-coords.at(col)
         
         let isgate = is-gate(item)
-        let do-draw-later = true
         
-        // let content = get-content(item, draw-params)  
-        // let size = measure(content, styles)
-        let size = get-size-hint(item, draw-params)
-        
+        let size = get-size-hint(item, draw-params)        
+        let center-x = center-x-coords.at(col)
         let top = center-y - size.height / 2
         let bottom = center-y + size.height / 2
   
@@ -1247,19 +1228,18 @@
                 y2, 
                 center-x, 
                 wire, 
-                wire-count: item.multi.wire-count)
+                wire-count: item.multi.wire-count
+              )
             } 
             let nq = item.multi.num-qubits
             if nq > 1 {
-              assert(row + nq -1 < center-y-coords.len(), message: "Target 
+              assert(row + nq - 1 < center-y-coords.len(), message: "Target 
               qubit for multi qubit gate does not exist")
               let y1 = center-y-coords.at(row + nq - 1)
               let y2 = center-y-coords.at(row)
               draw-params.multi.wire-distance = y1 - y2
-              // content = get-content(item, draw-params)
               let func = item.size-hint
               size.width = func(item, draw-params).width
-              do-draw-later = true
             }
             
           }
@@ -1289,27 +1269,25 @@
         }
         
         let content = get-content(item, draw-params)
-        if do-draw-later {
-          let result
-          if isgate {
-            let gate-bounds
-            (result, gate-bounds) = place-with-labels(
-              content, dx: x-pos, dy: y-pos, labels: item.labels, styles: draw-params.styles
-            )
-            bounds = update-bounds(bounds, gate-bounds, draw-params.styles)
-          } else {
-            result = place(
-              dx: x-pos, dy: y-pos, 
-              if isgate { content } else { box(content) }
-            )
-          }
-          to-be-drawn-later.push(result)
+
+        let result
+        if isgate {
+          let gate-bounds
+          (result, gate-bounds) = place-with-labels(
+            content, 
+            size: if item.multi != none and item.multi.num-qubits > 1 {auto} else {size},
+            dx: x-pos, dy: y-pos, 
+            labels: item.labels, draw-params: draw-params
+          )
+          bounds = update-bounds(bounds, gate-bounds, draw-params.em)
         } else {
-          place(
+          result = place(
             dx: x-pos, dy: y-pos, 
             if isgate { content } else { box(content) }
           )
         }
+        to-be-drawn-later.push(result)
+      
           
         x += colwidths.at(col)
         col += 1
@@ -1353,7 +1331,7 @@
     width: scale-float * (circuit-width + extra-left + extra-right), 
     height: scale-float * (circuit-height + extra-bottom + extra-top), 
     // fill: background,
-    stroke: 1pt + gray,
+    // stroke: 1pt + gray,
     move(dy: scale-float * extra-top, dx: scale-float * extra-left, 
       scale(
         x: scale-factor, 
