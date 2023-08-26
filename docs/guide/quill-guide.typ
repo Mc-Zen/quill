@@ -289,14 +289,14 @@ There is another option for #ref-fn("quantum-circuit()") that has a lot of impac
     lstick($|0〉$, n: 3), gate($H$), ctrl(1), 
       ctrl(2), 1, rstick("GHZ", n: 3), [\ ],
     1, gate($H$), ctrl(0), 1, gate($H$), 1, [\ ],
-    1, gate($H$), 1, ctrl(0), gate($H$), 1, [\ ],
+    1, gate($H$), 1, ctrl(0), gate($H$)
 )
 ```, quantum-circuit(
     gate-padding: 2pt,
     row-spacing: 5pt, column-spacing: 7pt,
     lstick($|0〉$, n: 3), gate($H$), ctrl(1), ctrl(2), 1, rstick("GHZ", n: 3), [\ ],
     1, gate($H$), ctrl(0), 1, gate($H$), 1, [\ ],
-    1, gate($H$), 1, ctrl(0), gate($H$), 1, [\ ],
+    1, gate($H$), 1, ctrl(0), gate($H$)
   )
 )
 

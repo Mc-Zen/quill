@@ -320,7 +320,6 @@
   let width = size.width + brace-size.width
   let height = size.height
   let brace-offset-y
-  let total-offset-y = 0pt
   let content-offset-y = 0pt
   
   if gate.multi == none {
@@ -328,10 +327,9 @@
   } else {
     let dy = draw-params.multi.wire-distance
     // at layout stage:
-    if dy == 0pt { return box(width: 2 * width, height: size.height, content) }
+    if dy == 0pt { return box(width: 2 * width, height: 0pt, content) }
     height = dy
-    total-offset-y = + size.height/2
-    content-offset-y = -total-offset-y + height/2
+    content-offset-y = -size.height/2 + height/2
     brace-offset-y = -.25em
   }
   
@@ -340,7 +338,7 @@
   let brace-pos-x = if isleftstick { size.width } else { 0pt }
   let content-pos-x = if isleftstick { 0pt } else { brace-size.width }
 
-  move(dy: total-offset-y,
+  move(dy: 0pt,
     box(width: 2 * width, height: height,
     inset: inset, 
       {
@@ -476,6 +474,26 @@
     ))
   }
   processed-labels
+}
+
+
+#let process-padding-arg(padding) = {
+  let type = type(padding)
+  if type == "length" { 
+    return (left: padding, top: padding, right: padding, bottom: padding)
+  }
+  if type == "dictionary" {
+    let rest = padding.at("rest", default: 0pt)
+    let x = padding.at("x", default: rest)
+    let y = padding.at("y", default: rest)
+    return (
+      left: padding.at("left", default: x), 
+      right: padding.at("right", default: x), 
+      top: padding.at("top", default: y), 
+      bottom: padding.at("bottom", default: y), 
+    )
+  }
+  assert(false, message: "Unsupported type \"" + type + "\" as argument for padding")
 }
 
 /// This is the basic command for creating gates. Use this to create a simple gate, e.g., `gate($X$)`. 
@@ -1022,7 +1040,7 @@
   font-size: 10pt,
   scale-factor: 100%,
   baseline: 0pt,
-  circuit-padding: none,
+  circuit-padding: .4em,
   ..content
 ) = { 
   if content.pos().len() == 0 { return }
@@ -1133,7 +1151,7 @@
     let max-row-height = calc.max(..rowheights)
     rowheights = rowheights.map(x => max-row-height)
   }
-  let center-x-coords = compute-center-coords(colwidths, col-gutter)//.map(x => x - 0.5 * column-spacing)
+  let center-x-coords = compute-center-coords(colwidths, col-gutter).map(x => x - 0.5 * column-spacing)
   let center-y-coords = compute-center-coords(rowheights, row-gutter).map(x => x - 0.5 * row-spacing)
   draw-params.center-y-coords = center-y-coords
   
@@ -1141,7 +1159,7 @@
   let (x, y) = (0pt, 0pt) // current cell top-left coordinates
   let center-y = y + rowheights.at(row) / 2 // current cell center y-coordinate
   let center-y = center-y-coords.at(0) // current cell center y-coordinate
-  let circuit-width = colwidths.sum() + col-gutter.slice(0, -1).sum(default: 0pt)
+  let circuit-width = colwidths.sum() + col-gutter.slice(0, -1).sum(default: 0pt) - column-spacing
   let circuit-height = rowheights.sum() + row-gutter.sum() - row-spacing
 
   let wire-count = 1
@@ -1316,10 +1334,11 @@
   extra-right = calc.max(extra-right, bounds.at(2) - circuit-width)
   extra-bottom = calc.max(extra-bottom, bounds.at(3) - circuit-height)
   if circuit-padding != none {
-    extra-left += circuit-padding.at("left", default: 0pt)
-    extra-top += circuit-padding.at("top", default: 0pt)
-    extra-right += circuit-padding.at("right", default: 0pt)
-    extra-bottom += circuit-padding.at("bottom", default: 0pt)
+    let circuit-padding = process-padding-arg(circuit-padding)
+    extra-left += circuit-padding.left
+    extra-top += circuit-padding.top
+    extra-right += circuit-padding.right
+    extra-bottom += circuit-padding.bottom
   }
   let height = scale-float * (circuit-height + extra-bottom + extra-top)
   
@@ -1331,7 +1350,7 @@
     width: scale-float * (circuit-width + extra-left + extra-right), 
     height: scale-float * (circuit-height + extra-bottom + extra-top), 
     // fill: background,
-    // stroke: 1pt + gray,
+    stroke: 1pt + gray,
     move(dy: scale-float * extra-top, dx: scale-float * extra-left, 
       scale(
         x: scale-factor, 
