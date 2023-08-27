@@ -1,4 +1,4 @@
-#import "../quill.typ": *
+#import "../src/quill.typ": *
 
 #let group = gategroup.with(stroke: (dash: "dotted", thickness: .5pt))
 

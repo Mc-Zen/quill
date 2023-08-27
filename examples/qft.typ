@@ -1,7 +1,7 @@
-#import "../quill.typ": *
+#import "../src/quill.typ": *
 
 #quantum-circuit(
-  scale-factor: 85%,
+  scale: 85%,
   row-spacing: 5pt,
   column-spacing: 8pt,
   lstick($|j_1〉$), gate($H$), gate($R_2$), midstick($ dots $), 

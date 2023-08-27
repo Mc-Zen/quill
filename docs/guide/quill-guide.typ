@@ -1,6 +1,6 @@
 #import "template.typ": *
 #import "typst-doc.typ": parse-module, show-module, show-outline
-#import "../../quill.typ": *
+#import "../../src/quill.typ": *
 #show link: underline
 
 #show: project.with(
@@ -578,7 +578,7 @@ All built-in gates are drawn with a dedicated `draw-function` and you can also t
     
     #set heading(numbering: none)
     #{
-      let docs = parse-module("../../quill.typ", label-prefix: "quill:")
+      let docs = parse-module("../../src/quill.typ", label-prefix: "quill:")
     
       let gates = docs
       gates.functions = gates.functions.filter(

@@ -1,4 +1,4 @@
-#import "../quill.typ": *
+#import "../src/quill.typ": *
 
 #quantum-circuit(
   lstick($|0〉$), gate($H$), ctrl(3), 5, gate($X$), ctrl(2), rstick($|x〉$), [\ ],

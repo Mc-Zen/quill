@@ -1,4 +1,4 @@
-#import "../../quill.typ": *
+#import "../../src/quill.typ": *
 
 #set page(width: 17.5cm, height: auto, margin: 2mm)
 

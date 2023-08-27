@@ -1,4 +1,4 @@
-#import "../quill.typ": *
+#import "../src/quill.typ": *
 
 #quantum-circuit(
   setwire(0), lstick(align(center)[First register\ $t$ qubits], n: 4), lstick($|0〉$), 

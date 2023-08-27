@@ -1,7 +1,7 @@
 [package]
 name = "quill"
 version = "0.1.0"
-entrypoint = "quill.typ"
+entrypoint = "src/quill.typ"
 authors = ["Mc-Zen"]
 license = "MIT"
 description = "A library for creating quantum circuit diagrams."
