@@ -985,6 +985,8 @@
   }
 }
 
+#let std-scale = scale
+
 /// Create a quantum circuit diagram. Content items may be
 /// - Gates created by one of the many gate commands (@@gate, 
 ///   @@mqgate, @@meter, ...)
@@ -1012,7 +1014,7 @@
 ///            for instance and update `wire` and `fill` accordingly.           
 /// - fill (color): Default fill color for gates. 
 /// - font-size (length): Default font size for text in the circuit. 
-/// - scale-factor (relative length): Total scale factor applied to the entire 
+/// - scale (ratio): Total scale factor applied to the entire 
 ///            circuit without changing proportions
 /// - baseline (length, content, string): Set the baseline for the circuit. If a 
 ///            content or a string is given, the baseline will be adjusted auto-
@@ -1038,6 +1040,7 @@
   color: black,
   fill: white,
   font-size: 10pt,
+  scale: 100%,
   scale-factor: 100%,
   baseline: 0pt,
   circuit-padding: .4em,
@@ -1166,8 +1169,6 @@
   let wire-distance = 1pt
   let wire-stroke = wire
   let prev-wire-x = center-x-coords.at(0)
-  let (extra-top, extra-bottom) = (0pt, 0pt)
-  let (extra-left, extra-right) = (0pt, 0pt)
 
   /////////// Second pass: Generation ///////////
   let bounds = (0pt, 0pt, circuit-width, circuit-height)
@@ -1268,9 +1269,6 @@
         if isgate and item.box { prev-wire-x = center-x + size.width / 2 } 
         else { prev-wire-x = current-wire-x }
         
-        extra-left = calc.max(-(center-x - size.width/2), extra-left)
-        extra-right = calc.max(center-x + size.width/2 - circuit-width, extra-right)
-
         let x-pos = center-x
         let y-pos = center-y
         let offset = size.at("offset", default: auto)
@@ -1326,35 +1324,32 @@
   }) // end circuit = block(..., {
     
   /////////// END Second pass: Generation ///////////
-
-  
-  let scale-float = float(repr(scale-factor).slice(0,-1))  * 0.01
-  extra-left = calc.max(extra-left, -bounds.at(0))
-  extra-top = calc.max(extra-top, -bounds.at(1))
-  extra-right = calc.max(extra-right, bounds.at(2) - circuit-width)
-  extra-bottom = calc.max(extra-bottom, bounds.at(3) - circuit-height)
+  // grace period backwards-compatibility:
+  let scale = scale
+  if scale-factor != 100% { scale = scale-factor }
+  let scale-float = scale / 100%
   if circuit-padding != none {
     let circuit-padding = process-padding-arg(circuit-padding)
-    extra-left += circuit-padding.left
-    extra-top += circuit-padding.top
-    extra-right += circuit-padding.right
-    extra-bottom += circuit-padding.bottom
+    bounds.at(0) -= circuit-padding.left
+    bounds.at(1) -= circuit-padding.top
+    bounds.at(2) += circuit-padding.right
+    bounds.at(3) += circuit-padding.bottom
   }
-  let height = scale-float * (circuit-height + extra-bottom + extra-top)
+  let final-height = scale-float * (bounds.at(3) - bounds.at(1))
+  let final-width = scale-float * (bounds.at(2) - bounds.at(0))
   
   let thebaseline = baseline
   if type(thebaseline) in ("content", "string") {
     thebaseline = height/2 - measure(thebaseline, styles).height/2
   }
   box(baseline: thebaseline,
-    width: scale-float * (circuit-width + extra-left + extra-right), 
-    height: scale-float * (circuit-height + extra-bottom + extra-top), 
-    // fill: background,
+    width: final-width,
+    height: final-height, 
     stroke: 1pt + gray,
-    move(dy: scale-float * extra-top, dx: scale-float * extra-left, 
-      scale(
-        x: scale-factor, 
-        y: scale-factor, 
+    move(dy: -scale-float * bounds.at(1), dx: -scale-float * bounds.at(0), 
+      std-scale(
+        x: scale, 
+        y: scale, 
         origin: left + top, 
         circuit
     ))

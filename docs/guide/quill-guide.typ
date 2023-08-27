@@ -122,7 +122,7 @@ Let's look at a quantum bit-flipping error correction circuit. Here we encounter
   lstick($|0〉$), 1, targ(), 2, targ(), ctrl(-1), 1
 )
 ```, quantum-circuit(
-  scale-factor: 80%,
+  scale: 80%,
   lstick($|psi〉$), ctrl(1), ctrl(2), mqgate($E_"bit"$, n: 3), ctrl(1), ctrl(2), targ(), rstick($|psi〉$), [\ ],
   lstick($|0〉$), targ(), 2, targ(), 1, ctrl(-1), 1, [\ ],
   lstick($|0〉$), 1, targ(), 2, targ(), ctrl(-1), 1
@@ -199,17 +199,17 @@ The `wire`, `color` and `fill` options provide means to customize line strokes a
   1,1, targ(), meter(), 
 )))
 
-Furthermore, a common task is changing the total size of a circuit by scaling it up or down. Instead of tweaking all the parameters like `font-size`, `padding`, `row-spacing` etc. you can specify the `scale-factor` option which takes a percentage value:
+Furthermore, a common task is changing the total size of a circuit by scaling it up or down. Instead of tweaking all the parameters like `font-size`, `padding`, `row-spacing` etc. you can specify the `scale` option which takes a percentage value:
 
 #makefigure(vertical: false,
 ```typ
 #quantum-circuit(
-  scale-factor: 60%,
+  scale: 60%,
   1, gate($H$), ctrl(1), gate($H$), 1, [\ ],
   1, 1, targ(), 2
 )
 ```, quantum-circuit(
-  scale-factor: 60%,
+  scale: 60%,
   1, gate($H$), ctrl(1), gate($H$), 1, [\ ],
   1, 1, targ(), 2
 ))
@@ -261,7 +261,7 @@ Setting the option `equal-row-heights` to `true` solves this problem (manually s
 // #makefigure(vertical: false,
 // ```typ
 // #quantum-circuit(
-//   scale-factor: 60%,
+//   scale: 60%,
 //   1, gate($H$), ctrl(1), gate($H$), 1, [\ ],
 //   1, 1, targ(), 2
 // )
@@ -289,14 +289,14 @@ There is another option for #ref-fn("quantum-circuit()") that has a lot of impac
     lstick($|0〉$, n: 3), gate($H$), ctrl(1), 
       ctrl(2), 1, rstick("GHZ", n: 3), [\ ],
     1, gate($H$), ctrl(0), 1, gate($H$), 1, [\ ],
-    1, gate($H$), 1, ctrl(0), gate($H$)
+    1, gate($H$), 1, ctrl(0), gate($H$), 1
 )
 ```, quantum-circuit(
     gate-padding: 2pt,
     row-spacing: 5pt, column-spacing: 7pt,
     lstick($|0〉$, n: 3), gate($H$), ctrl(1), ctrl(2), 1, rstick("GHZ", n: 3), [\ ],
     1, gate($H$), ctrl(0), 1, gate($H$), 1, [\ ],
-    1, gate($H$), 1, ctrl(0), gate($H$)
+    1, gate($H$), 1, ctrl(0), gate($H$), 1
   )
 )
 
@@ -473,10 +473,10 @@ text(```typ
 )
 
 
-#let annotate-circuit(scale-factor: 100%) = quantum-circuit(
+#let annotate-circuit(scale: 100%) = quantum-circuit(
   // gate-padding: 30pt,
   circuit-padding: (top: 1.5em, bottom: 1.5em),
-  scale-factor: scale-factor,
+  scale: scale,
   lstick($|psi〉_C$), ctrl(1), gate($H$), meter(), setwire(2), ctrl(2, wire-count:2), [\ ],
   lstick($|Phi〉_A^+$), targ(), meter(), setwire(2), ctrl(1, wire-count:2), [\ ],
   lstick($|Phi〉_B^+$),1,nwire(2), targ(fill: true), ctrl(0),1, rstick($|psi〉_B$), 
@@ -640,7 +640,7 @@ makefigure(```typ
   lstick($|0〉$), setwire(1), 1, targ(), 1)
 
 #quantum-circuit(
-  scale-factor: 80%,
+  scale: 80%,
   lstick($|ψ〉$), 1, 10pt, ctrl(3), ctrl(6), gate($H$),
     1, 15pt, ctrl(1), ctrl(2), 1, [\ ],
   ..ancillas, [\ ],
@@ -657,7 +657,7 @@ makefigure(```typ
   setwire(0), 5, lstick($|0〉$), setwire(1), 1, targ(), 1)
   
   quantum-circuit(
-  scale-factor: 80%,
+  scale: 80%,
   lstick($|ψ〉$), 1, ctrl(3), ctrl(6), gate($H$), 1, 15pt, ctrl(1), ctrl(2), 1, [\ ],
   ..ancillas, [\ ],
   lstick($|0〉$), 1, targ(), 1, gate($H$), 1, ctrl(1), ctrl(2), 1, [\ ],
