@@ -3,6 +3,7 @@
 
 #import "utility.typ"
 #import "arrow.typ"
+#import "layout.typ"
 
 
 
@@ -246,12 +247,56 @@
   let brace-pos-x = if isleftstick { size.width } else { 0pt }
   let content-pos-x = if isleftstick { 0pt } else { brace-size.width }
 
-  move(dy: 0pt,
-    box(width: 2 * width, height: height,
-    inset: inset, 
-      {
-        place(brace, dy: brace-offset-y, dx: brace-pos-x)
-        place(content, dy: content-offset-y, dx: content-pos-x)
-      }
-  ))
+  box(
+    width: width, 
+    height: height, 
+    {
+      place(brace, dy: brace-offset-y, dx: brace-pos-x)
+      place(content, dy: content-offset-y, dx: content-pos-x)
+    }
+  )
+}
+
+
+
+
+#let draw-gategroup(x1, x2, y1, y2, item, draw-params) = {
+  let p = item.padding
+  let (x1, x2, y1, y2) = (x1 - p.left, x2 + p.right, y1 - p.top, y2 + p.bottom)
+  let size = (width: x2 - x1, height: y2 - y1)
+  layout.place-with-labels(
+    dx: x1, dy: y1, 
+    labels: item.labels, 
+    size: size,
+    draw-params: draw-params, rect(
+      width: size.width, height: size.height,
+      stroke: item.style.stroke,
+      fill: item.style.fill,
+      radius: item.style.radius
+    )
+  )
+}
+
+#let draw-slice(x, y1, y2, item, draw-params) = layout.place-with-labels(
+  dx: x, dy: y1, 
+  size: (width: 0pt, height: y2 - y1),
+  labels: item.labels, draw-params: draw-params, 
+  line(angle: 90deg, length: y2 - y1, stroke: item.style.stroke)
+)
+
+
+
+#let draw-horizontal-wire(x1, x2, y, stroke, wire-count, wire-distance: 1pt) = {
+  if x1 == x2 { return }
+  for i in range(wire-count) {
+    place(line(start: (x1, y), end: (x2, y), stroke: stroke), 
+      dy: (2*i - (wire-count - 1)) * wire-distance)
+  }
+}
+
+#let draw-vertical-wire(y1, y2, x, stroke, wire-count: 1, wire-distance: 1pt) = {
+  for i in range(wire-count) {
+    place(line(start: (x, y1), end: (x, y2), stroke: stroke), 
+      dx: (2*i - int(wire-count/2)) * wire-distance)
+  }
 }

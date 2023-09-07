@@ -2,145 +2,7 @@
 #import "draw-functions.typ"
 #import "process-args.typ"
 #import "layout.typ"
-
-
-#let convert-em-length(length, em) = {
-  if length.em == 0pt { return length }
-  return length.abs + length.em / 1em * em
-}
-
-#let get-length(length, container-length) = {
-  if type(length) == "length" { return length }
-  if type(length) == "ratio" { return length * container-length}
-  if type(length) == "relative length" { return length.length + length.ratio * container-length}
-}
-
-/// Update bounds to contain the given rectangle
-/// - bounds (array): Current bound coordinates x0, y0, x1, y1
-/// - rect (array): Bounds rectangle x0, y0, x1, y1
-#let update-bounds(bounds, rect, em) = (
-  calc.min(bounds.at(0), convert-em-length(rect.at(0), em)), 
-  calc.min(bounds.at(1), convert-em-length(rect.at(1), em)),
-  calc.max(bounds.at(2), convert-em-length(rect.at(2), em)),
-  calc.max(bounds.at(3), convert-em-length(rect.at(3), em)),
-)
-
-#let offset-bounds(bounds, offset) = (
-  bounds.at(0) + offset.at(0),
-  bounds.at(1) + offset.at(1),
-  bounds.at(2) + offset.at(0),
-  bounds.at(3) + offset.at(1),
-)
-
-#let make-bounds(x0: 0pt, y0: 0pt, width: 0pt, height: 0pt, x1: none, y1: none, em) = (
-  convert-em-length(x0, em),
-  convert-em-length(y0, em),
-  convert-em-length(if x1 != none { x1 } else { x0 + width }, em),
-  convert-em-length(if y1 != none { y1 } else { y0 + height }, em),
-)
-
-
-
-
-/// Place some content along with optional labels while computing bounds. 
-/// 
-/// Returns a pair of the placed content and a bounds array. 
-///
-/// - content (content): The content to place. 
-/// - dx (length): Horizontal displacement.
-/// - dy (length): Vertical displacement.
-/// - size (auto, dictionary): For computing bounds, the size of the placed content
-///           is needed. If `auto` is passed, this function computes the size itself
-///           but if it is already known it can be passed through this parameter. 
-/// - labels (array): An array of labels which in turn are dictionaries that must 
-///           specify values for the keys `content` (content), `pos` (strictly 2d 
-///           alignment), `dx` and `dy` (both length, ratio or relative length).
-/// - draw-params (dictionary): Drawing parameters. Must contain a styles object at 
-///           the key `styles` and an absolute length at the key `em`. 
-/// -> pair
-#let place-with-labels(
-  content, 
-  dx: 0pt, 
-  dy: 0pt,
-  size: auto,
-  labels: (),
-  draw-params: none,
-) = {
-  if size == auto { size = measure(content, draw-params.styles) }
-  let bounds = make-bounds(
-    x0: dx, y0: dy, width: size.width, height: size.height, draw-params.em
-  )
-  if labels.len() == 0 {
-    return (place(content, dx: dx, dy: dy), bounds)    
-  }
-  
-  let offset = (dx, dy)
-  let placed-labels = place(dx: dx, dy: dy, 
-    box(width: size.width, height: size.height, {
-      for label in labels {
-        let label-size = measure(label.content, draw-params.styles)
-        let ldx = get-length(label.dx, size.width)
-        let ldy = get-length(label.dy, size.height)
-        
-        if label.pos.x == left { ldx -= label-size.width }
-        else if label.pos.x == center { ldx += 0.5 * (size.width - label-size.width) }
-        else if label.pos.x == right { ldx += size.width }
-        if label.pos.y == top { ldy -= label-size.height }
-        else if label.pos.y == horizon { ldy += 0.5 * (size.height - label-size.height) }
-        else if label.pos.y == bottom { ldy += size.height }
-        
-        let placed-label = place(label.content, dx: ldx, dy: ldy)
-        let label-bounds = make-bounds(
-          x0: ldx + dx, y0: ldy + dy, 
-          width: label-size.width, height: label-size.height, 
-          draw-params.em
-        )
-        bounds = update-bounds(bounds, label-bounds, draw-params.em)
-        placed-label
-      }
-    })
-  )
-  return (place(content, dx: dx, dy: dy) + placed-labels, bounds)
-}
-
-
-
-#let lrstick-size-hint(gate, draw-params) = {
-  let content = box(inset: draw-params.padding, gate.content)
-  let size = measure(content, draw-params.styles)
-  let hint = (
-    width1: 2 * size.width,
-    width: 1 * size.width,
-    height: size.height,
-  )
-  return hint
-}
-
-
-#let draw-gategroup(x1, x2, y1, y2, item, draw-params) = {
-  let p = item.padding
-  let (x1, x2, y1, y2) = (x1 - p.left, x2 + p.right, y1 - p.top, y2 + p.bottom)
-  let size = (width: x2 - x1, height: y2 - y1)
-  place-with-labels(
-    dx: x1, dy: y1, 
-    labels: item.labels, 
-    size: size,
-    draw-params: draw-params, rect(
-      width: size.width, height: size.height,
-      stroke: item.style.stroke,
-      fill: item.style.fill,
-      radius: item.style.radius
-    )
-  )
-}
-
-#let draw-slice(x, y1, y2, item, draw-params) = place-with-labels(
-  dx: x, dy: y1, 
-  size: (width: 0pt, height: y2 - y1),
-  labels: item.labels, draw-params: draw-params, 
-  line(angle: 90deg, length: y2 - y1, stroke: item.style.stroke)
-)
-
+#import "length-helpers.typ"
 
 
 
@@ -281,7 +143,7 @@
 #let lrstick(content, n, align, brace) = gate(
   content, 
   draw-function: draw-functions.draw-lrstick.with(align: align), 
-  // size-hint: lrstick-size-hint,
+  size-hint: layout.lrstick-size-hint,
   box: false, 
   floating: true,
   multi: if n == 1 { none } else { 
@@ -292,7 +154,10 @@
     label: label,
     size-all-wires: if n > 1 { none } else { false }
   )},
-  data: (brace: brace), 
+  data: (
+    brace: brace,
+    align: align,
+  ), 
   // labels: (content: "a", pos: top)
 )
 
@@ -546,75 +411,6 @@
 
 
 
-// From a list of row heights or col widths, compute the respective
-// cell center coordinates, e.g., (3pt, 3pt, 4pt) -> (1.5pt, 4.5pt, 8pt)
-#let compute-center-coords(cell-lengths, gutter) = {
-  let center-coords = ()
-  let tmpx = 0pt
-  gutter.insert(0, 0pt)
-  // assert.eq(cell-lengths.len(), gutter.len())
-  for (cell-length, gutter) in cell-lengths.zip(gutter) {
-    center-coords.push(tmpx + cell-length / 2 + gutter)
-    tmpx += cell-length + gutter
-  }
-  return center-coords
-} 
-
-// Given a list of n center coordinates in and n cell sizes along one axis (x or y), retrieve the coordinates for a single cell or a list of cells given by index. 
-// If a cell index is out of bounds, the outer last coordinate is returned
-// center-coords: List of center coordinates for each index
-// cell-sizes: List of cell sizes for each index
-// cells: Indices of cell for which to retrieve coordinates
-// mode: "center" or "start"
-#let obtain-cell-coords(center-coords, cell-sizes, cells, mode) = {
-  assert(mode in ("center", "start", "end"), message:"Only \"center\", \"start\" and \"end\" are allowed for cell coordinate mode")
-  let last = center-coords.at(-1) + cell-sizes.at(-1) / 2
-  let get(x) = { 
-    let coord = center-coords.at(x, default: last)
-    if mode == "start" { coord -= cell-sizes.at(x, default: 0pt)/2 }
-    if mode == "end" { coord += cell-sizes.at(x, default: 0pt)/2 }
-    return coord
-  }
-  if type(cells) == "integer" { get(cells)  }
-  else if type(cells) == "array" { cells.map(x => get(x)) }
-  else { panic("Unsupported coordinate type") }
-}
-
-// Given a list of n center coordinates in and n cell sizes along one axis (x or y), retrieve the coordinates for a single cell or a list of cells given by index. 
-// If a cell index is out of bounds, the outer last coordinate is returned
-// center-coords: List of center coordinates for each index
-// cell-sizes: List of cell sizes for each index
-// cells: Indices of cell for which to retrieve coordinates
-// These may also be floats. In this case, the integer part determines the cell index and the fractional part a percentage of the cell width. e.g., passing 2.5 would return the center coordinate of the cell
-#let obtain-cell-coords1(center-coords, cell-sizes, cells) = {
-  let last = center-coords.at(-1) + cell-sizes.at(-1) / 2
-  let get(x) = { 
-    let integral = calc.floor(x)
-    let fractional = x - integral
-    let cell-width = cell-sizes.at(integral, default: 0pt)
-    return center-coords.at(integral, default: last) + cell-width * (fractional - 0.5)
-  }
-  if type(cells) in ("integer", "float") { get(cells)  }
-  else if type(cells) == "array" { cells.map(x => get(x)) }
-  else { panic("Unsupported coordinate type") }
-}
-
-
-#let draw-horizontal-wire(x1, x2, y, stroke, wire-count, wire-distance: 1pt) = {
-  if x1 == x2 { return }
-  for i in range(wire-count) {
-    place(line(start: (x1, y), end: (x2, y), stroke: stroke), 
-      dy: (2*i - (wire-count - 1)) * wire-distance)
-  }
-}
-
-#let draw-vertical-wire(y1, y2, x, stroke, wire-count: 1, wire-distance: 1pt) = {
-  for i in range(wire-count) {
-    place(line(start: (x, y1), end: (x, y2), stroke: stroke), 
-      dx: (2*i - int(wire-count/2)) * wire-distance)
-  }
-}
-
 #let std-scale = scale
 
 /// Create a quantum circuit diagram. Content items may be
@@ -703,10 +499,10 @@
   
   /////////// First pass: Layout (spacing)   ///////////
   
-  let column-spacing = convert-em-length(column-spacing, draw-params.em)
-  let row-spacing = convert-em-length(row-spacing, draw-params.em)
-  let min-row-height = convert-em-length(min-row-height, draw-params.em)
-  let min-column-width = convert-em-length(min-column-width, draw-params.em)
+  let column-spacing = length-helpers.convert-em-length(column-spacing, draw-params.em)
+  let row-spacing = length-helpers.convert-em-length(row-spacing, draw-params.em)
+  let min-row-height = length-helpers.convert-em-length(min-row-height, draw-params.em)
+  let min-column-width = length-helpers.convert-em-length(min-column-width, draw-params.em)
   
   let colwidths = ()
   let rowheights = (min-row-height,)
@@ -784,8 +580,8 @@
     let max-row-height = calc.max(..rowheights)
     rowheights = rowheights.map(x => max-row-height)
   }
-  let center-x-coords = compute-center-coords(colwidths, col-gutter).map(x => x - 0.5 * column-spacing)
-  let center-y-coords = compute-center-coords(rowheights, row-gutter).map(x => x - 0.5 * row-spacing)
+  let center-x-coords = layout.compute-center-coords(colwidths, col-gutter).map(x => x - 0.5 * column-spacing)
+  let center-y-coords = layout.compute-center-coords(rowheights, row-gutter).map(x => x - 0.5 * row-spacing)
   draw-params.center-y-coords = center-y-coords
   
   (row, col) = (0, 0)
@@ -828,26 +624,26 @@
           assert(row+item.wires <= rowheights.len(), message: "gategroup: height exceeds range")
           assert(item.steps > 0, message: "gategroup: steps arg needs to be > 0")
           assert(col+item.steps <= colwidths.len(), message: "gategroup: width exceeds range")
-          let y1 = obtain-cell-coords1(center-y-coords, rowheights, row)
-          let y2 = obtain-cell-coords1(center-y-coords, rowheights, row + item.wires - 1e-9)
-          let x1 = obtain-cell-coords1(center-x-coords, colwidths, col)
-          let x2 = obtain-cell-coords1(center-x-coords, colwidths, col + item.steps - 1e-9)
-          let (result, b) = draw-gategroup(x1, x2, y1, y2, item, draw-params)
-          bounds = update-bounds(bounds, b, draw-params.em)
+          let y1 = layout.get-cell-coords(center-y-coords, rowheights, row)
+          let y2 = layout.get-cell-coords(center-y-coords, rowheights, row + item.wires - 1e-9)
+          let x1 = layout.get-cell-coords(center-x-coords, colwidths, col)
+          let x2 = layout.get-cell-coords(center-x-coords, colwidths, col + item.steps - 1e-9)
+          let (result, b) = draw-functions.draw-gategroup(x1, x2, y1, y2, item, draw-params)
+          bounds = layout.update-bounds(bounds, b, draw-params.em)
           result
         } else if item.qc-instr == "slice" {
           assert(item.wires >= 0, message: "slice: wires arg needs to be > 0")
           assert(row+item.wires <= rowheights.len(), message: "slice: height exceeds range")
           let end = if item.wires == 0 {rowheights.len()} else {row+item.wires}
-          let y1 = obtain-cell-coords1(center-y-coords, rowheights, row)
-          let y2 = obtain-cell-coords1(center-y-coords, rowheights, end)
-          let x = obtain-cell-coords1(center-x-coords, colwidths, col)
-          let (result, b) = draw-slice(x, y1, y2, item, draw-params)
-          bounds = update-bounds(bounds, b, draw-params.em)
+          let y1 = layout.get-cell-coords(center-y-coords, rowheights, row)
+          let y2 = layout.get-cell-coords(center-y-coords, rowheights, end)
+          let x = layout.get-cell-coords(center-x-coords, colwidths, col)
+          let (result, b) = draw-functions.draw-slice(x, y1, y2, item, draw-params)
+          bounds = layout.update-bounds(bounds, b, draw-params.em)
           result
         } else if item.qc-instr == "annotate" {
-          let rows = obtain-cell-coords1(center-y-coords, rowheights, item.rows)
-          let cols = obtain-cell-coords1(center-x-coords, colwidths, item.columns)
+          let rows = layout.get-cell-coords(center-y-coords, rowheights, item.rows)
+          let cols = layout.get-cell-coords(center-x-coords, colwidths, item.columns)
           place((item.callback)(rows, cols))
         }
       // ---------------------------- Gates & Co. ------------------------------
@@ -855,10 +651,11 @@
         
         let isgate = utility.is-gate(item)
         
-        let size = utility.get-size-hint(item, draw-params)        
+        let size = utility.get-size-hint(item, draw-params)
+        let single-qubit-height = size.height
         let center-x = center-x-coords.at(col)
-        let top = center-y - size.height / 2
-        let bottom = center-y + size.height / 2
+        let top = center-y - single-qubit-height / 2
+        let bottom = center-y + single-qubit-height / 2
   
 
         if isgate {
@@ -872,7 +669,7 @@
               let target-qubit = row + item.multi.target
               assert(center-y-coords.len() > target-qubit, message: "Target qubit for controlled gate is out of range")
               let (y1, y2) = ((bottom, top).at(int(item.multi.target < 1)), center-y-coords.at(target-qubit))
-              draw-vertical-wire(
+              draw-functions.draw-vertical-wire(
                 y1, 
                 y2, 
                 center-x, 
@@ -887,14 +684,13 @@
               let y1 = center-y-coords.at(row + nq - 1)
               let y2 = center-y-coords.at(row)
               draw-params.multi.wire-distance = y1 - y2
-              let func = item.size-hint
-              size.width = func(item, draw-params).width
+              size = (item.size-hint)(item, draw-params)
             }
           }
         }
         
         let current-wire-x = center-x
-        draw-horizontal-wire(prev-wire-x, current-wire-x, center-y, wire-stroke, wire-count, wire-distance: wire-distance)
+        draw-functions.draw-horizontal-wire(prev-wire-x, current-wire-x, center-y, wire-stroke, wire-count, wire-distance: wire-distance)
         if isgate and item.box { prev-wire-x = center-x + size.width / 2 } 
         else { prev-wire-x = current-wire-x }
         
@@ -903,13 +699,13 @@
         let offset = size.at("offset", default: auto)
         if offset == auto {
           x-pos -= size.width / 2
-          y-pos -= size.height / 2
+          y-pos -= single-qubit-height / 2
         } else if type(offset) == "dictionary" {
           let offset-x = offset.at("x", default: auto)
           let offset-y = offset.at("y", default: auto)
           if offset-x == auto { x-pos -= size.width / 2}
           else if type(offset-x) == "length" { x-pos -= offset-x }
-          if offset-y == auto { y-pos -= size.width / 2}
+          if offset-y == auto { y-pos -= single-qubit-height / 2}
           else if type(offset-y) == "length" { y-pos -= offset-y }
         }
         
@@ -918,13 +714,13 @@
         let result
         if isgate {
           let gate-bounds
-          (result, gate-bounds) = place-with-labels(
+          (result, gate-bounds) = layout.place-with-labels(
             content, 
             size: if item.multi != none and item.multi.num-qubits > 1 {auto} else {size},
             dx: x-pos, dy: y-pos, 
             labels: item.labels, draw-params: draw-params
           )
-          bounds = update-bounds(bounds, gate-bounds, draw-params.em)
+          bounds = layout.update-bounds(bounds, gate-bounds, draw-params.em)
         } else {
           result = place(
             dx: x-pos, dy: y-pos, 
@@ -942,7 +738,7 @@
         // let t = col
         // if col == center-x-coords.len() { t -= 1}
         let center-x = center-x-coords.at(col - 1)
-        draw-horizontal-wire(prev-wire-x, center-x, center-y, wire-stroke, wire-count, wire-distance: wire-distance)
+        draw-functions.draw-horizontal-wire(prev-wire-x, center-x, center-y, wire-stroke, wire-count, wire-distance: wire-distance)
         prev-wire-x = center-x
       }
       
@@ -974,7 +770,7 @@
   box(baseline: thebaseline,
     width: final-width,
     height: final-height, 
-    // stroke: 1pt + gray,
+    stroke: 1pt + gray,
     move(dy: -scale-float * bounds.at(1), dx: -scale-float * bounds.at(0), 
       std-scale(
         x: scale, 
