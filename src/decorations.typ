@@ -86,6 +86,8 @@
 /// - stroke (stroke): Stroke for rectangle.
 /// - fill (color): Fill color for rectangle.
 /// - radius (length, dictionary): Corner radius for rectangle.
+/// - labels (array, string, content, dictionary): One or more labels to add to the  
+///        group. See @@gate(). 
 #let gategroup(
   wires, 
   steps, 
@@ -108,6 +110,8 @@
 /// - wires (integer): Number of wires to slice.
 /// - labels (array, dictionary): Labels for the slice. See @@gate()
 /// - stroke (stroke): Line style for the slice. 
+/// - labels (array, string, content, dictionary): One or more labels to add to the  
+///        slice. See @@gate(). 
 #let slice(
   wires: 0, 
   stroke: (paint: red, thickness: .7pt, dash: "dashed"),

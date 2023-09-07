@@ -22,11 +22,16 @@
 
 
 /// Process the label argument to `gate`. Allowed input formats are array of dictionaries
-/// or a single dictionary (for just one label). The dictionary needs to contain the key 
-/// content and may optionally have values for the  keys `pos` (specifying a 1d or 2d 
-/// alignment) and `dx` as well as `dy`
+/// or a single dictionary/string/content (for just one label). 
+/// 
+/// Each dictionary needs to contain the key content and may optionally have values 
+/// for the  keys `pos` (specifying a 1d or 2d alignment) and `dx` as well as `dy`
 #let process-labels-arg(labels, default-pos: right) = {
-  if type(labels) == "dictionary" { labels = (labels,) } 
+
+  let type = type(labels)
+  if type == "dictionary" { labels = (labels,) } 
+  else if type in ("content", "string") { labels = ((content: labels),) } 
+  else if type == "dictionary" { labels = ((content: labels),) } 
   let processed-labels = ()
   for label in labels {
     let alignment = layout.make-2d-alignment(label.at("pos", default: default-pos))

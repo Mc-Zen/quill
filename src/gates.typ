@@ -26,11 +26,13 @@
 ///             Signature: `(gate, draw-params).`
 /// - draw-function (function): Drawing function that produces the displayed content.
 ///             Signature: `(gate, draw-params).`
-/// - labels (array, dictionary): One or more labels to add to the gate. A label consists
-///             of a dictionary with entries for the keys `content` (the label content), 
-///             `pos` (2d alignment specifying the position of the label) and 
-///             optionally `dx` and/or `dy` (lengths, ratios or relative 
-///             lengths). 
+/// - labels (array, string, content, dictionary): One or more labels to add to the gate.
+///             Usually, a label consists of a dictionary with entries for the keys 
+///             `content` (the label content), `pos` (2d alignment specifying the 
+///             position of the label) and optionally `dx` and/or `dy` (lengths, ratios 
+///             or relative lengths). If only a single label is to be added, a plain 
+///             content or string value can be passed which is then placed at the default
+///             position. 
 ///
 /// - data (any): Optional additional gate data. This can for example be a dictionary
 ///             storing extra information that may be used for instance in a custom
@@ -94,7 +96,8 @@
 ///          - Affect height on only the first and last wire (`false`)
 ///          - Affect the height of all wires (`true`)
 ///          - Affect the height on no wire (`none`)
-/// - labels (array, dictionary): One or more labels to add to the gate. See @@gate(). 
+/// - labels (array, string, content, dictionary): One or more labels to add to the gate. 
+///        See @@gate(). 
 /// - data (any): Optional additional gate data. This can for example be a dictionary
 ///        storing extra information that may be used for instance in a custom
 ///        `draw-function`.
@@ -248,4 +251,3 @@
 /// - show-dot (boolean): Whether to show the control dot. Set this to 
 ///        false to obtain a vertical wire with no dots at all. 
 #let ctrl(n, wire-count: 1, open: false, fill: none, size: 2.3pt, show-dot: true, labels: ()) = mqgate(none, target: n, draw-function: draw-functions.draw-ctrl, wire-count: wire-count, fill: fill, data: (open: open, size: size, show-dot: show-dot), labels: labels)
-d
