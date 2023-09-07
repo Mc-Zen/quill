@@ -313,53 +313,7 @@ There is another option for #ref-fn("quantum-circuit()") that has a lot of impac
 ]
 #pagebreak()
 
-= Tips and Tricks
 
-
-== Circuit Style Template
-If you find yourself setting the same style parameters for the `quantum-circuit()` function over and over again, consider adding an alias with preprended parameter values:
-
-#makefigure(
-```typ
-#let mycircuit = quantum-circuit.with(row-spacing: 5pt, column-spacing: 5pt)
-```, [
-  #let mycircuit = quantum-circuit.with(row-spacing: 5pt, column-spacing: 5pt)
-  #mycircuit(1, gate($X$), 1)
-])
-
-You can then use `mycircuit()` in place of `quantum-circuit()`. This can also be used to create a white-on-black template:
-
-#makefigure(
-```typ
-#let darkcircuit = quantum-circuit.with(
-  wire: .7pt + white, 
-  color: white, 
-  fill: black
-)
-```, [
-  #let darkcircuit = quantum-circuit.with(wire: .7pt + white, color: white, fill: black)
-  #darkcircuit(1, gate($X$), 1)
-])
-
-
-== Gate Templates
-
-It is very easy and often worth to declare a certain gate that is used multiple times in a variable:
-
-#makefigure(
-```typ
-#let noise = gate($cal(E)$, radius: 5pt)
-```, [
-])
-
-Also, the same technique as described in the previous section can be used to add gate "templates". For example, we might want to have a round, blue gate (with different content) at many places in the circuit. We can then write 
-
-#makefigure(
-```typ
-#let noise = gate($cal(E)$, radius: 5pt)
-```, [
-])
-#pagebreak()
 
 = Fine-Tuning <fine-tuning>
 
@@ -554,6 +508,7 @@ It is generally possible to read any value from a gate that has been provided in
 
 All built-in gates are drawn with a dedicated `draw-function` and you can also take a look at the source code for ideas and hints. 
 
+
 #pagebreak()
 = Function Documentation
 
@@ -578,31 +533,28 @@ All built-in gates are drawn with a dedicated `draw-function` and you can also t
     
     #set heading(numbering: none)
     #{
-      let docs = parse-module("../../src/quill.typ", label-prefix: "quill:")
+      let show-module = show-module.with(show-module-name: false, first-heading-level: 2)
+      let parse-module = parse-module.with(label-prefix: "quill:")
+      
+      let docs = parse-module("/src/quill.typ")
+      let docs-gates = parse-module("/src/gates.typ")
+      let docs-decorations = parse-module("/src/decorations.typ")
     
-      let gates = docs
-      gates.functions = gates.functions.filter(
-        x => x.name in ("gate", "mqgate", "meter", "permute", "phantom", "ctrl", "targ", "targX", "swap", "control", "phase", "controlled"))
-    
-      let decorations = docs
-      decorations.functions = decorations.functions.filter(
-        x => x.name in ("lstick", "rstick", "midstick", "nwire", "slice", "annotate", "gategroup", "setwire"))
-    
-      let circuit = docs
-      circuit.functions = circuit.functions.filter(
-        x => x.name in ("quantum-circuit"))
-    
-      [*Gates*]
-      show-outline(gates)
-      [*Decorations*]
-      show-outline(decorations)
       [*Quantum Circuit*]
-      show-outline(circuit)
-      show-module(docs, show-module-name: false, first-heading-level: 2)
+      show-outline(docs)
+      [*Gates*]
+      show-outline(docs-gates)
+      [*Decorations*]
+      show-outline(docs-decorations)
+      
+      show-module(docs)
+      show-module(docs-gates)
+      show-module(docs-decorations)
     }
   ])
 
 ]
+
 
 #pagebreak()
 = Demo <demo>
