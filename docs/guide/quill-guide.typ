@@ -159,6 +159,34 @@ The `setwire` command produces no cells and can be called at any point on the wi
 ))
 
 
+In order to structure quantum circuits you often want to mark sections to denote certain steps in the circuit. This can be easily achieved through the #ref-fn("slice()") and #ref-fn("gategroup()") commands. Both are inserted into the circuit where they should begin and allow an arbitrary number of labels through the `labels` argument. The function `gategroup()` takes two positional integer arguments which specify the number of wires and steps respectively the group should span. Slices reach down to the last wire by default but the number of sliced wires can also be set manually. 
+
+
+#makefigure(
+```typ
+#quantum-circuit(
+  1, gate($H$), ctrl(1), 
+    slice(labels: "1"), 1, 
+    gategroup(3, 3, labels: (content: 
+      "Syndrome measurement", pos: bottom)), 
+    1, ctrl(2), ctrl(0), 1, 
+    slice(labels: "3", wires: 2, 
+      stroke: blue), 
+    2, [\ ],
+  2, targ(), 1, ctrl(1), 1, ctrl(0), 3, [\ ], 
+  4, targ(), targ(), meter(target: -2)
+)
+```, quantum-circuit(
+  1, gate($H$), ctrl(1), slice(labels: "1"), 1, 
+    gategroup(3, 3, labels: (content: "Syndrome measurement", pos: bottom)), 
+    1, ctrl(2), ctrl(0), 1, 
+    slice(labels: "3", n: 2, stroke: blue), 2, [\ ],
+  2, targ(), 1, ctrl(1), 1, ctrl(0), 3, [\ ], 
+  4, targ(), targ(), meter(target: -2)
+))
+
+
+
 
 #pagebreak()
 = Circuit Styling <circuit-styling>
