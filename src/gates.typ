@@ -147,9 +147,9 @@
 ///                           qubit the specified number of wires up or down.
 /// - wire-count (integer):   Wire count for the (optional) control wire. 
 /// - n (integer):            Number of wires to span this meter across. 
-/// - label (content):        Label to show above the meter. 
-#let meter(target: none, n: 1, wire-count: 2, label: none, fill: none, radius: 0pt) = {
-  let labels = if label != none {(content: label, pos: top, dy: -0.5em)} else { () }
+/// - labels (content):        Label to show above the meter. 
+#let meter(target: none, n: 1, wire-count: 2, labels: none, fill: none, radius: 0pt) = {
+  labels = if labels != none {(content: labels, pos: top, dy: -0.5em)} else { () }
   if target == none and n == 1 {
     gate(none, fill: fill, radius: radius, draw-function: draw-functions.draw-meter, data: (meter-label: label), labels: labels)
   } else {

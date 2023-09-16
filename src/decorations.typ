@@ -107,18 +107,18 @@
 
 /// Slice the circuit vertically, showing a separation line between columns. 
 /// 
-/// - wires (integer): Number of wires to slice.
+/// - n (integer): Number of wires to slice.
 /// - labels (array, dictionary): Labels for the slice. See @@gate()
 /// - stroke (stroke): Line style for the slice. 
 /// - labels (array, string, content, dictionary): One or more labels to add to the  
 ///        slice. See @@gate(). 
 #let slice(
-  wires: 0, 
+  n: 0, 
   stroke: (paint: red, thickness: .7pt, dash: "dashed"),
   labels: ()
 ) = (
   qc-instr: "slice",
-  wires: wires,
+  wires: n,
   style: (stroke: stroke),
   labels: process-args.process-labels-arg(labels, default-pos: top)
 )
