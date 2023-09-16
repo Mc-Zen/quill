@@ -98,6 +98,9 @@
 ///          - Affect the height on no wire (`none`)
 /// - labels (array, string, content, dictionary): One or more labels to add to the gate. 
 ///        See @@gate(). 
+/// - wire-label (array, string, content, dictionary): One or more labels to add to the 
+///        control wire. Works analogous to `labels` but with default positioning to the 
+///        right of the wire. 
 /// - data (any): Optional additional gate data. This can for example be a dictionary
 ///        storing extra information that may be used for instance in a custom
 ///        `draw-function`.
@@ -116,8 +119,9 @@
   extent: auto, 
   size-all-wires: false,
   draw-function: draw-functions.draw-boxed-multigate, 
-  data: none,
   labels: (),
+  wire-label: (),
+  data: none,
 ) = gate(
   content, 
   fill: fill, box: box, 
@@ -133,6 +137,7 @@
     size-all-wires: size-all-wires,
     inputs: inputs,
     outputs: outputs,
+    wire-label: process-args.process-labels-arg(wire-label, default-pos: right),
   ),
   labels: labels,
   data: data,
@@ -238,7 +243,20 @@
 /// 
 /// - n (integer): How many wires up or down the target wire lives. 
 /// - size (length): Size of the target symbol. 
-#let swap(n, size: 7pt, labels: ()) = mqgate(none, target: n, box: false, draw-function: draw-functions.draw-swap, data: (size: size), labels: labels)
+/// - wire-label (array, string, content, dictionary): One or more labels 
+///        to add to the control wire. See @@mqgate(). 
+#let swap(n, wire-count: 1, size: 7pt, labels: (), wire-label: ()) = mqgate(
+  none,
+  target: n,
+  box: false,
+  draw-function: draw-functions.draw-swap,
+  wire-count: wire-count,
+  data: (size: size),
+  labels: labels,
+  wire-label: wire-label
+)
+
+
 
 /// Creates a control with a vertical wire to another qubit. 
 /// 
@@ -250,4 +268,24 @@
 /// - size (length): Size of the control circle. 
 /// - show-dot (boolean): Whether to show the control dot. Set this to 
 ///        false to obtain a vertical wire with no dots at all. 
-#let ctrl(n, wire-count: 1, open: false, fill: none, size: 2.3pt, show-dot: true, labels: ()) = mqgate(none, target: n, draw-function: draw-functions.draw-ctrl, wire-count: wire-count, fill: fill, data: (open: open, size: size, show-dot: show-dot), labels: labels)
+/// - wire-label (array, string, content, dictionary): One or more labels 
+///        to add to the control wire. See @@mqgate(). 
+#let ctrl(
+  n,
+  wire-count: 1,
+  open: false,
+  fill: none,
+  size: 2.3pt,
+  show-dot: true,
+  labels: (),
+  wire-label: (),
+) = mqgate(
+  none,
+  target: n,
+  draw-function: draw-functions.draw-ctrl,
+  wire-count: wire-count,
+  fill: fill,
+  data: (open: open, size: size, show-dot: show-dot),
+  labels: labels,
+  wire-label: wire-label
+)

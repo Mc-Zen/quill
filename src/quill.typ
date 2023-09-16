@@ -232,7 +232,7 @@
           result
         } else if item.qc-instr == "slice" {
           assert(item.wires >= 0, message: "slice: wires arg needs to be > 0")
-          assert(row+item.wires <= rowheights.len(), message: "slice: height exceeds range")
+          assert(row+item.wires <= rowheights.len(), message: "slice: number of wires exceeds range")
           let end = if item.wires == 0 {rowheights.len()} else {row+item.wires}
           let y1 = layout.get-cell-coords(center-y-coords, rowheights, row)
           let y2 = layout.get-cell-coords(center-y-coords, rowheights, end)
@@ -267,14 +267,30 @@
             if item.multi.target != none {
               let target-qubit = row + item.multi.target
               assert(center-y-coords.len() > target-qubit, message: "Target qubit for controlled gate is out of range")
-              let (y1, y2) = ((bottom, top).at(int(item.multi.target < 1)), center-y-coords.at(target-qubit))
-              draw-functions.draw-vertical-wire(
-                y1, 
-                y2, 
-                center-x, 
-                wire, 
-                wire-count: item.multi.wire-count
-              )
+              let y1 = center-y
+              let y2 = center-y-coords.at(target-qubit)
+
+              if item.multi.wire-label.len() == 0 {
+                draw-functions.draw-vertical-wire(
+                  y1, 
+                  y2, 
+                  center-x, 
+                  wire, 
+                  wire-count: item.multi.wire-count,
+                )
+              } else {
+                let (result, gate-bounds) = draw-functions.draw-vertical-wire-with-labels(
+                  y1, 
+                  y2, 
+                  center-x, 
+                  wire, 
+                  wire-count: item.multi.wire-count,
+                  wire-labels: item.multi.wire-label,
+                  draw-params: draw-params
+                )
+                result
+                bounds = layout.update-bounds(bounds, gate-bounds, draw-params.em)
+              }
             } 
             let nq = item.multi.num-qubits
             if nq > 1 {

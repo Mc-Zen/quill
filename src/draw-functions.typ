@@ -295,9 +295,55 @@
   }
 }
 
-#let draw-vertical-wire(y1, y2, x, stroke, wire-count: 1, wire-distance: 1pt) = {
-  for i in range(wire-count) {
-    place(line(start: (x, y1), end: (x, y2), stroke: stroke), 
-      dx: (2*i - int(wire-count/2)) * wire-distance)
+#let draw-vertical-wire(
+  y1, 
+  y2,
+  x,
+  stroke,
+  wire-count: 1,
+  wire-distance: 1pt,
+) = {
+  let height = y2 - y1
+
+  let wires = {
+    for i in range(wire-count) {
+      let x = 2 * i * wire-distance
+      place(line(start: (x, 0pt), end: (x, height), stroke: stroke))
+    }
   }
+
+  place(
+    dx: x - (wire-count - 1) * wire-distance,
+    dy: y1,
+    wires
+  )
+}
+
+#let draw-vertical-wire-with-labels(
+  y1, 
+  y2,
+  x,
+  stroke,
+  wire-count: 1,
+  wire-distance: 1pt,
+  wire-labels: (),
+  draw-params: none,
+) = {
+  let height = y2 - y1
+
+  let wires = {
+    for i in range(wire-count) {
+      let x = 2 * i * wire-distance
+      place(line(start: (x, 0pt), end: (x, height), stroke: stroke))
+    }
+  }
+
+  layout.place-with-labels(
+    dx: x - (wire-count - 1) * wire-distance,
+    dy: y1,
+    labels: wire-labels,
+    draw-params: draw-params,
+    size: (width: 2 * (wire-count - 1) * wire-distance, height: height),
+    wires
+  )
 }
