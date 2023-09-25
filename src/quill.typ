@@ -5,7 +5,6 @@
 
 
 
-#let std-scale = scale
 
 /// Create a quantum circuit diagram. Content items may be
 /// - Gates created by one of the many gate commands (@@gate, 
@@ -48,7 +47,7 @@
 ///            This setting basically just changes the size of the bounding box 
 ///            for the circuit and can be used to increase it when labels or 
 ///            annotations extend beyond the actual circuit. 
-/// - ..content (array): Items, gates and circuit commands (see description). 
+/// - ..children (array): Items, gates and circuit commands (see description). 
 #let quantum-circuit(
   wire: .7pt + black,     
   row-spacing: 12pt,
@@ -64,11 +63,11 @@
   scale-factor: 100%,
   baseline: 0pt,
   circuit-padding: .4em,
-  ..content
+  ..children
 ) = { 
-  if content.pos().len() == 0 { return }
-  if content.named().len() > 0 { 
-    panic("Unexpected named argument '" + content.named().keys().at(0) + "' for quantum-circuit()")
+  if children.pos().len() == 0 { return }
+  if children.named().len() > 0 { 
+    panic("Unexpected named argument '" + children.named().keys().at(0) + "' for quantum-circuit()")
   }
   set text(color, size: font-size)
   
@@ -89,7 +88,10 @@
 
   draw-params.x-gate-size = layout.default-size-hint(gate($X$), draw-params)
   
-  let items = content.pos()
+  let items = children.pos().map( x => {
+    if type(x) == "content" and x != [\ ] { return gate(x) }
+    return x
+  })
   
   /////////// First pass: Layout (spacing)   ///////////
   
@@ -320,7 +322,7 @@
           else if type(offset-y) == "length" { y-pos -= offset-y }
         }
         
-        let content = utility.get-content(item, draw-params)
+        let content = draw-functions.get-content(item, draw-params)
 
         let result
         if isgate {
@@ -378,12 +380,15 @@
   if type(thebaseline) in ("content", "string") {
     thebaseline = height/2 - measure(thebaseline, styles).height/2
   }
+  if type(thebaseline) == "fraction" {
+    thebaseline = 100% - layout.get-cell-coords1(center-y-coords, rowheights, thebaseline / 1fr) + bounds.at(1)
+  }
   box(baseline: thebaseline,
     width: final-width,
     height: final-height, 
     // stroke: 1pt + gray,
     move(dy: -scale-float * bounds.at(1), dx: -scale-float * bounds.at(0), 
-      std-scale(
+      layout.std-scale(
         x: scale, 
         y: scale, 
         origin: left + top, 
