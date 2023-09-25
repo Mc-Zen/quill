@@ -322,7 +322,7 @@
           else if type(offset-y) == "length" { y-pos -= offset-y }
         }
         
-        let content = draw-functions.get-content(item, draw-params)
+        let content = utility.get-content(item, draw-params)
 
         let result
         if isgate {

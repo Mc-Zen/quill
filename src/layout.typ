@@ -107,7 +107,7 @@
   
   let offset = (dx, dy)
   let placed-labels = place(dx: dx, dy: dy, 
-    box(width: size.width, height: size.height, {
+    box({
       for label in labels {
         let label-size = measure(label.content, draw-params.styles)
         let ldx = get-length(label.dx, size.width)
@@ -119,6 +119,7 @@
         if label.pos.y == top { ldy -= label-size.height }
         else if label.pos.y == horizon { ldy += 0.5 * (size.height - label-size.height) }
         else if label.pos.y == bottom { ldy += size.height }
+        
         
         let placed-label = place(label.content, dx: ldx, dy: ldy)
         let label-bounds = make-bounds(
@@ -152,7 +153,7 @@
 } 
 
 
-// Given a list of n center coordinates in and n cell sizes along one axis (x or y), retrieve the coordinates for a single cell or a list of cells given by index. 
+// Given a list of n center coordinates and n cell sizes along one axis (x or y), retrieve the coordinates for a single cell or a list of cells given by index. 
 // If a cell index is out of bounds, the outer last coordinate is returned
 // center-coords: List of center coordinates for each index
 // cell-sizes: List of cell sizes for each index
@@ -170,3 +171,20 @@
   else if type(cells) == "array" { cells.map(x => get(x)) }
   else { panic("Unsupported coordinate type") }
 }
+
+#let get-cell-coords1(center-coords, cell-sizes, cells) = {
+  let last = center-coords.at(-1) + cell-sizes.at(-1) / 2
+  let get(x) = { 
+    let integral = calc.floor(x)
+    let fractional = x - integral
+    let cell-width = cell-sizes.at(integral, default: 0pt)
+    let c1 = center-coords.at(integral, default: last)
+    let c2 = center-coords.at(integral + 1, default: last)
+    return c1 + (c2 - c1) * (fractional)
+  }
+  if type(cells) in ("integer", "float") { get(cells)  }
+  else if type(cells) == "array" { cells.map(x => get(x)) }
+  else { panic("Unsupported coordinate type") }
+}
+
+#let std-scale = scale

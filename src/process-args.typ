@@ -25,7 +25,7 @@
 }
 
 
-/// Process the label argument to `gate`. Allowed input formats are array of dictionaries
+/// Process the label argument to `gate`. Allowed input formats are none, array of dictionaries
 /// or a single dictionary/string/content (for just one label). 
 /// 
 /// Each dictionary needs to contain the key content and may optionally have values 
@@ -33,10 +33,10 @@
 #let process-label-arg(
   labels, 
   default-pos: right,
-  default-dx: .3em, 
-  default-dy: .3em
+  default-dx: .4em, 
+  default-dy: .4em
 ) = {
-
+  if labels == none {  return () }
   let type = type(labels)
   if type == "dictionary" { labels = (labels,) } 
   else if type in ("content", "string") { labels = ((content: labels),) } 

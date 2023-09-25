@@ -3,7 +3,7 @@
 
 // align: "left" (for rstick) or "right" (for lstick)
 // brace: auto, none, "{", "}", "|", "[", ...
-#let lrstick(content, n, align, brace) = gate(
+#let lrstick(content, n, align, brace, label) = gate(
   content, 
   draw-function: draw-functions.draw-lrstick.with(align: align), 
   size-hint: layout.lrstick-size-hint,
@@ -21,6 +21,7 @@
     brace: brace,
     align: align,
   ), 
+  label: label
 )
 
 
@@ -32,8 +33,10 @@
 /// - brace (auto, none, string): If `brace` is `auto`, then a default `{` brace
 ///      is shown only if `n > 1`. A brace is always shown when 
 ///      explicitly given, e.g., `"}"`, `"["` or `"|"`. No brace is shown for 
-///      `brace: none`. 
-#let lstick(content, n: 1, brace: auto) = lrstick(content, n, "right", brace)
+///      `brace: none`
+/// - label (array, string, content, dictionary): One or more labels to add to the gate. 
+///        See @@gate(). . 
+#let lstick(content, n: 1, brace: auto, label: none) = lrstick(content, n, "right", brace, label)
 
 
 /// Basic command for labelling a wire at the end. 
@@ -43,7 +46,9 @@
 ///      is shown only if `n > 1`. A brace is always shown when 
 ///      explicitly given, e.g., `"}"`, `"["` or `"|"`. No brace is shown for 
 ///      `brace: none`. 
-#let rstick(content, n: 1, brace: auto) = lrstick(content, n, "left", brace)
+/// - label (array, string, content, dictionary): One or more labels to add to the gate. 
+///        See @@gate(). 
+#let rstick(content, n: 1, brace: auto, label: none) = lrstick(content, n, "left", brace, label)
 
 /// Create a midstick
 #let midstick(content) = gate(content, draw-function: draw-functions.draw-unboxed-gate)
@@ -95,7 +100,7 @@
   stroke: .7pt, 
   fill: none,
   radius: 0pt,
-  label: ()
+  label: none
 ) = (
   qc-instr: "gategroup",
   wires: wires,
@@ -114,7 +119,7 @@
 #let slice(
   n: 0, 
   stroke: (paint: red, thickness: .7pt, dash: "dashed"),
-  label: ()
+  label: none
 ) = (
   qc-instr: "slice",
   wires: n,

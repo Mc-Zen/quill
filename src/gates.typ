@@ -49,7 +49,7 @@
   draw-function: draw-functions.draw-boxed-gate,
   gate-type: "",
   data: none,
-  label: ()
+  label: none
 ) = (
   content: content, 
   fill: fill,
@@ -62,7 +62,7 @@
   draw-function: draw-function,
   gate-type: gate-type, 
   data: data,
-  labels: process-args.process-label-arg(label)
+  labels: process-args.process-label-arg(label, default-pos: top)
 )
 
 
@@ -117,8 +117,8 @@
   extent: auto, 
   size-all-wires: false,
   draw-function: draw-functions.draw-boxed-multigate, 
-  label: (),
-  wire-label: (),
+  label: none,
+  wire-label: none,
   data: none,
 ) = gate(
   content, 
@@ -204,7 +204,7 @@
 /// - fill (none, color, boolean): Fill color for the target circle. If set 
 ///        to `true`, the target is filled with the circuits background color.
 /// - size (length): Size of the target symbol. 
-#let targ(fill: none, size: 4.3pt, label: ()) = gate(none, box: false, draw-function: draw-functions.draw-targ, fill: fill, data: (size: size), label: label)
+#let targ(fill: none, size: 4.3pt, label: none) = gate(none, box: false, draw-function: draw-functions.draw-targ, fill: fill, data: (size: size), label: label)
 
 /// Target element for controlled #smallcaps("z") operations (#sym.bullet). 
 ///
@@ -216,7 +216,7 @@
 
 /// Target element for #smallcaps("swap") operations (#sym.times) without vertical wire). 
 /// - size (length): Size of the target symbol. 
-#let targX(size: 7pt, label: ()) = gate(none, box: false, draw-function: draw-functions.draw-swap, data: (size: size), label: label)
+#let targX(size: 7pt, label: none) = gate(none, box: false, draw-function: draw-functions.draw-swap, data: (size: size), label: label)
 
 /// Create a phase gate shown as a point on the wire together with a label. 
 ///
@@ -245,7 +245,7 @@
 /// - size (length): Size of the target symbol. 
 /// - wire-label (array, string, content, dictionary): One or more labels 
 ///        to add to the control wire. See @@mqgate(). 
-#let swap(n, wire-count: 1, size: 7pt, label: (), wire-label: ()) = mqgate(
+#let swap(n, wire-count: 1, size: 7pt, label: none, wire-label: none) = mqgate(
   none,
   target: n,
   box: false,
@@ -277,8 +277,8 @@
   fill: none,
   size: 2.3pt,
   show-dot: true,
-  label: (),
-  wire-label: (),
+  label: none,
+  wire-label: none,
 ) = mqgate(
   none,
   target: n,

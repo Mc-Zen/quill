@@ -387,7 +387,7 @@ The `annotate()` command allows for querying cell coordinates of the circuit and
 Let's look at an example:
 
 #makefigure(vertical: false,
-text(size: .8em, ```typ
+text(size: .9em, ```typ
 #quantum-circuit(
   1, ctrl(1), gate($H$), meter(), [\ ],
   1, targ(), 1, meter(),
@@ -398,7 +398,10 @@ text(size: .8em, ```typ
       let content = [Readout circuit]
       style(styles => {
         let size = measure(content, styles)
-        place(dx: x1 + (x2 - x1)/2 - size.width/2, dy: y - .6em - size.height, content)
+        place(
+          dx: x1 + (x2 - x1)/2 - size.width/2,
+          dy: y - .6em - size.height, content
+        )
       })
   })
 )
@@ -412,7 +415,10 @@ text(size: .8em, ```typ
       let content = [Readout circuit]
       style(styles => {
         let size = measure(content, styles)
-        place(dx: x1 + (x2 - x1)/2 - size.width/2, dy: y - .6em - size.height, content)
+        place(
+          dx: x1 + (x2 - x1)/2 - size.width/2,
+          dy: y - .6em - size.height, content
+        )
       })
   })
   )
