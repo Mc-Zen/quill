@@ -86,7 +86,7 @@
 /// - stroke (stroke): Stroke for rectangle.
 /// - fill (color): Fill color for rectangle.
 /// - radius (length, dictionary): Corner radius for rectangle.
-/// - labels (array, string, content, dictionary): One or more labels to add to the  
+/// - label (array, string, content, dictionary): One or more labels to add to the  
 ///        group. See @@gate(). 
 #let gategroup(
   wires, 
@@ -95,32 +95,31 @@
   stroke: .7pt, 
   fill: none,
   radius: 0pt,
-  labels: ()
+  label: ()
 ) = (
   qc-instr: "gategroup",
   wires: wires,
   steps: steps,
   padding: process-args.process-padding-arg(padding),
   style: (fill: fill, stroke: stroke, radius: radius),
-  labels: process-args.process-labels-arg(labels, default-pos: top)
+  labels: process-args.process-label-arg(label, default-pos: top)
 )
 
 /// Slice the circuit vertically, showing a separation line between columns. 
 /// 
 /// - n (integer): Number of wires to slice.
-/// - labels (array, dictionary): Labels for the slice. See @@gate()
 /// - stroke (stroke): Line style for the slice. 
-/// - labels (array, string, content, dictionary): One or more labels to add to the  
+/// - label (array, string, content, dictionary): One or more labels to add to the  
 ///        slice. See @@gate(). 
 #let slice(
   n: 0, 
   stroke: (paint: red, thickness: .7pt, dash: "dashed"),
-  labels: ()
+  label: ()
 ) = (
   qc-instr: "slice",
   wires: n,
   style: (stroke: stroke),
-  labels: process-args.process-labels-arg(labels, default-pos: top)
+  labels: process-args.process-label-arg(label, default-pos: top)
 )
 
 /// Lower-level interface to the cell coordinates to create an arbitrary

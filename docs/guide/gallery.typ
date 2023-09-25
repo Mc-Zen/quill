@@ -14,7 +14,7 @@
     [Round gate], quantum-circuit(1, gate($X$, radius: 100%), 1), raw("gate($X$, \nradius: 100%)"), 
     [D gate], quantum-circuit(1, gate($Y$, radius: (right: 100%)), 1), raw("gate($Y$, radius: \n(right: 100%))"), 
     [Meter], quantum-circuit(1, meter(), 1), raw("meter()"), 
-    [Meter with \ label], quantum-circuit(1, meter(labels: $lr(|±〉)$), 1), raw("meter(label: \n$lr(|±〉)$)"), 
+    [Meter with \ label], quantum-circuit(1, meter(label: $lr(|±〉)$), 1), raw("meter(label: \n$lr(|±〉)$)"), 
     [Phase gate], quantum-circuit(1, phase($α$), 1), raw("phase($α$)"), 
     [Control], quantum-circuit(1, ctrl(0), 1), raw("ctrl(0)"), 
     [Open control], quantum-circuit(1, ctrl(0, open: true), 1), raw("ctrl(0, open: true)"), 
@@ -34,30 +34,31 @@
     [Controlled \ Hadamard], quantum-circuit(1, mqgate($H$, target: 1), 1, [\ ], 1, ctrl(0), 1), [#raw("mqgate($H$,target:1)") \ + \ #raw("ctrl(0)")],
     [Plain\ vertical\ wire], quantum-circuit(1, ctrl(1, show-dot: false), 1, [\ ], 3), raw("ctrl(1, show-dot: false)"),
     [Meter to \ classical], quantum-circuit(1, meter(target: 1), 1, [\ ], setwire(2), 1, ctrl(0), 1), [#raw("meter(target: 1)") \ + \ #raw("ctrl(0)")],   
+    [Classical wire], quantum-circuit(setwire(2), 3), raw("setwire(2)"), [Styled wire], quantum-circuit(setwire(1, stroke: green), 3), raw("setwire(1, stroke: green)"),
     [], [],[],[Gate inputs \ and outputs],
-  quantum-circuit(scale: 80%,
-    1, mqgate($U$, n: 3, width: 5em,
+    quantum-circuit(scale: 80%,
+      1, mqgate($U$, n: 3, width: 5em,
+        inputs: (
+          (qubit: 0, n: 2, label: $x$),
+          (qubit: 2, label: $y$)
+        ),
+        outputs: (
+          (qubit: 0, n: 2, label: $x$),
+          (qubit: 2, label: $y ⊕ f(x)$)
+        ),
+      ), 1, [\ ], 3, [\ ], 3
+    ),
+    [#set text(size: .6em);```typc
+    mqgate($U$, n: 3, width: 5em,
       inputs: (
-        (qubit: 0, n: 2, label: $x$),
-        (qubit: 2, label: $y$)
+        (qubit:0, n:2, label:$x$),
+        (qubit:2, label: $y$)
       ),
       outputs: (
-        (qubit: 0, n: 2, label: $x$),
-        (qubit: 2, label: $y ⊕ f(x)$)
-      ),
-    ), 1, [\ ], 3, [\ ], 3
-  ),
-  [#set text(size: .6em);```typc
-  mqgate($U$, n: 3, width: 5em,
-    inputs: (
-      (qubit:0, n:2, label:$x$),
-      (qubit:2, label: $y$)
-    ),
-    outputs: (
-      (qubit:0, n:2, label:$x$),
-      (qubit:2, label:$y⊕f(x)$)
-    )
-  )```]
+        (qubit:0, n:2, label:$x$),
+        (qubit:2, label:$y⊕f(x)$)
+      )
+    )```]
   )
 }
 

@@ -26,7 +26,7 @@
 ///             Signature: `(gate, draw-params).`
 /// - draw-function (function): Drawing function that produces the displayed content.
 ///             Signature: `(gate, draw-params).`
-/// - labels (array, string, content, dictionary): One or more labels to add to the gate.
+/// - label (array, string, content, dictionary): One or more labels to add to the gate.
 ///             Usually, a label consists of a dictionary with entries for the keys 
 ///             `content` (the label content), `pos` (2d alignment specifying the 
 ///             position of the label) and optionally `dx` and/or `dy` (lengths, ratios 
@@ -49,7 +49,7 @@
   draw-function: draw-functions.draw-boxed-gate,
   gate-type: "",
   data: none,
-  labels: ()
+  label: ()
 ) = (
   content: content, 
   fill: fill,
@@ -62,7 +62,7 @@
   draw-function: draw-function,
   gate-type: gate-type, 
   data: data,
-  labels: process-args.process-labels-arg(labels)
+  labels: process-args.process-label-arg(label)
 )
 
 
@@ -79,7 +79,6 @@
 /// - width (auto, length): The width of the gate can be specified manually with this property. 
 /// - box (boolean): Whether this is a boxed gate (determines whether the 
 ///        outgoing wire will be drawn all through the gate (`box: false`) or not).
-/// - label (content): Optional label on the vertical wire. 
 /// - wire-count (integer): Wire count for control wires.
 /// - inputs (none, array): You can put labels inside the gate to label the input wires with 
 ///        this argument. It accepts a list of labels, each of which has to be a dictionary
@@ -96,7 +95,7 @@
 ///          - Affect height on only the first and last wire (`false`)
 ///          - Affect the height of all wires (`true`)
 ///          - Affect the height on no wire (`none`)
-/// - labels (array, string, content, dictionary): One or more labels to add to the gate. 
+/// - label (array, string, content, dictionary): One or more labels to add to the gate. 
 ///        See @@gate(). 
 /// - wire-label (array, string, content, dictionary): One or more labels to add to the 
 ///        control wire. Works analogous to `labels` but with default positioning to the 
@@ -112,14 +111,13 @@
   radius: 0pt,
   width: auto,
   box: true, 
-  label: none, 
   wire-count: 1,
   inputs: none,
   outputs: none,
   extent: auto, 
   size-all-wires: false,
   draw-function: draw-functions.draw-boxed-multigate, 
-  labels: (),
+  label: (),
   wire-label: (),
   data: none,
 ) = gate(
@@ -137,9 +135,9 @@
     size-all-wires: size-all-wires,
     inputs: inputs,
     outputs: outputs,
-    wire-label: process-args.process-labels-arg(wire-label, default-pos: right),
+    wire-label: process-args.process-label-arg(wire-label, default-pos: right),
   ),
-  labels: labels,
+  label: label,
   data: data,
 )
 
@@ -152,13 +150,14 @@
 ///                           qubit the specified number of wires up or down.
 /// - wire-count (integer):   Wire count for the (optional) control wire. 
 /// - n (integer):            Number of wires to span this meter across. 
-/// - labels (content):        Label to show above the meter. 
-#let meter(target: none, n: 1, wire-count: 2, labels: none, fill: none, radius: 0pt) = {
-  labels = if labels != none {(content: labels, pos: top, dy: -0.5em)} else { () }
+/// - label (array, string, content, dictionary): One or more labels to add to the gate. 
+///        See @@gate(). 
+#let meter(target: none, n: 1, wire-count: 2, label: none, fill: none, radius: 0pt) = {
+  label = if label != none {(content: label, pos: top, dy: -0.5em)} else { () }
   if target == none and n == 1 {
-    gate(none, fill: fill, radius: radius, draw-function: draw-functions.draw-meter, data: (meter-label: label), labels: labels)
+    gate(none, fill: fill, radius: radius, draw-function: draw-functions.draw-meter, data: (meter-label: label), label: label)
   } else {
-     mqgate(none, n: n, target: target, fill: fill, radius: radius, box: true, wire-count: wire-count, draw-function: draw-functions.draw-meter, data: (meter-label: label), labels: labels)
+     mqgate(none, n: n, target: target, fill: fill, radius: radius, box: true, wire-count: wire-count, draw-function: draw-functions.draw-meter, data: (meter-label: label), label: label)
   }
 }
 
@@ -205,7 +204,7 @@
 /// - fill (none, color, boolean): Fill color for the target circle. If set 
 ///        to `true`, the target is filled with the circuits background color.
 /// - size (length): Size of the target symbol. 
-#let targ(fill: none, size: 4.3pt, labels: ()) = gate(none, box: false, draw-function: draw-functions.draw-targ, fill: fill, data: (size: size), labels: labels)
+#let targ(fill: none, size: 4.3pt, label: ()) = gate(none, box: false, draw-function: draw-functions.draw-targ, fill: fill, data: (size: size), label: label)
 
 /// Target element for controlled #smallcaps("z") operations (#sym.bullet). 
 ///
@@ -217,7 +216,7 @@
 
 /// Target element for #smallcaps("swap") operations (#sym.times) without vertical wire). 
 /// - size (length): Size of the target symbol. 
-#let targX(size: 7pt, labels: ()) = gate(none, box: false, draw-function: draw-functions.draw-swap, data: (size: size), labels: labels)
+#let targX(size: 7pt, label: ()) = gate(none, box: false, draw-function: draw-functions.draw-swap, data: (size: size), label: label)
 
 /// Create a phase gate shown as a point on the wire together with a label. 
 ///
@@ -226,15 +225,16 @@
 /// - fill (none, color): Fill color for the circle or stroke color if
 ///        `open: true`. 
 /// - size (length): Size of the circle. 
-#let phase(label, open: false, fill: none, size: 2.3pt, labels: ()) = gate(
+#let phase(label, open: false, fill: none, size: 2.3pt) = gate(
   none, 
   box: false,
-  draw-function: (gate, draw-params) => {
-      box(inset: (x: .6em), draw-functions.draw-ctrl(gate, draw-params))
-    },
+  draw-function: (gate, draw-params) => box(
+    inset: (x: .6em), 
+    draw-functions.draw-ctrl(gate, draw-params)
+  ),
   fill: fill,
   data: (open: open, size: size),
-  labels: ((content: label, pos: top + right, dx: -.5em), ) + labels
+  label: process-args.process-label-arg(label, default-pos: top + right, default-dx: -.5em)
 )
 
 
@@ -245,14 +245,14 @@
 /// - size (length): Size of the target symbol. 
 /// - wire-label (array, string, content, dictionary): One or more labels 
 ///        to add to the control wire. See @@mqgate(). 
-#let swap(n, wire-count: 1, size: 7pt, labels: (), wire-label: ()) = mqgate(
+#let swap(n, wire-count: 1, size: 7pt, label: (), wire-label: ()) = mqgate(
   none,
   target: n,
   box: false,
   draw-function: draw-functions.draw-swap,
   wire-count: wire-count,
   data: (size: size),
-  labels: labels,
+  label: label,
   wire-label: wire-label
 )
 
@@ -277,7 +277,7 @@
   fill: none,
   size: 2.3pt,
   show-dot: true,
-  labels: (),
+  label: (),
   wire-label: (),
 ) = mqgate(
   none,
@@ -286,6 +286,6 @@
   wire-count: wire-count,
   fill: fill,
   data: (open: open, size: size, show-dot: show-dot),
-  labels: labels,
+  label: label,
   wire-label: wire-label
 )

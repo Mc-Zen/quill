@@ -166,21 +166,21 @@ In order to structure quantum circuits you often want to mark sections to denote
 ```typ
 #quantum-circuit(
   1, gate($H$), ctrl(1), 
-    slice(labels: "1"), 1, 
-    gategroup(3, 3, labels: (content: 
+    slice(label: "1"), 1, 
+    gategroup(3, 3, label: (content: 
       "Syndrome measurement", pos: bottom)), 
     1, ctrl(2), ctrl(0), 1, 
-    slice(labels: "3", wires: 2, 
+    slice(label: "3", wires: 2, 
       stroke: blue), 
     2, [\ ],
   2, targ(), 1, ctrl(1), 1, ctrl(0), 3, [\ ], 
   4, targ(), targ(), meter(target: -2)
 )
 ```, quantum-circuit(
-  1, gate($H$), ctrl(1), slice(labels: "1"), 1, 
-    gategroup(3, 3, labels: (content: "Syndrome measurement", pos: bottom)), 
+  1, gate($H$), ctrl(1), slice(label: "1"), 1, 
+    gategroup(3, 3, label: (content: "Syndrome measurement", pos: bottom)), 
     1, ctrl(2), ctrl(0), 1, 
-    slice(labels: "3", n: 2, stroke: blue), 2, [\ ],
+    slice(label: "3", n: 2, stroke: blue), 2, [\ ],
   2, targ(), 1, ctrl(1), 1, ctrl(0), 3, [\ ], 
   4, targ(), targ(), meter(target: -2)
 ))

@@ -1,3 +1,7 @@
+// This file contains helper functions to process and normalize special 
+// arguments to functions, especially where multiple formats and types 
+// are allowed.
+
 #import "layout.typ"
 
 
@@ -26,7 +30,12 @@
 /// 
 /// Each dictionary needs to contain the key content and may optionally have values 
 /// for the  keys `pos` (specifying a 1d or 2d alignment) and `dx` as well as `dy`
-#let process-labels-arg(labels, default-pos: right) = {
+#let process-label-arg(
+  labels, 
+  default-pos: right,
+  default-dx: .3em, 
+  default-dy: .3em
+) = {
 
   let type = type(labels)
   if type == "dictionary" { labels = (labels,) } 
@@ -39,8 +48,8 @@
     processed-labels.push((
       content: label.content,
       pos: alignment,
-      dx: label.at("dx", default: .3em * x),
-      dy: label.at("dy", default: .3em * y)
+      dx: label.at("dx", default: default-dx * x),
+      dy: label.at("dy", default: default-dy * y)
     ))
   }
   processed-labels
