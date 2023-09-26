@@ -16,17 +16,14 @@ _Note, that this package is in beta and may still be undergoing breaking changes
 
 _Meanwhile, we suggest importing everything from the package in a local scope to avoid polluting the global namespace (see example below)._
 
-<!-- ## Setup
-
-Since there is no package manager for Typst yet, in order to use this library, download the [quill.typ](./qcircuit.typ) file and place it in your Typst project.  -->
 
 ## Usage
 
-Create circuit diagrams by calling the function `quantum-circuit()` with any number of positional arguments — just like the built-in Typst functions `table()` or `grid()`. A variety of different gate and instructions commands are available and plain numbers can be used to produce any number of empty cells just filled with the current wire mode. A new wire is started by adding the content item `[\ ]`. 
+Create circuit diagrams by calling the function `quantum-circuit()` with any number of positional arguments — just like the built-in Typst functions `table()` or `grid()`. A variety of different gate and instruction commands are available and plain numbers can be used to produce any number of empty cells just filled with the current wire mode. A new wire is started by adding the content item `[\ ]`. 
 
-```java
+```typ
 #{
-  import "@preview/quill:0.1.0": *
+  import "@preview/quill:0.2.0": *
   quantum-circuit(
     lstick($|0〉$), gate($H$), ctrl(1), rstick($(|00〉+|11〉)/√2$, n: 2), [\ ],
     lstick($|0〉$), 1, targ(), 1
@@ -58,3 +55,30 @@ Some show-off examples, loosely replicating figures from [Quantum Computation an
 <h3 align="center">
   <img alt="Quantum fourier transformation circuit" src="docs/images/qft.svg" style="max-width: 100%; padding: 10px 10px; box-shadow: 1pt 1pt 10pt 0pt #AAAAAA; border-radius: 4pt; background: white; box-sizing: border-box">
 </h3>
+
+
+## Changelog
+
+
+### v0.2.0
+- New features:
+  - Add arbitrary labels to any `gate` (also derived gates such as `meter`, `ctrl`, ...), `gategroup` or `slice` that can be anchored to any of the nine 2d alignments. 
+  - Add optional gate inputs and outputs for multi-qubit gates (see gallery).
+  - Implicit gates (breaking change ⚠️): a content item automatically becomes a gate, so you can just type `$H$` instead of `gate($H$)` (of course, the `gate()` function is still important in order to use the many available options). 
+- Other breaking changes ⚠️: 
+  - `slice()` has no `dx` and `dy` parameters anymore. Instead, labels are handled through `label` exactly as in `gate()`. Also the `wires` parameter is replaced with `n` for consistency with other multi-qubit gates. 
+  - Swap order of row and column parameters in `annotate` to make it consistent with built-in Typst functions. 
+- Improvements: 
+  - Improve layout (allow row/column spacing and min lengths to be specified in em-lenghts).
+  - Improve meter (allow multi-qubit gate meters and respect global (per-circuit) gate padding).d
+- Fixes:
+  - `lstick`/`rstick` braces broke with Typst 0.7.0.
+- Documentation
+  - Add section on creating custom gates. 
+  - Add section on using labels. 
+  - Explain usage of `slice()` and `gategroup()`.
+  <!-- - Add Tips and tricks section -->
+
+### v0.1.0
+
+Initial Release
