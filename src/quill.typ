@@ -89,7 +89,7 @@
   draw-params.x-gate-size = layout.default-size-hint(gate($X$), draw-params)
   
   let items = children.pos().map( x => {
-    if type(x) == "content" and x != [\ ] { return gate(x) }
+    if type(x) in ("content", "string") and x != [\ ] { return gate(x) }
     return x
   })
   
@@ -241,7 +241,22 @@
         } else if item.qc-instr == "annotate" {
           let rows = layout.get-cell-coords(center-y-coords, rowheights, item.rows)
           let cols = layout.get-cell-coords(center-x-coords, colwidths, item.columns)
-          place((item.callback)(rows, cols))
+          let annotation = (item.callback)(cols, rows)
+          if type(annotation) == "dictionary" {
+            assert("content" in annotation, message: "Missing field 'content' in annotation")
+            let (content, b) = layout.place-with-labels(
+              annotation.content,
+              dx: annotation.at("dx", default: 0pt),
+              dy: annotation.at("dy", default: 0pt),
+              draw-params: draw-params
+            )
+            content 
+            bounds = layout.update-bounds(bounds, b, draw-params.em)
+          } else if type(annotation) == "content" {
+            place(annotation)
+          } else {
+            assert(false, message: "Unsupported annotation type")
+          }
         }
       // ---------------------------- Gates & Co. ------------------------------
       } else if utility.is-circuit-drawable(item) {

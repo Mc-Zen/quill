@@ -50,8 +50,10 @@
 ///        See @@gate(). 
 #let rstick(content, n: 1, brace: auto, label: none) = lrstick(content, n, "left", brace, label)
 
-/// Create a midstick
-#let midstick(content) = gate(content, draw-function: draw-functions.draw-unboxed-gate)
+/// Create a midstick, i.e., a mid-circuit text. 
+/// - content (content): Label to display, e.g., `$|0〉$`.
+/// - label (array, string, content, dictionary): One or more labels to add to the gate. 
+#let midstick(content, label: none) = gate(content, draw-function: draw-functions.draw-unboxed-gate, label: label)
 
 
 
@@ -133,15 +135,15 @@
 /// This function is passed the coordinates of the specified cell rows 
 /// and columns. 
 /// 
-/// - rows (integer, array): Row indices for which to obtain coordinates. 
 /// - columns (integer, array): Column indices for which to obtain coordinates. 
+/// - rows (integer, array): Row indices for which to obtain coordinates. 
 /// - callback (function): Function to call with the obtained coordinates. The
-///     signature should be with signature `(row-coords, col-coords) => {}`. 
+///     signature should be with signature `(col-coords, row-coords) => {}`. 
 ///     This function is expected to display the content to draw in absolute 
 ///     coordinates within the circuit. 
 #let annotate(
-  rows,
   columns,
+  rows,
   callback 
 ) = (
   qc-instr: "annotate",

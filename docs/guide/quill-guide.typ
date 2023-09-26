@@ -49,7 +49,7 @@ _@gate-gallery features a gallery of many gates that are possible to use with th
 Would you like to create quantum circuits directly in Typst? Maybe a circuit for quantum teleportation?
 #align(center)[#include("../../examples/teleportation.typ")]
 
-Or rather for phase estimation (the code for both examples can be found in @demo)?
+Or one for phase estimation (the code for both examples can be found in @demo)?
 #align(center)[#include("../../examples/phase-estimation.typ")]
 
 This library provides high-level functionality for generating these and more quantum circuit diagrams. 
@@ -85,15 +85,15 @@ A basic circuit can be created by calling the #ref-fn("quantum-circuit()") comma
 
 A quantum gate is created using the #ref-fn("gate()") command. Unlike `qcircuit` and `quantikz`, the math environment is not automatically entered for the content of the gate which allows to pass in any type of content (even images or tables). Use displaystyle math (for example `$ U_1 $` instead of `$U_1$`) to enable appropriate scaling of the gate for more complex mathematical expressions like double subscripts etc. 
 
-Consecutive gates are automatically joined with wires. Plain integers can be used to indicate a number of cells with just wire and no gate (where you would use a lot of `&`'s and `qw`'s in `quantikz`): 
+Consecutive gates are automatically joined with wires. Plain integers can be used to indicate a number of cells with just wire and no gate (where you would use a lot of `&`'s and `qw`'s in `quantikz`). Also, to make life easier, instead of calling `gate()`, you can just put in the gate's content:
 
 #makefigure(
 ```typ
 #quantum-circuit(
-  1, gate($H$), 4, meter()
+  1, $H$, 4, meter()
 )
 ```, quantum-circuit(
-  1, gate($H$), 4, meter()
+  1, $H$, 4, meter()
 ))
 
 #show raw: set text(size: .9em)
@@ -103,15 +103,18 @@ A new wire can be created by breaking the current wire with `[\ ]`:
 #makefigure(
 ```typ
 #quantum-circuit(
-  1, gate($H$), ctrl(1), 1, [\ ],
+  1, $H$, ctrl(1), 1, [\ ],
   2, targ(), 1
 )
 ```, quantum-circuit(
-  1, gate($H$), ctrl(1), 1, [\ ],
+  1, $H$, ctrl(1), 1, [\ ],
   2, targ(), 1
 ))
 We can create a #smallcaps("cx")-gate by calling #ref-fn("ctrl()") and passing the relative distance to the desired wire, e.g., `1` to the next wire, `2` to the second-next one or `-1` to the previous wire. Per default, the end of the vertical wire is  just joined with the target wire without any decoration at all. Here, we make the gate a #smallcaps("cx")-gate by adding a #ref-fn("targ()") symbol on the second wire. 
 
+#pagebreak()
+
+== Multi-Qubit Gates and Wire Labels
 Let's look at a quantum bit-flipping error correction circuit. Here we encounter our first multi-qubit gate as well as wire labels:
 #makefigure(vertical: true,
 ```typ
@@ -122,29 +125,43 @@ Let's look at a quantum bit-flipping error correction circuit. Here we encounter
   lstick($|0〉$), 1, targ(), 2, targ(), ctrl(-1), 1
 )
 ```, quantum-circuit(
-  scale: 80%,
+  // scale: 80%,
   lstick($|psi〉$), ctrl(1), ctrl(2), mqgate($E_"bit"$, n: 3), ctrl(1), ctrl(2), targ(), rstick($|psi〉$), [\ ],
   lstick($|0〉$), targ(), 2, targ(), 1, ctrl(-1), 1, [\ ],
   lstick($|0〉$), 1, targ(), 2, targ(), ctrl(-1), 1
 ))
 
-Multi-qubit gates have a dedicated command #ref-fn("mqgate()") which takes the content as well as the number of qubits. Wires can be labelled at the beginning or the end with the #ref-fn("lstick()") and #ref-fn("rstick()") commands respectively. 
+Multi-qubit gates have a dedicated command #ref-fn("mqgate()") which allows to specify the number of qubits `n`. Wires can be labelled at the beginning or the end with the #ref-fn("lstick()") and #ref-fn("rstick()") commands respectively. Just as multi-qubit gates, these can span multiple wires:
+#makefigure(vertical: true,
+```typ
+#quantum-circuit(
+  lstick($|000〉$, n: 3), $H$, ctrl(1), ctrl(2), 1,
+    rstick($|psi〉$, n: 3, brace: "]"), [\ ],
+  1, $H$, ctrl(0), 3, [\ ],
+  1, $H$, 1, ctrl(0), 2
+)
+```, quantum-circuit(
+  lstick($|000〉$, n: 3), $H$, ctrl(1), ctrl(2), 1,
+    rstick($|psi〉$, n: 3, brace: "]"), [\ ],
+  1, $H$, ctrl(0), 3, [\ ],
+  1, $H$, 1, ctrl(0), 2
+))
 
 
+== All about Wires
 In many circuits, we need classical wires. This library generalizes the concept of quantumm classical and bundled wires and provides the #ref-fn("setwire()") command that allows all sorts of changes to the current wire setting. You may call `setwire()` with the number of wires to display:
 
 #makefigure(vertical: false,
 ```typ
 #quantum-circuit(
-  1, gate($A$), meter(n: 1), [\ ],
+  1, $A$, meter(n: 1), [\ ],
   setwire(2), 2, ctrl(0), 2, [\ ],
-  1, gate($X$), setwire(0), 1, lstick($|0〉$), 
-    setwire(1), gate($Y$),
+  1, $X$, setwire(0), 1, lstick($|0〉$), setwire(1), $Y$,
 )
 ```, quantum-circuit(
-  1, gate($A$), meter(n: 1), [\ ],
+  1, $A$, meter(n: 1), [\ ],
   setwire(2), 2, ctrl(0), 2, [\ ],
-  1, gate($X$), setwire(0), 1, lstick($|0〉$), setwire(1), gate($Y$),
+  1, $X$, setwire(0), 1, lstick($|0〉$), setwire(1), $Y$,
 ))
 
 The `setwire` command produces no cells and can be called at any point on the wire. When a new wire is started, the default wire setting is restored automatically (quantum wire with default wire style, see @circuit-styling on how to customize the default). Calling `setwire(0)` removes the wire altogether until `setwire` is called with different arguments. More than two wires are possible and it lies in your hands to decide how many wires still look good. The distance between wires can also be specified:
@@ -152,25 +169,27 @@ The `setwire` command produces no cells and can be called at any point on the wi
 #makefigure(vertical: false,
 ```typ
 #quantum-circuit(
-  setwire(4, wire-distance: 1.5pt), 1, gate($U$), meter()
+  setwire(4, wire-distance: 1.5pt), 1, $U$, meter()
 )
 ```, quantum-circuit(
-  setwire(4, wire-distance: 1.5pt), 1, gate($U$), meter()
+  setwire(4, wire-distance: 1.5pt), 1, $U$, meter()
 ))
 
 
-In order to structure quantum circuits you often want to mark sections to denote certain steps in the circuit. This can be easily achieved through the #ref-fn("slice()") and #ref-fn("gategroup()") commands. Both are inserted into the circuit where they should begin and allow an arbitrary number of labels through the `labels` argument. The function `gategroup()` takes two positional integer arguments which specify the number of wires and steps respectively the group should span. Slices reach down to the last wire by default but the number of sliced wires can also be set manually. 
+== Slices and Gate Groups
+
+In order to structure quantum circuits you often want to mark sections to denote certain steps in the circuit. This can be easily achieved through the #ref-fn("slice()") and #ref-fn("gategroup()") commands. Both are inserted into the circuit where the slice or group should begin and allow an arbitrary number of labels through the `labels` argument. The function `gategroup()` takes two positional integer arguments which specify the number of wires and steps the group should span. Slices reach down to the last wire by default but the number of sliced wires can also be set manually. 
 
 
 #makefigure(
 ```typ
 #quantum-circuit(
   1, gate($H$), ctrl(1), 
-    slice(label: "1"), 1, 
-    gategroup(3, 3, label: (content: 
-      "Syndrome measurement", pos: bottom)), 
-    1, ctrl(2), ctrl(0), 1, 
-    slice(label: "3", wires: 2, 
+    slice(label: "1"), 1,
+    gategroup(3, 3, label: (content:
+     "Syndrome measurement", pos: bottom)),
+    1, ctrl(2), ctrl(0), 1,
+    slice(label: "3", wires: 2,
       stroke: blue), 
     2, [\ ],
   2, targ(), 1, ctrl(1), 1, ctrl(0), 3, [\ ], 
@@ -185,6 +204,69 @@ In order to structure quantum circuits you often want to mark sections to denote
   4, targ(), targ(), meter(target: -2)
 ))
 
+== Labels
+Finally, we want to show how to place labels on gates and vertical wires. The function `gate` and all the derived gate commands such as #ref-fn("meter()"), #ref-fn("ctrl()"), #ref-fn("lstick()") etc. feature a `label` argument for adding any number of labels on and around the element. In order to produce a simple label on the default position (for plain gates this is at the top of the gate, for vertical wires it is to the right and for the #ref-fn("phase()") gate, it is to the top right), you can just pass content or a string:
+#makefigure(
+```typ
+#quantum-circuit(
+  1, gate($H$, label: "Hadamard"), 1
+)
+```, quantum-circuit(
+  1, gate($H$, label: "Hadamard"), 1
+))
+If you want to change the position of the label or specify the offset, you want to pass a dictionary with the key `content` and optional values for `pos` (alignment), `dx` and `dy` (length, ratio or relative length):
+#makefigure(
+```typ
+#quantum-circuit(
+  1, gate($H$, label: (content: "Hadamard", pos: bottom, dy: 0pt)), 1
+)
+```, quantum-circuit(
+  1, gate($H$, label: (content: "Hadamard", pos: bottom, dy: 0pt)), 1
+))
+Multiple labels can be added by passing an array of labels specified through dictionaries. 
+#makefigure(
+```typ
+#quantum-circuit(
+  1, gate(hide($H$), label: (
+    (content: "lt", pos: left + top),
+    (content: "t", pos: top),
+    (content: "rt", pos: right + top),
+    (content: "l", pos: left),
+    (content: "c", pos: center),
+    (content: "r", pos: right),
+    (content: "lb", pos: left + bottom),
+    (content: "b", pos: bottom),
+    (content: "rb", pos: right + bottom),
+  )), 1
+)
+```, quantum-circuit(
+  1, gate(hide($H$), label: (
+    (content: "lt", pos: left + top),
+    (content: "t", pos: top),
+    (content: "rt", pos: right + top),
+    (content: "l", pos: left),
+    (content: "c", pos: center),
+    (content: "r", pos: right),
+    (content: "lb", pos: left + bottom),
+    (content: "b", pos: bottom),
+    (content: "rb", pos: right + bottom),
+  )), 1
+))
+Labels for slices and gate groups work just the same. In order to place a label on a control wire, you can use the `wire-label` parameter provided for #ref-fn("mqgate()"), #ref-fn("ctrl()") and #ref-fn("swap()").
+#makefigure(
+```typ
+#quantum-circuit(
+  1, ctrl(1, wire-label: $phi$), 2,
+    swap(1, wire-label: (
+      content: rotate(-90deg, smallcaps("swap")), 
+      pos: left, dx: 0pt)
+    ), 1, [\ ], 10pt,
+  1, ctrl(0), 2, swap(0), 1,
+)
+```, quantum-circuit(
+  1, ctrl(1, wire-label: $phi$), 2, swap(1, wire-label: (content: rotate(-90deg, smallcaps("swap")), pos: left, dx: 0pt)), 1, [\ ], 10pt,
+  1, ctrl(0), 2, swap(0), 1, 
+))
 
 
 
@@ -198,14 +280,14 @@ The #ref-fn("quantum-circuit()") command provides several options for styling th
 #quantum-circuit(
   row-spacing: 5pt,
   column-spacing: 5pt,
-  1, gate($A$), gate($B$), 1, [\ ],
-  1, 1, gate($S$), 1
+  1, $A$, $B$, 1, [\ ],
+  1, 1, $S$, 1
 )
 ```, quantum-circuit(
   row-spacing: 5pt,
   column-spacing: 5pt,
-  1, gate($A$), swap(1), gate($B$), 1, [\ ],
-  1, 1, targX(), gate($S$), 1
+  1, $A$, swap(1), $B$, 1, [\ ],
+  1, 1, targX(), $S$, 1
 ))
 
 The `wire`, `color` and `fill` options provide means to customize line strokes and colors. This allows us to easily create "dark-mode" circuits:
@@ -216,14 +298,14 @@ The `wire`, `color` and `fill` options provide means to customize line strokes a
   wire: .7pt + white, // Wire and stroke color
   color: white,       // Default foreground and text color
   fill: black,        // Gate fill color
-  1, gate($X$), ctrl(1), rstick([*?*]), [\ ],
+  1, $X$, ctrl(1), rstick([*?*]), [\ ],
   1,1, targ(), meter(), 
 ))
 ```, box(fill: black, quantum-circuit(
   wire: .7pt + white, // Wire and stroke color
   color: white,       // Default foreground and text color
   fill: black,        // Gate fill color
-  1, gate($X$), ctrl(1), rstick([*?*]), [\ ],
+  1, $X$, ctrl(1), rstick([*?*]), [\ ],
   1,1, targ(), meter(), 
 )))
 
@@ -233,12 +315,12 @@ Furthermore, a common task is changing the total size of a circuit by scaling it
 ```typ
 #quantum-circuit(
   scale: 60%,
-  1, gate($H$), ctrl(1), gate($H$), 1, [\ ],
+  1, $H$, ctrl(1), $H$, 1, [\ ],
   1, 1, targ(), 2
 )
 ```, quantum-circuit(
   scale: 60%,
-  1, gate($H$), ctrl(1), gate($H$), 1, [\ ],
+  1, $H$, ctrl(1), $H$, 1, [\ ],
   1, 1, targ(), 2
 ))
 
@@ -250,18 +332,18 @@ For an optimally layout, the height for each row is determined by the gates on t
 ```typ
 #quantum-circuit(
     row-spacing: 2pt, min-row-height: 4pt,
-    1, gate($H$), ctrl(1), gate($H$), 1, [\ ],
-    1, gate($H$), targ(), gate($H$), 1, [\ ],
+    1, $H$, ctrl(1), $H$, 1, [\ ],
+    1, $H$, targ(), $H$, 1, [\ ],
     2, ctrl(1), 2, [\ ],
-    1, gate($H$), targ(), gate($H$), 1
+    1, $H$, targ(), $H$, 1
 )
 ```, quantum-circuit(
     row-spacing: 2pt,
     min-row-height: 0pt,
-    1, gate($H$), ctrl(1), gate($H$), 1, [\ ],
-    1, gate($H$), targ(), gate($H$), 1, [\ ],
+    1, $H$, ctrl(1), $H$, 1, [\ ],
+    1, $H$, targ(), $H$, 1, [\ ],
     2, ctrl(1), 2, [\ ],
-    1, gate($H$), targ(), gate($H$), 1
+    1, $H$, targ(), $H$, 1
   ))
 
 Setting the option `equal-row-heights` to `true` solves this problem (manually spacing the wires with lengths is still possible, see @fine-tuning):
@@ -271,19 +353,19 @@ Setting the option `equal-row-heights` to `true` solves this problem (manually s
 #quantum-circuit(
     equal-row-heights: true,
     row-spacing: 2pt, min-row-height: 4pt,
-    1, gate($H$), ctrl(1), gate($H$), 1, [\ ],
-    1, gate($H$), targ(), gate($H$), 1, [\ ],
+    1, $H$, ctrl(1), $H$, 1, [\ ],
+    1, $H$, targ(), $H$, 1, [\ ],
     2, ctrl(1), 2, [\ ],
-    1, gate($H$), targ(), gate($H$), 1
+    1, $H$, targ(), $H$, 1
 )
 ```, quantum-circuit(
     equal-row-heights: true,
     row-spacing: 2pt,
     min-row-height: 4pt,
-    1, gate($H$), ctrl(1), gate($H$), 1, [\ ],
-    1, gate($H$), targ(), gate($H$), 1, [\ ],
+    1, $H$, ctrl(1), $H$, 1, [\ ],
+    1, $H$, targ(), $H$, 1, [\ ],
     2, ctrl(1), 2, [\ ],
-    1, gate($H$), targ(), gate($H$), 1
+    1, $H$, targ(), $H$, 1
   ))
 
 // #makefigure(vertical: false,
@@ -307,24 +389,25 @@ Setting the option `equal-row-heights` to `true` solves this problem (manually s
 // ])
 
 
-There is another option for #ref-fn("quantum-circuit()") that has a lot of impact on the looks of the diagram: `gate-padding`. This at the same time controls the default gate box padding and the distance of `lstick`'s and `rstick`'s to the wire. Need really wide or tight circuits?
+There is another option for #ref-fn("quantum-circuit()") that has a lot of impact on the looks of the diagram: `gate-padding`. This at the same time controls the default gate box padding and the distance of `lstick`s and `rstick`s to the wire. Need really wide or tight circuits?
 
 #makefigure(vertical: false,
 ```typ
 #quantum-circuit(
     gate-padding: 2pt,
     row-spacing: 5pt, column-spacing: 7pt,
-    lstick($|0〉$, n: 3), gate($H$), ctrl(1), 
+    lstick($|0〉$, n: 3), $H$, ctrl(1), 
       ctrl(2), 1, rstick("GHZ", n: 3), [\ ],
-    1, gate($H$), ctrl(0), 1, gate($H$), 1, [\ ],
-    1, gate($H$), 1, ctrl(0), gate($H$), 1
+    1, $H$, ctrl(0), 1, $H$, 1, [\ ],
+    1, $H$, 1, ctrl(0), $H$, 1
 )
 ```, quantum-circuit(
     gate-padding: 2pt,
     row-spacing: 5pt, column-spacing: 7pt,
-    lstick($|0〉$, n: 3), gate($H$), ctrl(1), ctrl(2), 1, rstick("GHZ", n: 3), [\ ],
-    1, gate($H$), ctrl(0), 1, gate($H$), 1, [\ ],
-    1, gate($H$), 1, ctrl(0), gate($H$), 1
+    lstick($|0〉$, n: 3), $H$, ctrl(1), 
+      ctrl(2), 1, rstick("GHZ", n: 3), [\ ],
+    1, $H$, ctrl(0), 1, $H$, 1, [\ ],
+    1, $H$, 1, ctrl(0), $H$, 1
   )
 )
 
@@ -352,10 +435,10 @@ The #ref-fn("quantum-circuit()") command allows not only gates as well as conten
 #makefigure(vertical: false,
 text(size: .8em, ```typ
 #quantum-circuit(
-  gate($X$), gate($Y$), 10pt, gate($Z$)
+  $X$, $Y$, 10pt, $Z$
 )
 ```), quantum-circuit(
-  gate($X$), gate($Y$), 10pt, gate($Z$)
+  $X$, $Y$, 10pt, $Z$
   )
 )
 
@@ -366,10 +449,10 @@ Putting a a length after the wire break item `[\ ]` produces a *vertical space* 
 #makefigure(vertical: false,
 text(size: .8em, ```typ
 #quantum-circuit(
-  gate($X$), [\ ], gate($Y$), [\ ], 10pt, gate($Z$)
+  $X$, [\ ], $Y$, [\ ], 10pt, $Z$
 )
 ```), quantum-circuit(
-  gate($X$), [\ ], gate($Y$), [\ ], 10pt, gate($Z$)
+  $X$, [\ ], $Y$, [\ ], 10pt, $Z$
   )
 )
 
@@ -389,10 +472,10 @@ Let's look at an example:
 #makefigure(vertical: false,
 text(size: .9em, ```typ
 #quantum-circuit(
-  1, ctrl(1), gate($H$), meter(), [\ ],
+  1, ctrl(1), $H$, meter(), [\ ],
   1, targ(), 1, meter(),
   annotate(0, (2, 4), 
-    (y, (x1, x2)) => { 
+    ((x1, x2), y) => { 
       let brace = math.lr($#block(height: x2 - x1)}$)
       place(dx: x1, dy: y, rotate(brace, -90deg, origin: top))
       let content = [Readout circuit]
@@ -406,10 +489,10 @@ text(size: .9em, ```typ
   })
 )
 ```), quantum-circuit(
-  1, ctrl(1), gate($H$), meter(), [\ ],
+  1, ctrl(1), $H$, meter(), [\ ],
   1, targ(), 1, meter(),
-  annotate(0, (2, 4),
-    (y, (x1, x2)) => { 
+  annotate((2, 4), 0,
+    ((x1, x2), y) => { 
       let brace = math.lr($#block(height: x2 - x1)}$)
       place(dx: x1, dy: y, rotate(brace, -90deg, origin: top))
       let content = [Readout circuit]
@@ -424,7 +507,7 @@ text(size: .9em, ```typ
   )
 )
 
-First, the call to `annotate()` asks for the $y$ coordinate of the zeroth row (first wire) and the $x$ coordinates of the second and forth column. The draw callback function then gets the corresponding coordinates as arguments and uses them to draw a brace and some text above the cells. 
+First, the call to `annotate()` asks for the $x$ coordinates of the second and forth column and the $y$ coordinate of the zeroth row (first wire). The draw callback function then gets the corresponding coordinates as arguments and uses them to draw a brace and some text above the cells. 
 
 Note, that the circuit does not know how large the annotation is. If it goes beyond the circuits bounds, you may want to adjust the parameter `circuit-padding` of #ref-fn("quantum-circuit()") appropriately. 
 
@@ -433,11 +516,11 @@ Another example, here we want to obtain coordinates for the cell centers. We can
 #makefigure(vertical: false,
 text(```typ
 #quantum-circuit(
-  1, gate($X$), 2, [\ ],
-  1, 2, gate($Y$), [\ ],
-  1, 1, gate($H$), meter(), 
-  annotate((0.5, 1.5, 2.5), (1.5, 3.5, 2.5),
-    ((y0, y1, y2), (x0, x1, x2)) => { 
+  1, $X$, 2, [\ ],
+  1, 2, $Y$, [\ ],
+  1, 1, $H$, meter(), 
+  annotate((1.5, 3.5, 2.5), (0.5, 1.5, 2.5), 
+    ((x0, x1, x2), (y0, y1, y2)) => { 
       path(
         (x0, y0), (x1, y1), (x2, y2), 
         closed: true, 
@@ -446,11 +529,11 @@ text(```typ
   })
 )
 ```), quantum-circuit(
-  1, gate($X$), 2, [\ ],
-  1, 2, gate($Y$), [\ ],
-  1, 1, gate($H$), meter(), 
-  annotate((0.5, 1.5, 2.5), (1.5, 3.5, 2.5),
-    ((y0, y1, y2), (x0, x1, x2)) => { 
+  1, $X$, 2, [\ ],
+  1, 2, $Y$, [\ ],
+  1, 1, $H$, meter(), 
+  annotate((1.5, 3.5, 2.5), (0.5, 1.5, 2.5), 
+    ((x0, x1, x2), (y0, y1, y2)) => { 
       path(
         (x0, y0), (x1, y1), (x2, y2), 
         closed: true, 
@@ -460,33 +543,6 @@ text(```typ
 )
 )
 
-
-#let annotate-circuit(scale: 100%) = quantum-circuit(
-  // gate-padding: 30pt,
-  circuit-padding: (top: 1.5em, bottom: 1.5em),
-  scale: scale,
-  lstick($|psi〉_C$), ctrl(1), gate($H$), meter(), setwire(2), ctrl(2, wire-count:2), [\ ],
-  lstick($|Phi〉_A^+$), targ(), meter(), setwire(2), ctrl(1, wire-count:2), [\ ],
-  lstick($|Phi〉_B^+$),1,nwire(2), targ(fill: true), ctrl(0),1, rstick($|psi〉_B$), 
-  annotate(0, (2, 4), (y, cols) => { 
-    let (x1, x2) = cols
-    place(dx: x1, dy: y, rotate(math.lr($#box(height: x2 - x1)}$), -90deg, origin: top))
-    let content = [Two Instructions]
-    style(styles => {
-      let size = measure(content, styles)
-      place(dx: x1 + (x2 - x1)/2 - size.width/2, dy: y - .6em - size.height, content)
-    })
-  }),
-  annotate(3, (2, 6), (y, cols) => {
-    let (x1, x2) = cols
-    place(dx: x1, dy: y, rotate(math.lr(${#box(height: x2 - x1)$), -90deg, origin: top))
-    let content = [Some weird stuff]
-    style(styles => {
-      let size = measure(content, styles)
-      place(dx: x1+(x2 -x1)/2 - size.width/2, dy: y + .5em, content)
-    })
-  }) 
-)
 
 
 #pagebreak()
@@ -622,18 +678,18 @@ Encoding circuit for the Shor nine qubit code. This diagram repdoduces Figure 10
 #table(columns: (2fr, 1fr), align: horizon, stroke: none,
 makefigure(```typ
 #let ancillas = (setwire(0), 5, lstick($|0〉$), 
-  setwire(1), targ(), 2, [\ ], setwire(0), 5, 
+  setwire(1), targ(), 2, [\ ], setwire(0), 5,
   lstick($|0〉$), setwire(1), 1, targ(), 1)
 
 #quantum-circuit(
   scale: 80%,
-  lstick($|ψ〉$), 1, 10pt, ctrl(3), ctrl(6), gate($H$),
+  lstick($|ψ〉$), 1, 10pt, ctrl(3), ctrl(6), $H$,
     1, 15pt, ctrl(1), ctrl(2), 1, [\ ],
   ..ancillas, [\ ],
-  lstick($|0〉$), 1, targ(), 1, gate($H$), 1, ctrl(1),
+  lstick($|0〉$), 1, targ(), 1, $H$, 1, ctrl(1),
     ctrl(2), 1, [\ ],
   ..ancillas, [\ ],
-  lstick($|0〉$), 2, targ(),  gate($H$), 1, ctrl(1),
+  lstick($|0〉$), 2, targ(),  $H$, 1, ctrl(1),
     ctrl(2), 1, [\ ],
   ..ancillas
 )```, {
@@ -644,11 +700,11 @@ makefigure(```typ
   
   quantum-circuit(
   scale: 80%,
-  lstick($|ψ〉$), 1, ctrl(3), ctrl(6), gate($H$), 1, 15pt, ctrl(1), ctrl(2), 1, [\ ],
+  lstick($|ψ〉$), 1, ctrl(3), ctrl(6), $H$, 1, 15pt, ctrl(1), ctrl(2), 1, [\ ],
   ..ancillas, [\ ],
-  lstick($|0〉$), 1, targ(), 1, gate($H$), 1, ctrl(1), ctrl(2), 1, [\ ],
+  lstick($|0〉$), 1, targ(), 1, $H$, 1, ctrl(1), ctrl(2), 1, [\ ],
   ..ancillas, [\ ],
-  lstick($|0〉$), 2, targ(),  gate($H$), 1, ctrl(1), ctrl(2), 1, [\ ],
+  lstick($|0〉$), 2, targ(),  $H$, 1, ctrl(1), ctrl(2), 1, [\ ],
   ..ancillas
 )}
 )
