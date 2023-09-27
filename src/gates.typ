@@ -23,9 +23,9 @@
 /// - size-hint (function): Size hint function. This function should return a dictionary
 ///             containing the keys `width` and `height`. The result is used to determine 
 ///             the gates position and cell sizes of the grid. 
-///             Signature: `(gate, draw-params).`
+///             Signature: `(gate, draw-params) => {}`.
 /// - draw-function (function): Drawing function that produces the displayed content.
-///             Signature: `(gate, draw-params).`
+///             Signature: `(gate, draw-params) => {}`.
 /// - label (array, string, content, dictionary): One or more labels to add to the gate.
 ///             Usually, a label consists of a dictionary with entries for the keys 
 ///             `content` (the label content), `pos` (2d alignment specifying the 
@@ -200,13 +200,13 @@
   gate(thecontent, box: false, fill: none)
 }
 
-/// Target element for controlled #smallcaps("x") operations (#sym.plus.circle). 
+/// Target element for controlled-X operations (#sym.plus.circle). 
 /// - fill (none, color, boolean): Fill color for the target circle. If set 
 ///        to `true`, the target is filled with the circuits background color.
 /// - size (length): Size of the target symbol. 
 #let targ(fill: none, size: 4.3pt, label: none) = gate(none, box: false, draw-function: draw-functions.draw-targ, fill: fill, data: (size: size), label: label)
 
-/// Target element for controlled #smallcaps("z") operations (#sym.bullet). 
+/// Target element for controlled-Z operations (#sym.bullet). 
 ///
 /// - open (boolean): Whether to draw an open dot. 
 /// - fill (none, color): Fill color for the circle or stroke color if

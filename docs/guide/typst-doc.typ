@@ -34,7 +34,7 @@
 #let type-box(type) = { 
   let color = get-type-color(type)
   h(2pt)
-  box(outset: 2pt, fill: color, radius: 2pt, raw(type))
+  box(outset: 2pt, fill: color, radius: 2pt, raw(type, lang: ""))
   h(2pt)
 }
 
@@ -160,7 +160,7 @@
 #let process-function-references(text, label-prefix: none) = {
   return text.replace(reference-matcher, info => {
     let target = info.captures.at(0).trim(")").trim("(")
-    return "#link(label(\"" + label-prefix + target + "()\"))[`" + target + "()`]"
+    return "#link(label(\"" + label-prefix + target + "()\"))[#raw(\"" + target + "()\", lang: \"\")]"
   })
 }
 

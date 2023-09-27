@@ -34,7 +34,7 @@ Create circuit diagrams by calling the function `quantum-circuit()` with any num
   <img alt="Bell Circuit" src="docs/images/bell.svg" style="max-width: 100%; padding: 10px 10px; box-shadow: 1pt 1pt 10pt 0pt #AAAAAA; border-radius: 4pt; box-sizing: border-box; background: white">
 </h3>
 
-Refer to the [user guide](https://github.com/Mc-Zen/quill/blob/main/docs/guide/quill-guide.pdf) for full documentation.
+Refer to the [user guide](docs/guide/quill-guide.pdf) for full documentation.
 
 ## Gallery
 
@@ -70,9 +70,11 @@ Some show-off examples, loosely replicating figures from [Quantum Computation an
   - Swap order of row and column parameters in `annotate` to make it consistent with built-in Typst functions. 
 - Improvements: 
   - Improve layout (allow row/column spacing and min lengths to be specified in em-lenghts).
+  - Automatic bounds computation, even for labels. 
   - Improve meter (allow multi-qubit gate meters and respect global (per-circuit) gate padding).d
 - Fixes:
   - `lstick`/`rstick` braces broke with Typst 0.7.0.
+  - `lstick`/`rstick` bounds.
 - Documentation
   - Add section on creating custom gates. 
   - Add section on using labels. 

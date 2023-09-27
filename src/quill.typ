@@ -6,15 +6,16 @@
 
 
 
-/// Create a quantum circuit diagram. Content items may be
-/// - Gates created by one of the many gate commands (@@gate, 
-///   @@mqgate, @@meter, ...)
-/// - `[\ ]` for creating a new wire/row 
-/// - Commands like @@setwire or @@gategroup
-/// - Integers for creating cells filled with the current wire setting 
-/// - Lengths for creating space between rows or columns 
-/// - Plain content or strings to be placed on the wire 
-/// - @@lstick, @@midstick or @@rstick for placement next to the wire 
+/// Create a quantum circuit diagram. Children may be
+/// - gates created by one of the many gate commands (@@gate, 
+///   @@mqgate, @@meter, ...),
+/// - `[\ ]` for creating a new wire/row,
+/// - commands like @@setwire, @@slice or @@gategroup,
+/// - integers for creating cells filled with the current wire setting,
+/// - lengths for creating space between rows or columns,
+/// - plain content or strings to be placed on the wire, and
+/// - @@lstick, @@midstick or @@rstick for placement next to the wire.
+///
 ///
 /// - wire (stroke): Style for drawing the circuit wires. This can take anything 
 ///            that is valid for the stroke of the builtin `line()` function. 
