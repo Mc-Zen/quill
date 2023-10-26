@@ -1,6 +1,6 @@
 #import "../../src/quill.typ": *
 
-#set page(width: 18cm, height: auto, margin: 2mm)
+#set page(width: 18cm, height: auto, margin: 0mm)
 
 
 #let gallery = {
@@ -87,4 +87,10 @@
 }
 
 
-#gallery
+#rect(
+  stroke: none,
+  radius: 3pt,
+  inset: (x: 6pt, y: 6pt),
+  fill: white,
+  gallery
+)
