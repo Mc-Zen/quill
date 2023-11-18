@@ -31,7 +31,7 @@ Create circuit diagrams by calling the function `quantum-circuit()` with any num
 }
 ```
 <h3 align="center">
-  <img alt="Bell Circuit" src="docs/images/bell.svg" style="max-width: 100%">
+  <img alt="Bell Circuit" src="docs/images/bell.svg">
 </h3>
 
 As a shorthand for simple gates you can also just write `$H$` instead of the more lengthy `gate($H$)`. 
@@ -49,13 +49,13 @@ Refer to the [user guide](docs/guide/quill-guide.pdf) for a full documentation o
 Some show-off examples, loosely replicating figures from [Quantum Computation and Quantum Information by M. Nielsen and I. Chuang](https://www.cambridge.org/highereducation/books/quantum-computation-and-quantum-information/01E10196D0A682A6AEFFEA52D53BE9AE#overview).
 
 <h3 align="center">
-  <img alt="Quantum teleportation circuit" src="docs/images/teleportation.svg" style="max-width: 100%">
+  <img alt="Quantum teleportation circuit" src="docs/images/teleportation.svg">
 </h3>
 <h3 align="center">
-  <img alt="Quantum circuit for phase estimation" src="docs/images/phase-estimation.svg" style="max-width: 100%">
+  <img alt="Quantum circuit for phase estimation" src="docs/images/phase-estimation.svg">
 </h3>
 <h3 align="center">
-  <img alt="Quantum fourier transformation circuit" src="docs/images/qft.svg" style="max-width: 100%">
+  <img alt="Quantum fourier transformation circuit" src="docs/images/qft.svg">
 </h3>
 
 

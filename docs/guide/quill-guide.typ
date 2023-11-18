@@ -590,28 +590,28 @@ All built-in gates are drawn with a dedicated `draw-function` and you can also t
 #show raw.where(block: true): set text(size: 0.9em)
 
 
-This section demonstrates the use of the *quantum-circuit* library by reproducing some figures from the famous book _Quantum Computation and Quantum Information_ by Nielsen and Chuang #cite("nielsen_2022_quantum").
+This section demonstrates the use of the *quantum-circuit* library by reproducing some figures from the famous book _Quantum Computation and Quantum Information_ by Nielsen and Chuang @nielsen_2022_quantum.
 
 == Quantum Teleportation
-Quantum teleportation circuit reproducing the Figure 4.15 in #cite("nielsen_2022_quantum"). 
+Quantum teleportation circuit reproducing the Figure 4.15 in @nielsen_2022_quantum. 
 #insert-example("../../examples/teleportation.typ")
 
 
 == Quantum Phase Estimation
-Quantum phase estimation circuit reproducing the Figure 5.2 in #cite("nielsen_2022_quantum"). 
+Quantum phase estimation circuit reproducing the Figure 5.2 in @nielsen_2022_quantum. 
 #insert-example("../../examples/phase-estimation.typ")
 
 #pagebreak()
 
 
 == Quantum Fourier Transform:
-Circuit for performing the quantum Fourier transform, reproducing the Figure 5.1 in #cite("nielsen_2022_quantum"). 
+Circuit for performing the quantum Fourier transform, reproducing the Figure 5.1 in @nielsen_2022_quantum. 
 #insert-example("../../examples/qft.typ")
 
 
 == Shor Nine Qubit Code
 
-Encoding circuit for the Shor nine qubit code. This diagram repdoduces Figure 10.4 in #cite("nielsen_2022_quantum")
+Encoding circuit for the Shor nine qubit code. This diagram repdoduces Figure 10.4 in @nielsen_2022_quantum
 
 #table(columns: (2fr, 1fr), align: horizon, stroke: none,
   block(raw({
@@ -625,12 +625,12 @@ Encoding circuit for the Shor nine qubit code. This diagram repdoduces Figure 10
 
 == Fault-Tolerant Measurement
 
-Circuit for performing fault-tolerant measurement (as Figure 10.28 in #cite("nielsen_2022_quantum")). 
+Circuit for performing fault-tolerant measurement (as Figure 10.28 in @nielsen_2022_quantum). 
 #insert-example("../../examples/fault-tolerant-measurement.typ")
 
 
 == Fault-Tolerant Gate Construction
-The following two circuits reproduce figures from Exercise 10.66 and 10.68 on construction fault-tolerant $pi/8$ and Toffoli gates in #cite("nielsen_2022_quantum").
+The following two circuits reproduce figures from Exercise 10.66 and 10.68 on construction fault-tolerant $pi/8$ and Toffoli gates in @nielsen_2022_quantum.
 #insert-example("../../examples/fault-tolerant-pi8.typ")
 #insert-example("../../examples/fault-tolerant-toffoli1.typ")
 #insert-example("../../examples/fault-tolerant-toffoli2.typ")
