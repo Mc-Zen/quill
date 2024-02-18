@@ -7,14 +7,14 @@
 
 
 /// Create a quantum circuit diagram. Children may be
-/// - gates created by one of the many gate commands (@@gate, 
-///   @@mqgate, @@meter, ...),
+/// - gates created by one of the many gate commands (@@gate(), 
+///   @@mqgate(), @@meter(), ...),
 /// - `[\ ]` for creating a new wire/row,
-/// - commands like @@setwire, @@slice or @@gategroup,
+/// - commands like @@setwire(), @@slice() or @@gategroup(),
 /// - integers for creating cells filled with the current wire setting,
 /// - lengths for creating space between rows or columns,
 /// - plain content or strings to be placed on the wire, and
-/// - @@lstick, @@midstick or @@rstick for placement next to the wire.
+/// - @@lstick(), @@midstick() or @@rstick() for placement next to the wire.
 ///
 ///
 /// - wire (stroke): Style for drawing the circuit wires. This can take anything 
@@ -25,7 +25,7 @@
 ///             gates are given).
 /// - min-column-width (length): Minimum width of a column.
 /// - gate-padding (length): General padding setting including the inset for 
-///            gate boxes and the distance of @@lstick and co. to the wire. 
+///            gate boxes and the distance of @@lstick() and co. to the wire. 
 /// - equal-row-heights (boolean): If true, then all rows will have the same 
 ///            height and the wires will have equal distances orienting on the
 ///            highest row. 

@@ -1,7 +1,5 @@
 #import "template.typ": *
-#import "typst-doc.typ": parse-module, show-module, show-outline
-#import "../../src/quill.typ"
-#import quill: *
+#import "typst-doc.typ": show-outline
 #show link: underline.with(offset: 1.2pt)
 #show link: set text(fill: purple.darken(30%))
 
@@ -16,51 +14,6 @@
   version: version,
   url: "https://github.com/Mc-Zen/quill"
 )
-
-#set raw(lang: "typc")
-#show raw: set text(size: .9em)
-#show raw.where(block: true) : set par(justify: false)
-
-#let ref-fn(name) = link(label("quill:" + name), raw(name, lang: ""))
-
-
-#let makefigure(code, content, vertical: false) = {
-  align(center,
-    box(fill: gray.lighten(90%), inset: .8em, {
-      table(
-        align: center + horizon, 
-        columns: if vertical { 1 } else { 2 }, 
-        gutter: 1em,
-        stroke: none,
-        box(code), block(content)
-      )
-    })
-  )
-}
-
-#let example(code, vertical: false, scope: (:)) = {
-  figure(
-    pad(y: 1em,
-      box(fill: gray.lighten(90%), inset: .8em, {
-        table(
-          align: center + horizon, 
-          columns: if vertical { 1 } else { 2 }, 
-          gutter: 1em,
-          stroke: none,
-          box(code), block(eval("#import quill: *\n" + code.text, mode: "markup", scope: (quill: quill) + scope))
-        )
-      })
-    )
-  )
-}
-
-
-#let insert-example(filename, fontsize: 1em) = {
-  let content = read(filename)
-  content = content.slice(content.position("*")+1).trim()
-  makefigure(text(size: fontsize, raw(lang: "typ", block: true, content)), [])
-  figure(include(filename))
-}
 
 #v(4em)
 
@@ -558,15 +511,23 @@ All built-in gates are drawn with a dedicated `draw-function` and you can also t
   #columns(2,[      
     This section contains a complete reference for every function in *quill*. 
     
-    
+    // #set raw(lang: none)
     #set heading(numbering: none)
     #{
-      let show-module = show-module.with(show-module-name: false, first-heading-level: 2)
-      let parse-module = parse-module.with(label-prefix: "quill:")
+      import "@preview/tidy:0.2.0"
+      let parse-module = tidy.parse-module.with(
+        label-prefix: "quill:",
+        scope: (quill: quill)
+      )
+      let show-module = tidy.show-module.with(
+        show-module-name: false, 
+        first-heading-level: 2,
+        show-outline: false
+      )
       
-      let docs = parse-module("/src/quill.typ")
-      let docs-gates = parse-module("/src/gates.typ")
-      let docs-decorations = parse-module("/src/decorations.typ")
+      let docs = parse-module(read("/src/quill.typ"))
+      let docs-gates = parse-module(read("/src/gates.typ"))
+      let docs-decorations = parse-module(read("/src/decorations.typ"))
     
       [*Quantum Circuit*]
       show-outline(docs)
@@ -574,7 +535,6 @@ All built-in gates are drawn with a dedicated `draw-function` and you can also t
       show-outline(docs-gates)
       [*Decorations*]
       show-outline(docs-decorations)
-      
       show-module(docs)
       show-module(docs-gates)
       show-module(docs-decorations)

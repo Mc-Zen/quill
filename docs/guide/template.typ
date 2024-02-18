@@ -1,3 +1,7 @@
+#import "../../src/quill.typ"
+#import quill: *
+
+
 // The project function defines how your document looks.
 // It takes your content and some metadata and formats it.
 // Go ahead and customize it to your liking!
@@ -58,6 +62,53 @@
 
   // Main body.
   set par(justify: true)
+  set raw(lang: "typc")
+  show raw: set text(size: .9em)
+  show raw.where(block: true) : set par(justify: false)
+
 
   body
 }
+
+
+
+
+#let makefigure(code, content, vertical: false) = {
+  align(center,
+    box(fill: gray.lighten(90%), inset: .8em, {
+      table(
+        align: center + horizon, 
+        columns: if vertical { 1 } else { 2 }, 
+        gutter: 1em,
+        stroke: none,
+        box(code), block(content)
+      )
+    })
+  )
+}
+
+#let example(code, vertical: false, scope: (:)) = {
+  figure(
+    pad(y: 1em,
+      box(fill: gray.lighten(90%), inset: .8em, {
+        table(
+          align: center + horizon, 
+          columns: if vertical { 1 } else { 2 }, 
+          gutter: 1em,
+          stroke: none,
+          box(code), block(eval("#import quill: *\n" + code.text, mode: "markup", scope: (quill: quill) + scope))
+        )
+      })
+    )
+  )
+}
+
+
+#let insert-example(filename, fontsize: 1em) = {
+  let content = read(filename)
+  content = content.slice(content.position("*")+1).trim()
+  makefigure(text(size: fontsize, raw(lang: "typ", block: true, content)), [])
+  figure(include(filename))
+}
+
+#let ref-fn(name) = link(label("quill:" + name), raw(name, lang: ""))

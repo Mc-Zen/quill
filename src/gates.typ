@@ -10,7 +10,9 @@
 /// Note, that most of the parameters listed here are mostly used for derived gate 
 /// functions and do not need to be touched in all but very few cases. 
 ///
-/// - content (content): What to show in the gate (may be none for special gates like @@ctrl).
+/// //#example(`quill.quantum-circuit(1, quill.gate($H$), 1)`)
+///
+/// - content (content): What to show in the gate (may be none for special gates like @@ctrl() ).
 /// - fill (none, color): Gate backgrond fill color.
 /// - radius (length, dictionary): Gate rectangle border radius. 
 ///             Allows the same values as the builtin `rect()` function.
@@ -67,7 +69,7 @@
 
 
 
-/// Basic command for creating multi-qubit or controlled gates. See also @@ctrl and @@swap. 
+/// Basic command for creating multi-qubit or controlled gates. See also @@ctrl() and @@swap(). 
 ///
 /// - content (content):
 /// - n (integer): Number of wires the multi-qubit gate spans. 
