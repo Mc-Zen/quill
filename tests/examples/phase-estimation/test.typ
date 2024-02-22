@@ -1,4 +1,3 @@
 #set page(width: auto, height: auto, margin: 0pt)
-#import "examples.typ": *
 
-#phase-estimation
+#include "/examples/phase-estimation.typ"

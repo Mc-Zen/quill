@@ -1,1 +1,0 @@
-C:\Users\alpha\Code\Typst\packages\typst-quantum-circuit\tests\

@@ -1,4 +1,3 @@
 #set page(width: auto, height: auto, margin: 0pt)
-#import "examples.typ": *
 
-#teleportation
+#include "/examples/fault-tolerant-toffoli2.typ"

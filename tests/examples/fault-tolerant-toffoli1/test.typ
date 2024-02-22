@@ -1,4 +1,3 @@
 #set page(width: auto, height: auto, margin: 0pt)
-#import "examples.typ": *
 
-#qft
+#include "/examples/fault-tolerant-toffoli1.typ"
