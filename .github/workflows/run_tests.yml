@@ -1,7 +1,11 @@
-name: Tests
+name: tests
 on:
   push:
     branches: [ main ]
+    paths:
+      - src/**
+      - tests/**
+      - examples/**
   pull_request:
     branches: [ main ]
 

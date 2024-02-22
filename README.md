@@ -4,14 +4,14 @@
 
 
 <p align="center">
+  <a href="https://typst.app/docs/packages/">
+    <img alt="Typst Package" src="https://img.shields.io/badge/dynamic/toml?url=https%3A%2F%2Fraw.githubusercontent.com%2FMc-Zen%2Fquill%2Fmain%2Ftypst.toml&query=%24.package.version&prefix=v&logo=typst&label=package&color=239DAD"/>
+  </a>
   <a href="https://github.com/Mc-Zen/quill/actions/workflows/run_tests.yml">
-    <img alt="Typst Package" src="https://img.shields.io/badge/dynamic/toml?url=https%3A%2F%2Fraw.githubusercontent.com%2FMc-Zen%2Fquill%2Fmain%2Ftypst.toml&query=%24.package.version&prefix=v&logo=typst&label=Package&color=purple"/>
+    <img alt="Test Status" src="https://github.com/Mc-Zen/quill/actions/workflows/run_tests.yml/badge.svg"/>
   </a>
   <a href="https://github.com/Mc-Zen/quill/blob/main/LICENSE">
     <img alt="MIT License" src="https://img.shields.io/badge/license-MIT-blue"/>
-  </a>
-  <a href="https://github.com/Mc-Zen/quill/actions/workflows/run_tests.yml">
-    <img alt="MIT License" src="https://github.com/Mc-Zen/quill/actions/workflows/run_tests.yml/badge.svg"/>
   </a>
 </p>
 
@@ -25,13 +25,14 @@ _Meanwhile, we suggest importing everything from the package in a local scope to
 
 ## Usage
 
-Create circuit diagrams by calling the function `quantum-circuit()` with any number of positional arguments — just like the built-in Typst functions `table()` or `grid()`. A variety of different gate and instruction commands are available and plain numbers can be used to produce any number of empty cells just filled with the current wire style. A new wire is started by adding a `[\ ]` item. 
+Create circuit diagrams by calling the function `quantum-circuit()` with any number of positional arguments — just like the built-in Typst functions `table()` or `grid()`. A variety of different gate and instruction commands are available for adding elements and plain numbers can be used to produce any number of empty cells filled with the current wire style. A new wire is started by adding a `[\ ]` item. 
 
 ```typ
 #{
   import "@preview/quill:0.2.0": *
+
   quantum-circuit(
-    lstick($|0〉$), gate($H$), ctrl(1), rstick($(|00〉+|11〉)/√2$, n: 2), [\ ],
+    lstick($|0〉$), $H$, ctrl(1), rstick($(|00〉+|11〉)/√2$, n: 2), [\ ],
     lstick($|0〉$), 1, targ(), 1
   )
 }
@@ -40,7 +41,7 @@ Create circuit diagrams by calling the function `quantum-circuit()` with any num
   <img alt="Bell Circuit" src="docs/images/bell.svg">
 </h3>
 
-As a shorthand for simple gates you can also just write `$H$` instead of the more lengthy `gate($H$)`. 
+Plain quantum gates — such as a Hadamard gate — can be written with the shorthand notation `$H$` instead of the more lengthy `gate($H$)`. The latter offers more options. 
 
 Refer to the [user guide](docs/guide/quill-guide.pdf) for a full documentation of this package.
 
@@ -63,6 +64,9 @@ Some show-off examples, loosely replicating figures from [Quantum Computation an
 <h3 align="center">
   <img alt="Quantum fourier transformation circuit" src="docs/images/qft.svg">
 </h3>
+
+## Tests
+This package uses [typst-test](https://github.com/tingerrr/typst-test/) for running [tests](tests/). 
 
 
 ## Changelog
