@@ -3,11 +3,17 @@
 </h1>
 
 
-<!-- <p align="center">
+<p align="center">
+  <a href="https://github.com/Mc-Zen/quill/actions/workflows/run_tests.yml">
+    <img alt="Typst Package" src="https://img.shields.io/badge/dynamic/toml?url=https%3A%2F%2Fraw.githubusercontent.com%2FMc-Zen%2Fquill%2Fmain%2Ftypst.toml&query=%24.package.version&prefix=v&logo=typst&label=Package&color=purple"/>
+  </a>
   <a href="https://github.com/Mc-Zen/quill/blob/main/LICENSE">
     <img alt="MIT License" src="https://img.shields.io/badge/license-MIT-blue"/>
   </a>
-</p> -->
+  <a href="https://github.com/Mc-Zen/quill/actions/workflows/run_tests.yml">
+    <img alt="MIT License" src="https://github.com/Mc-Zen/quill/actions/workflows/run_tests.yml/badge.svg"/>
+  </a>
+</p>
 
 **Quill** is a package for creating quantum circuit diagrams in [Typst](https://typst.app/). 
 
