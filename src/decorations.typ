@@ -53,7 +53,7 @@
 /// Create a midstick, i.e., a mid-circuit text. 
 /// - content (content): Label to display, e.g., `$|0〉$`.
 /// - label (array, string, content, dictionary): One or more labels to add to the gate. 
-#let midstick(content, label: none) = gate(content, draw-function: draw-functions.draw-unboxed-gate, label: label)
+#let midstick(content, fill: none, label: none) = gate(content, draw-function: draw-functions.draw-unboxed-gate, label: label, fill: fill)
 
 
 
