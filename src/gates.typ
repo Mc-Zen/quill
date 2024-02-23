@@ -284,6 +284,7 @@
 ) = mqgate(
   none,
   target: n,
+  box: false,
   draw-function: draw-functions.draw-ctrl,
   wire-count: wire-count,
   fill: fill,
