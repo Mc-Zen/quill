@@ -178,9 +178,12 @@
 ///  
 /// - ..qubits (array): Qubit permutation specification. 
 /// - width (length): Width of the permutation gate. 
-/// 
-#let permute(..qubits, width: 30pt) = {
-  mqgate(none, n: qubits.pos().len(), width: width, draw-function: draw-functions.draw-permutation-gate, data: (qubits: qubits.pos(), extent: 2pt))
+/// - separation (auto, none, length, color, stroke): Overlapping wires are separated by drawing a thicker line below. With this option, this line can be customized in color or thickness. 
+#let permute(..qubits, width: 30pt, separation: auto) = {
+  if qubits.named().len() != 0 {
+    assert(false, message: "Unexpected named argument `" + qubits.named().keys().first() + "` in function `permute()`")
+  }
+  mqgate(none, n: qubits.pos().len(), width: width, draw-function: draw-functions.draw-permutation-gate, data: (qubits: qubits.pos(), extent: 2pt, separation: separation))
 }
 
 /// Create an invisible (phantom) gate for reserving space. If `content` 

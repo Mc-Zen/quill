@@ -179,6 +179,12 @@
   let dy = draw-params.multi.wire-distance
   let width = gate.width
   if dy == 0pt { return box(width: width, height: 4pt) }
+  
+  let separation = gate.data.separation
+  if separation == auto { separation = draw-params.background }
+  if type(separation) == color { separation += 3pt }
+  if type(separation) == length { separation += draw-params.background }
+  
   box(
     height: dy + 4pt,
     inset: (y: 2pt),
@@ -190,7 +196,9 @@
         let to = qubits.at(from)
         let y-from = draw-params.center-y-coords.at(from + gate.qubit) - y0
         let y-to = draw-params.center-y-coords.at(to + gate.qubit) - y0
-        place(path(((0pt,y-from), (-width/2, 0pt)), ((width, y-to), (-width/2, 0pt)), stroke: 3pt + draw-params.background))
+        if separation != none {
+          place(path(((0pt,y-from), (-width/2, 0pt)), ((width, y-to), (-width/2, 0pt)), stroke: separation))
+        }
         place(path(((-.1pt,y-from), (-width/2, 0pt)), ((width+.1pt, y-to), (-width/2, 0pt)), stroke: draw-params.wire)) 
       }
     }
