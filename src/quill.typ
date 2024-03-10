@@ -403,13 +403,13 @@
     width: final-width,
     height: final-height, 
     // stroke: 1pt + gray,
-    move(dy: -scale-float * bounds.at(1), dx: -scale-float * bounds.at(0), 
+    align(left + top, move(dy: -scale-float * bounds.at(1), dx: -scale-float * bounds.at(0), 
       layout.std-scale(
         x: scale, 
         y: scale, 
         origin: left + top, 
         circuit
-    ))
+    )))
   )
   
 })
