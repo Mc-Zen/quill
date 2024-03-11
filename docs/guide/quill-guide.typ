@@ -10,7 +10,7 @@
   title: "Guide for the Quill Package ",
   authors: ("Mc-Zen",),
   abstract: [Quill is a library for creating quantum circuit diagrams in #link("https://typst.app/", [Typst]). ],
-  date: "September 27, 2023",
+  date: "March 11, 2024",
   version: version,
   url: "https://github.com/Mc-Zen/quill"
 )
@@ -524,6 +524,7 @@ All built-in gates are drawn with a dedicated `draw-function` and you can also t
         first-heading-level: 2,
         show-outline: false
       )
+      let show-outline = tidy.styles.default.show-outline
       
       let docs = parse-module(read("/src/quill.typ"))
       let docs-gates = parse-module(read("/src/gates.typ"))
@@ -571,7 +572,7 @@ Circuit for performing the quantum Fourier transform, reproducing the Figure 5.1
 
 == Shor Nine Qubit Code
 
-Encoding circuit for the Shor nine qubit code. This diagram repdoduces Figure 10.4 in @nielsen_2022_quantum
+Encoding circuit for the Shor nine qubit code. This diagram reproduces Figure 10.4 in @nielsen_2022_quantum
 
 #table(columns: (2fr, 1fr), align: horizon, stroke: none,
   block(raw({

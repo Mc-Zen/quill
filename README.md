@@ -1,5 +1,5 @@
 <h1 align="center">
-  <img alt="Quantum Circuit" src="docs/images/logo.svg" style="max-width: 100%; width: 300pt">
+  <img alt="Quill" src="docs/images/logo.svg" style="max-width: 100%; width: 300pt">
 </h1>
 
 
@@ -29,7 +29,7 @@ Create circuit diagrams by calling the function `quantum-circuit()` with any num
 
 ```typ
 #{
-  import "@preview/quill:0.2.0": *
+  import "@preview/quill:0.2.1": *
 
   quantum-circuit(
     lstick($|0〉$), $H$, ctrl(1), rstick($(|00〉+|11〉)/√2$, n: 2), [\ ],
@@ -70,6 +70,16 @@ This package uses [typst-test](https://github.com/tingerrr/typst-test/) for runn
 
 
 ## Changelog
+
+
+### v0.2.1
+- Improvements:
+  - Add `fill` parameter to `midstick()`. 
+  - Add `bend` parameter to `permute()`. 
+  - Add `separation` parameter to `permute()`. 
+- Fixes:
+  - With Typst 0.11.0, `scale()` now takes into account outer alignment. This broke the positioning of centered/right-aligned circuits, e.g., ones put into a `figure()`. 
+  - Change wires to be drawn all through `ctrl()`, making it consistent to `swap()` and `targ()`. 
 
 
 ### v0.2.0
