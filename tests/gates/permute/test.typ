@@ -19,3 +19,11 @@
   1, [\ ],
   5
 )
+
+#pagebreak()
+
+// Test bend
+#quantum-circuit(
+  1, permute(1,0, bend: 0%), 1, [\ ],
+  3,
+)

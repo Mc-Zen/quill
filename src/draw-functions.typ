@@ -192,14 +192,15 @@
     width: width, {
       let qubits = gate.data.qubits
       let y0 = draw-params.center-y-coords.at(gate.qubit)
+      let bend = gate.data.bend * width / 2
       for from in range(qubits.len()) {
         let to = qubits.at(from)
         let y-from = draw-params.center-y-coords.at(from + gate.qubit) - y0
         let y-to = draw-params.center-y-coords.at(to + gate.qubit) - y0
         if separation != none {
-          place(path(((0pt,y-from), (-width/2, 0pt)), ((width, y-to), (-width/2, 0pt)), stroke: separation))
+          place(path(((0pt,y-from), (-bend, 0pt)), ((width, y-to), (-bend, 0pt)), stroke: separation))
         }
-        place(path(((-.1pt,y-from), (-width/2, 0pt)), ((width+.1pt, y-to), (-width/2, 0pt)), stroke: draw-params.wire)) 
+        place(path(((-.1pt,y-from), (-bend, 0pt)), ((width+.1pt, y-to), (-bend, 0pt)), stroke: draw-params.wire)) 
       }
     }
   )
