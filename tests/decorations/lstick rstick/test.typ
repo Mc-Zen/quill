@@ -37,3 +37,11 @@
 #quantum-circuit(
   1, rstick("very long rstick")
 )
+
+#pagebreak()
+
+// lstick with equation numbering
+#set math.equation(numbering: "1")
+#quantum-circuit(
+  lstick($|0〉$, brace: "{"), 1
+)

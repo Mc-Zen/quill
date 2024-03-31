@@ -71,7 +71,8 @@
     panic("Unexpected named argument '" + children.named().keys().at(0) + "' for quantum-circuit()")
   }
   set text(color, size: font-size)
-  
+  set math.equation(numbering: none)
+
   style(styles => {
   
   // Parameter object to pass to draw-function containing current style info
