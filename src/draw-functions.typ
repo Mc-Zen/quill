@@ -8,16 +8,6 @@
 
 
 
-// Creates a sized brace with given length. 
-// `brace` can be auto, defaulting to "{" if alignment is right
-// and "}" if alignment is left. Other possible values are 
-// "[", "]", "|", "{", and "}".
-#let create-brace(brace, alignment, length) = {
-  if brace == auto {
-    brace = if alignment == right {"{"} else {"}"} 
-  }
-  return $ lr(#brace, size: length) $
-}
 
 
 // Default gate draw function. Draws a box with global padding
@@ -28,26 +18,28 @@
   width: gate.width,
   radius: gate.radius,
   stroke: if gate.box { draw-params.wire }, 
-  fill: if gate.fill != none {gate.fill} else if gate.box {draw-params.background}, 
+  fill: utility.if-none(gate.fill, if gate.box {draw-params.background}),
   gate.content,
 ))
 
 // Same but without displaying a box
 #let draw-unboxed-gate(gate, draw-params) = box(
   inset: draw-params.padding, 
-  fill: if gate.fill != none {gate.fill} else {draw-params.background}, 
+  fill: utility.if-none(gate.fill, draw-params.background),
   gate.content
 )
 
 // Draw a gate spanning multiple wires
 #let draw-boxed-multigate(gate, draw-params) = {
   let dy = draw-params.multi.wire-distance
-  let extent = if gate.multi.extent == auto {draw-params.x-gate-size.height/2} else {gate.multi.extent}
+  let extent = gate.multi.extent
+  if extent == auto { extent = draw-params.x-gate-size.height / 2 }
+  
   let style-params = (
       width: gate.width,
       stroke: draw-params.wire, 
       radius: gate.radius,
-      fill: if gate.fill != none {gate.fill} else {draw-params.background}, 
+      fill: utility.if-none(gate.fill, draw-params.background), 
       inset: draw-params.padding, 
   )
   align(center + horizon, box(
@@ -63,15 +55,16 @@
       let width = measure(line(length: gate.width), draw-params.styles).width
       let y0 = -(dy + extent) - draw-params.center-y-coords.at(0)
       let get-wire-y(qubit) = { draw-params.center-y-coords.at(qubit) + y0 }
+      
       set text(size: .8em)
       style(styles => {
-        for input in inouts {
-          let size = measure(input.label, styles)
-          let y = get-wire-y(input.qubit)
+        for inout in inouts {
+          let size = measure(inout.label, styles)
+          let y = get-wire-y(inout.qubit)
           let label-x = draw-params.padding
-          if "n" in input and input.n > 1 {
-            let y2 = get-wire-y(input.qubit + input.n - 1)
-            let brace = create-brace(auto, alignment, y2 - y + draw-params.padding)
+          if "n" in inout and inout.n > 1 {
+            let y2 = get-wire-y(inout.qubit + inout.n - 1)
+            let brace = utility.create-brace(auto, alignment, y2 - y + draw-params.padding)
             let brace-x = 0pt
             let size = measure(brace, styles)
             if alignment == right { brace-x += width - size.width }
@@ -82,7 +75,7 @@
           }
           place(dy: y - size.height / 2, align(
             alignment, 
-            box(input.label, width: width, inset: (x: label-x))
+            box(inout.label, width: width, inset: (x: label-x))
           ))
         }
       })
@@ -96,8 +89,8 @@
 
 #let draw-targ(item, draw-params) = {
   let size = item.data.size
-  box[
-    #circle(
+  box({
+    circle(
       radius: size, 
       stroke: draw-params.wire, 
       fill: if item.fill == none {none} 
@@ -106,13 +99,12 @@
           else if type(item.fill) == "color" {item.fill} 
         }
     )
-    #place(line(start: (size, 0pt), length: 2*size, angle: -90deg, stroke: draw-params.wire))
-    #place(line(start: (0pt, -size), length: 2*size, stroke: draw-params.wire))
-  ]
+    place(line(start: (size, 0pt), length: 2*size, angle: -90deg, stroke: draw-params.wire))
+    place(line(start: (0pt, -size), length: 2*size, stroke: draw-params.wire))
+  })
 }
 
 #let draw-ctrl(gate, draw-params) = {
-  let clr = draw-params.wire
   let color = utility.if-none(gate.fill, draw-params.color)
   if "show-dot" in gate.data and not gate.data.show-dot { return none }
   if gate.data.open {
@@ -208,9 +200,10 @@
 }
 
 // Draw an lstick (align: "right") or rstick (align: "left")
-#let draw-lrstick(gate, draw-params, align: none) = {
-  assert(align in ("left", "right"), message: "Only left and right are allowed")
-  let isleftstick = (align == "right")
+#let draw-lrstick(gate, draw-params) = {
+
+  assert(gate.data.align in (left, right), message: "Only left and right are allowed")
+  let isleftstick = (gate.data.align == right)
   let draw-brace = gate.data.brace != none
     
   let content = box(inset: draw-params.padding, gate.content)
@@ -220,9 +213,6 @@
   let brace = none
   
   if draw-brace {
-   let brace-symbol = if gate.data.brace == auto {
-        if gate.multi != none { if isleftstick {"{"} else {"}"} }
-        } else { gate.data.brace }
     let brace-height
     if gate.multi == none {
       brace-height = 1em + 2 * draw-params.padding
@@ -233,7 +223,7 @@
     if brace-symbol == auto and gate.multi == none {
       brace-symbol = none
     }
-    brace = create-brace(brace-symbol, if isleftstick {right}else{left}, brace-height)
+    brace = utility.create-brace(brace-symbol, if isleftstick {right}else{left}, brace-height)
   }
   
   let brace-size = measure(brace, draw-params.styles)
@@ -253,8 +243,6 @@
     brace-offset-y = -.25em
   }
   
-  let inset = (:)
-  inset.insert(align, width)
   let brace-pos-x = if isleftstick { size.width } else { 0pt }
   let content-pos-x = if isleftstick { 0pt } else { brace-size.width }
 
@@ -291,7 +279,8 @@
 #let draw-slice(x, y1, y2, item, draw-params) = layout.place-with-labels(
   dx: x, dy: y1, 
   size: (width: 0pt, height: y2 - y1),
-  labels: item.labels, draw-params: draw-params, 
+  labels: item.labels, 
+  draw-params: draw-params, 
   line(angle: 90deg, length: y2 - y1, stroke: item.style.stroke)
 )
 
@@ -299,10 +288,12 @@
 
 #let draw-horizontal-wire(x1, x2, y, stroke, wire-count, wire-distance: 1pt) = {
   if x1 == x2 { return }
-  for i in range(wire-count) {
-    place(line(start: (x1, y), end: (x2, y), stroke: stroke), 
-      dy: (2*i - (wire-count - 1)) * wire-distance)
-  }
+
+  let wire = line(start: (x1, y), end: (x2, y), stroke: stroke)
+  range(wire-count)
+    .map(i => (2*i - (wire-count - 1)) * wire-distance)
+    .map(dy => place(wire, dy: dy))
+    .join()
 }
 
 #let draw-vertical-wire(
@@ -315,17 +306,15 @@
 ) = {
   let height = y2 - y1
 
-  let wires = {
-    for i in range(wire-count) {
-      let x = 2 * i * wire-distance
-      place(line(start: (x, 0pt), end: (x, height), stroke: stroke))
-    }
-  }
+  let wire = line(start: (0pt, 0pt), end: (0pt, height), stroke: stroke)
+  let wires = range(wire-count)
+    .map(i => 2 * i * wire-distance)
+    .map(dx => place(wire, dx: dx))
 
   place(
     dx: x - (wire-count - 1) * wire-distance,
     dy: y1,
-    wires
+    wires.join()
   )
 }
 
@@ -340,13 +329,11 @@
   draw-params: none,
 ) = {
   let height = y2 - y1
-
-  let wires = {
-    for i in range(wire-count) {
-      let x = 2 * i * wire-distance
-      place(line(start: (x, 0pt), end: (x, height), stroke: stroke))
-    }
-  }
+  
+  let wire = line(start: (0pt, 0pt), end: (0pt, height), stroke: stroke)
+  let wires = range(wire-count)
+    .map(i => 2 * i * wire-distance)
+    .map(dx => place(wire, dx: dx))
 
   layout.place-with-labels(
     dx: x - (wire-count - 1) * wire-distance,
@@ -354,6 +341,6 @@
     labels: wire-labels,
     draw-params: draw-params,
     size: (width: 2 * (wire-count - 1) * wire-distance, height: height),
-    wires
+    wires.join()
   )
 }

@@ -24,3 +24,15 @@
   } 
   measure(item, draw-params.styles)
 }
+
+
+// Creates a sized brace with given length. 
+// `brace` can be auto, defaulting to "{" if alignment is right
+// and "}" if alignment is left. Other possible values are 
+// "[", "]", "|", "{", and "}".
+#let create-brace(brace, alignment, length) = {
+  if brace == auto {
+    brace = if alignment == right {"{"} else {"}"} 
+  }
+  return $ lr(#brace, size: length) $
+}

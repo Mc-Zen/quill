@@ -64,7 +64,7 @@
 #let lrstick-size-hint(gate, draw-params) = {
   let hint = measure((gate.draw-function)(gate, draw-params), draw-params.styles)
   let dx = 0pt
-  if gate.data.align == "right" { dx = hint.width } 
+  if gate.data.align == right { dx = hint.width } 
   hint.offset = (x: dx, y: auto)
   return hint
 }

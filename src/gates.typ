@@ -199,8 +199,6 @@
 /// - height (length): Height of the phantom gate (ignored if `content` is not `none`). 
 #let phantom(content: none, width: 0pt, height: 0pt) = {
   let thecontent = if content != none { box(hide(content)) } else { 
-    let w = height
-    if type(w) in ("content", "string") { }
     box(width: width, height: height) 
   }
   gate(thecontent, box: false, fill: none)
