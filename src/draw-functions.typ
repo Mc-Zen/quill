@@ -8,14 +8,15 @@
 
 
 
-// create a sized brace with given length. 
+// Creates a sized brace with given length. 
 // `brace` can be auto, defaulting to "{" if alignment is right
-// and "}" if alignment is left. 
+// and "}" if alignment is left. Other possible values are 
+// "[", "]", "|", "{", and "}".
 #let create-brace(brace, alignment, length) = {
-  let brace-symbol = if brace == auto {
-      if alignment == right {"{"} else {"}"} 
-    } else { brace }
-  return $ lr(#brace-symbol#block(height: length)) $
+  if brace == auto {
+    brace = if alignment == right {"{"} else {"}"} 
+  }
+  return $ lr(#brace, size: length) $
 }
 
 
