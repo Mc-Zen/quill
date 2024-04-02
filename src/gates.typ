@@ -41,6 +41,8 @@
 ///             `draw-function`.
 #let gate(
   content,
+  x: auto,
+  y: auto,
   fill: none,
   radius: 0pt,
   width: auto,
@@ -54,6 +56,8 @@
   label: none
 ) = (
   content: content, 
+  x: x, 
+  y: y,
   fill: fill,
   radius: radius,
   width: width,
