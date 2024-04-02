@@ -2,53 +2,9 @@
 #import "length-helpers.typ"
 #import "decorations.typ": *
 
+#let signum(x) = if x >= 0. { 1. } else { -1. }
 
 
-
-
-/// Create a quantum circuit diagram. Children may be
-/// - gates created by one of the many gate commands (@@gate(), 
-///   @@mqgate(), @@meter(), ...),
-/// - `[\ ]` for creating a new wire/row,
-/// - commands like @@setwire(), @@slice() or @@gategroup(),
-/// - integers for creating cells filled with the current wire setting,
-/// - lengths for creating space between rows or columns,
-/// - plain content or strings to be placed on the wire, and
-/// - @@lstick(), @@midstick() or @@rstick() for placement next to the wire.
-///
-///
-/// - wire (stroke): Style for drawing the circuit wires. This can take anything 
-///            that is valid for the stroke of the builtin `line()` function. 
-/// - row-spacing (length): Spacing between rows.
-/// - column-spacing (length): Spacing between columns.
-/// - min-row-height (length): Minimum height of a row (e.g., when no 
-///             gates are given).
-/// - min-column-width (length): Minimum width of a column.
-/// - gate-padding (length): General padding setting including the inset for 
-///            gate boxes and the distance of @@lstick() and co. to the wire. 
-/// - equal-row-heights (boolean): If true, then all rows will have the same 
-///            height and the wires will have equal distances orienting on the
-///            highest row. 
-/// - color (color): Foreground color, default for strokes, text, controls
-///            etc. If you want to have dark-themed circuits, set this to white  
-///            for instance and update `wire` and `fill` accordingly.           
-/// - fill (color): Default fill color for gates. 
-/// - font-size (length): Default font size for text in the circuit. 
-/// - scale (ratio): Total scale factor applied to the entire 
-///            circuit without changing proportions
-/// - baseline (length, content, string): Set the baseline for the circuit. If a 
-///            content or a string is given, the baseline will be adjusted auto-
-///            matically to align with the center of it. One useful application is 
-///            `"="` so the circuit aligns with the equals symbol. 
-/// - circuit-padding (dictionary): Padding for the circuit (e.g., to accomodate 
-///            for annotations) in form of a dictionary with possible keys 
-///            `left`, `right`, `top` and `bottom`. Not all of those need to be 
-///            specified. 
-///
-///            This setting basically just changes the size of the bounding box 
-///            for the circuit and can be used to increase it when labels or 
-///            annotations extend beyond the actual circuit. 
-/// - ..children (array): Items, gates and circuit commands (see description). 
 #let quantum-circuit(
   wire: .7pt + black,     
   row-spacing: 12pt,
@@ -102,82 +58,239 @@
   let min-row-height = length-helpers.convert-em-length(min-row-height, draw-params.em)
   let min-column-width = length-helpers.convert-em-length(min-column-width, draw-params.em)
   
-  let colwidths = ()
-  let rowheights = (min-row-height,)
   let (row-gutter, col-gutter) = ((0pt,), ())
   let (row, col) = (0, 0)
   let wire-ended = false
-  
-  for item in items { 
+
+  let matrix = ((),)
+  let auto-cell = (content: auto, size: (width: 0pt, height: 0pt), gutter: 0pt)
+
+  let default-wire-style = (
+    count: 1,
+    distance: 1pt, 
+    stroke: wire
+  )
+  let wire-style = default-wire-style
+  let wire-pieces = ()
+
+  let gates = ()
+  let mqgates = ()
+
+  for item in items {
     if item == [\ ] {
-      
-      if rowheights.len() < row + 2 { 
-        rowheights.push(min-row-height)
+      row += 1; col = 0
+      if row >= matrix.len() {
+        matrix.push(())
         row-gutter.push(0pt)
       }
-      row += 1; col = 0
       wire-ended = true
     } else if utility.is-circuit-meta-instruction(item) { 
+      if item.qc-instr == "setwire" {
+        wire-style.count = item.wire-count
+        wire-style.distance = item.wire-distance
+        if item.stroke != none { wire-style.stroke = item.stroke }
+        wire-pieces.push(wire-style)
+      }
     } else if utility.is-circuit-drawable(item) {
-      let isgate = utility.is-gate(item)
-      if isgate { item.qubit = row }
-      let ismulti = isgate and item.multi != none
-      let size = utility.get-size-hint(item, draw-params)
-      
-      let width = size.width 
-      let height = size.height
-      if isgate and item.floating { width = 0pt }
+      let gate = item
+      let (x, y) = (gate.x, gate.y)
+      if x == auto { 
+        x = col 
+        wire-pieces.push((col, col + 1))
+        col += 1
+      }
+      if y == auto { y = row }
 
-      if colwidths.len() < col + 1 { 
-        colwidths.push(min-column-width)
-        col-gutter.push(0pt)
+      if y >= matrix.len() { matrix += ((),) * (y - matrix.len() + 1) }
+      if x >= matrix.at(y).len() {
+        matrix.at(y) +=  (auto-cell,) * (x - matrix.at(y).len() + 1)
       }
-      colwidths.at(col) = calc.max(colwidths.at(col), width)
-      
-      if not (ismulti and item.multi.size-all-wires == none) {
-        // e.g., l, rsticks
-        rowheights.at(row) = calc.max(rowheights.at(row), height)
-      } 
-      
-      if ismulti and item.multi.num-qubits > 1 and item.multi.size-all-wires != none { 
-        let start = row
-        if not item.multi.size-all-wires {
-          start = calc.max(0, row + item.multi.num-qubits - 1)
-        }
-        for qubit in range(start, row + item.multi.num-qubits) {
-          while rowheights.len() < qubit + 1 { 
-            rowheights.push(min-row-height)
-            row-gutter.push(0pt)
-          }
-          rowheights.at(qubit) = calc.max(rowheights.at(qubit), height)
-        }
+
+      assert(matrix.at(y).at(x).content == auto, message: "Attempted to place a second gate at column " + str(y) + ", row " + str(x))
+
+      let size-hint = utility.get-size-hint(item, draw-params)
+      if item.floating { size-hint.width = 0pt; }
+      // if not item.box { size-hint.height = 0pt; }
+
+      matrix.at(y).at(x) = (
+        // content: gate,
+        size: size-hint,
+        gutter: 0pt
+      )
+      let gate-info = (
+          gate: gate,
+          size: size-hint,
+          x: x,
+          y: y
+        )
+      if gate.multi != none {
+        mqgates.push(gate-info)
+      } else {
+        gates.push(gate-info)
       }
-      col += 1
       wire-ended = false
-    } else if type(item) == "integer" {
-      for _ in range(colwidths.len(), col + item) { 
-        colwidths.push(min-column-width)
-        col-gutter.push(0pt) 
-      }
+    } else if type(item) == int {
+      wire-pieces.push((col, col + item))
       col += item
+      if col >= matrix.at(row).len() {
+        matrix.at(row) += (auto-cell,) * (col - matrix.at(row).len())
+      }
       wire-ended = false
-    } else if type(item) == "length" {
+    } else if type(item) == length {
       if wire-ended {
         row-gutter.at(row - 1) = calc.max(row-gutter.at(row - 1), item)
       } else if col > 0 {
-        col-gutter.at(col - 1) = calc.max(col-gutter.at(col - 1), item)
+        matrix.at(row).at(col - 1).gutter = calc.max(matrix.at(row).at(col - 1).gutter, item)
       }
     }
   }
-  /////////// END First pass: Layout (spacing)   ///////////
-  
-  rowheights = rowheights.map(x => x + row-spacing)
-  colwidths = colwidths.map(x => x + column-spacing)
 
+  // finish up matrix
+  let num-rows = matrix.len()
+  let num-cols = calc.max(0, ..matrix.map(array.len))
+  for i in range(num-rows) {
+    matrix.at(i) += (auto-cell,) * (num-cols - matrix.at(i).len())
+  }
+  row-gutter += (0pt,) * (matrix.len() - row-gutter.len())
+
+  let vertical-wires = ()
+  // account for multi-qubit gates
+  for mqgate in mqgates {
+    let multi = mqgate.gate.multi
+    let size = mqgate.size
+    let (x, y) = mqgate
+    
+    if multi.target != none {
+      let diff = if multi.target > 0 {multi.num-qubits - 1} else {0}
+      vertical-wires.push((
+        x: x, 
+        y: y + diff, 
+        target: multi.target - diff, 
+        wire-style: (count: multi.wire-count)
+      ))
+    }
+    if multi.num-qubits == 1 { continue }
+    let start = y
+    if multi.size-all-wires != none {
+      if not multi.size-all-wires {
+        start = calc.max(0, y + multi.num-qubits - 1)
+      }
+      for qubit in range(start, y + multi.num-qubits) {
+        matrix.at(qubit).at(x).size = size
+      }
+    }
+  }
+
+  // place()[#vertical-wires]
+
+  let rowheights = matrix.map(row => 
+    calc.max(min-row-height, ..row.map(item => item.size.height)) + row-spacing
+  )
   if equal-row-heights {
     let max-row-height = calc.max(..rowheights)
-    rowheights = rowheights.map(x => max-row-height)
+    rowheights = (max-row-height,) * rowheights.len()
   }
+
+  let colwidths = range(num-cols).map(j => 
+    calc.max(min-column-width, ..range(num-rows).map(i => {
+        matrix.at(i).at(j).size.width
+    })) + column-spacing 
+  )
+
+  let col-gutter = range(num-cols).map(j => 
+    calc.max(0pt, ..range(num-rows).map(i => {
+        matrix.at(i).at(j).gutter
+    }))
+  )
+
+  if colwidths.len() == 0 {
+    place(horizon, text(red)[#matrix])
+  }
+
+
+
+  // return row-heights
+  
+  //////////
+  //////////
+
+
+  // let colwidths = ()
+  // let rowheights = (min-row-height,)
+  // let (row-gutter, col-gutter) = ((0pt,), ())
+  // let (row, col) = (0, 0)
+  // for item in items { 
+  //   if item == [\ ] {
+      
+  //     if rowheights.len() < row + 2 { 
+  //       rowheights.push(min-row-height)
+  //       row-gutter.push(0pt)
+  //     }
+  //     row += 1; col = 0
+  //     wire-ended = true
+  //   } else if utility.is-circuit-meta-instruction(item) { 
+  //   } else if utility.is-circuit-drawable(item) {
+  //     let isgate = utility.is-gate(item)
+  //     if isgate { item.qubit = row }
+  //     let ismulti = isgate and item.multi != none
+  //     let size = utility.get-size-hint(item, draw-params)
+      
+  //     let width = size.width 
+  //     let height = size.height
+  //     if isgate and item.floating { width = 0pt }
+
+  //     if colwidths.len() < col + 1 { 
+  //       colwidths.push(min-column-width)
+  //       col-gutter.push(0pt)
+  //     }
+  //     colwidths.at(col) = calc.max(colwidths.at(col), width)
+      
+  //     if not (ismulti and item.multi.size-all-wires == none) {
+  //       // e.g., l, rsticks
+  //       rowheights.at(row) = calc.max(rowheights.at(row), height)
+  //     } 
+      
+  //     if ismulti and item.multi.num-qubits > 1 and item.multi.size-all-wires != none { 
+  //       let start = row
+  //       if not item.multi.size-all-wires {
+  //         start = calc.max(0, row + item.multi.num-qubits - 1)
+  //       }
+  //       for qubit in range(start, row + item.multi.num-qubits) {
+  //         while rowheights.len() < qubit + 1 { 
+  //           rowheights.push(min-row-height)
+  //           row-gutter.push(0pt)
+  //         }
+  //         rowheights.at(qubit) = calc.max(rowheights.at(qubit), height)
+  //       }
+  //     }
+  //     col += 1
+  //     wire-ended = false
+  //   } else if type(item) == "integer" {
+  //     for _ in range(colwidths.len(), col + item) { 
+  //       colwidths.push(min-column-width)
+  //       col-gutter.push(0pt) 
+  //     }
+  //     col += item
+  //     wire-ended = false
+  //   } else if type(item) == "length" {
+  //     if wire-ended {
+  //       row-gutter.at(row - 1) = calc.max(row-gutter.at(row - 1), item)
+  //     } else if col > 0 {
+  //       col-gutter.at(col - 1) = calc.max(col-gutter.at(col - 1), item)
+  //     }
+  //   }
+  // }
+  // /////////// END First pass: Layout (spacing)   ///////////
+  
+  // rowheights = rowheights.map(x => x + row-spacing)
+  // colwidths = colwidths.map(x => x + column-spacing)
+  // if equal-row-heights {
+  //   let max-row-height = calc.max(..rowheights)
+  //   rowheights = rowheights.map(x => max-row-height)
+  // }
+
+  // place(dy: -1em,text(red)[#col-gutter, #num-cols])
+
   let center-x-coords = layout.compute-center-coords(colwidths, col-gutter).map(x => x - 0.5 * column-spacing)
   let center-y-coords = layout.compute-center-coords(rowheights, row-gutter).map(x => x - 0.5 * row-spacing)
   draw-params.center-y-coords = center-y-coords
@@ -193,6 +306,28 @@
   let wire-distance = 1pt
   let wire-stroke = wire
   let prev-wire-x = center-x-coords.at(0)
+
+
+
+  let get-gate-pos(x, y, size-hint) = {
+    let dx = center-x-coords.at(x)
+    let dy = center-y-coords.at(y)
+    let (width, height) = size-hint
+    let offset = size-hint.at("offset", default: auto)
+
+    if offset == auto { return (dx - width / 2, dy - height / 2) } 
+
+    assert(type(offset) == "dictionary", message: "Unexpected type `" + type(offset) + "` for parameter `offset`") 
+    
+    let offset-x = offset.at("x", default: auto)
+    let offset-y = offset.at("y", default: auto)
+    if offset-x == auto { dx -= width / 2}
+    else if type(offset-x) == "length" { dx -= offset-x }
+    if offset-y == auto { dy -= height / 2}
+    else if type(offset-y) == "length" { dy -= offset-y }
+    return (dx, dy)
+  }
+
 
   /////////// Second pass: Generation ///////////
   
@@ -324,20 +459,10 @@
         if isgate and item.box { prev-wire-x = center-x + size.width / 2 } 
         else { prev-wire-x = current-wire-x }
         
-        let x-pos = center-x
-        let y-pos = center-y
-        let offset = size.at("offset", default: auto)
-        if offset == auto {
-          x-pos -= size.width / 2
-          y-pos -= single-qubit-height / 2
-        } else if type(offset) == "dictionary" {
-          let offset-x = offset.at("x", default: auto)
-          let offset-y = offset.at("y", default: auto)
-          if offset-x == auto { x-pos -= size.width / 2}
-          else if type(offset-x) == "length" { x-pos -= offset-x }
-          if offset-y == auto { y-pos -= single-qubit-height / 2}
-          else if type(offset-y) == "length" { y-pos -= offset-y }
-        }
+        let new-size = size
+        new-size.height = single-qubit-height
+        let (x-pos, y-pos) = get-gate-pos(col, row, new-size)
+
         
         let content = utility.get-content(item, draw-params)
 
@@ -376,6 +501,41 @@
     for item in to-be-drawn-later {
       item
     }
+
+    gates.map(gate-info => {
+      let (gate, size, x, y) = gate-info
+      let (dx, dy) = get-gate-pos(x, y, size)
+      let content = utility.get-content(gate, draw-params)
+      let content = none
+      place(
+        dx: dx,
+        dy: dy,
+        content
+      )
+    }).join()
+
+    // vertical-wires.map(((x, y, target, wire-style)) => {
+    //   let (dx, dy1) = (center-x-coords.at(x), center-y-coords.at(y))
+    //   let dy2 = center-y-coords.at(y + target)
+    //   dy1 += matrix.at(y).at(x).size.height / 2 * signum(target)
+    //   dy2 -= matrix.at(y + target).at(x).size.height / 2 * signum(target)
+    //   draw-functions.draw-vertical-wire(
+    //     dy1, dy2, dx, 
+    //     red, wire-count: wire-style.count,
+    //   )
+    // }).join()
+
+    // show matrix
+    // for (i, row) in matrix.enumerate() {
+    //   for (j, entry) in row.enumerate() {
+    //     let (dx, dy) = (center-x-coords.at(j), center-y-coords.at(i))
+    //     place(
+    //       dx: dx - entry.size.width / 2, dy: dy - entry.size.height / 2, 
+    //       box(stroke: green, width: entry.size.width, height: entry.size.height)
+    //     )
+    //   }
+    // }
+  
   }) // end circuit = block(..., {
     
   /////////// END Second pass: Generation ///////////
@@ -415,6 +575,3 @@
   
 })
 }
-
-
-#import "quill2.typ": *
