@@ -21,7 +21,7 @@
     [Target], quantum-circuit(1, targ(), 1), raw("targ()"), 
     [Swap target], quantum-circuit(1, swap(0), 1), raw("swap(0)"), 
     [Permutation \ gate], quantum-circuit(1, permute(2,0,1), 1, [\ ], 3, [\ ], 3), raw("permute(2,0,1)"), 
-    [Multiqubit \ gate], quantum-circuit(1, mqgate($U$, n: 3), 1, [\ ], 3, [\ ], 3), raw("mqgate($U$, 3)"), 
+    [Multiqubit \ gate], quantum-circuit(1, mqgate($U$, n: 3), 1, [\ ], 3, [\ ], 3), raw("mqgate($U$, n: 3)"), 
     [lstick], quantum-circuit(lstick($|psi〉$), 2), raw("lstick($|psi〉$)"), 
     [rstick], quantum-circuit(2, rstick($|psi〉$)), raw("rstick($|psi〉$)"), 
     [Multi-qubit \ lstick], quantum-circuit(row-spacing: 10pt, lstick($|psi〉$, n: 2), 2, [\ ], 3), raw("lstick($|psi〉$, \nn: 2)"), 
