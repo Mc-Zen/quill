@@ -68,7 +68,7 @@
   let default-wire-style = (
     count: 1,
     distance: 1pt, 
-    stroke: wire
+    stroke: 1pt + orange //
   )
   let wire-style = default-wire-style
   let wire-pieces = ()
@@ -76,14 +76,18 @@
   let gates = ()
   let mqgates = ()
   let meta-instructions = ()
+  let prev-col = 0
 
   for item in items {
     if item == [\ ] {
       row += 1; col = 0
+      prev-col = 0
       if row >= matrix.len() {
         matrix.push(())
         row-gutter.push(0pt)
       }
+      wire-style = default-wire-style
+      wire-pieces.push(default-wire-style)
       wire-ended = true
     } else if utility.is-circuit-meta-instruction(item) { 
       if item.qc-instr == "setwire" {
@@ -104,7 +108,11 @@
       let (x, y) = (gate.x, gate.y)
       if x == auto { 
         x = col 
-        wire-pieces.push((col, col + 1))
+        // wire-pieces.push((row, col, col + 1))
+        if col != prev-col {
+          wire-pieces.push((row, prev-col, col))
+        }
+        prev-col = col 
         col += 1
       }
       if y == auto { y = row }
@@ -140,8 +148,9 @@
       }
       wire-ended = false
     } else if type(item) == int {
-      wire-pieces.push((col, col + item))
+      wire-pieces.push((row, prev-col, col + item - 1))
       col += item
+      prev-col = col - 1
       if col >= matrix.at(row).len() {
         matrix.at(row) += (auto-cell,) * (col - matrix.at(row).len())
       }
@@ -154,6 +163,8 @@
       }
     }
   }
+
+  place(dx: 4.4cm, text(2pt)[#wire-pieces])
 
   // finish up matrix
   let num-rows = matrix.len()
@@ -183,6 +194,9 @@
     let nq = multi.num-qubits
     if nq == 1 { continue }
     assert(y + nq - 1 < num-rows, message: "A " + str(nq) + "-qubit gate starting at qubit " + str(y) + " exceeds the circuit which has only " + str(num-rows) + " qubits")
+    for qubit in range(y, y + nq) {
+      matrix.at(qubit).at(x).size.width = size.width
+    }
     let start = y
     if multi.size-all-wires != none {
       if not multi.size-all-wires {
@@ -502,6 +516,7 @@
         // let t = col
         // if col == center-x-coords.len() { t -= 1}
         let center-x = center-x-coords.at(col - 1)
+        place(dx: 1cm, dy: col * 3pt, text(3pt, repr(col)))
         draw-functions.draw-horizontal-wire(prev-wire-x, center-x, center-y, wire-stroke, wire-count, wire-distance: wire-distance)
         prev-wire-x = center-x
       }
@@ -556,6 +571,15 @@
         }
       }
     }
+
+    
+    let get-anchor-width(x, y) = {
+      if x == num-cols {return 0pt }
+      let el = matrix.at(y).at(x)
+      if "box" in el and not el.box { return 0pt }
+      return el.size.width
+    }
+
 
     let get-anchor-height(x, y) = {
       let el = matrix.at(y).at(x)
@@ -629,6 +653,36 @@
     //     )
     //   }
     // }
+    let wire-style = default-wire-style
+    for wire-piece in wire-pieces {
+      if type(wire-piece) == dictionary {
+        wire-style = wire-piece
+      } else {
+        if wire-style.count == 0 { continue }
+        let (row, start, end) = wire-piece
+
+        let draw-subwire(x1, x2) = {
+          let (a, b) = (x1, x2)
+          let g1-w = get-anchor-width(x1, row)
+          let g2-w = get-anchor-width(x2, row)
+          let x1 = center-x-coords.at(x1)
+          let x2 = center-x-coords.at(x2, default: circuit-width)
+          let y = center-y-coords.at(row)
+          x1 += g1-w / 2
+          x2 -= g2-w / 2
+          draw-functions.draw-horizontal-wire(x1, x2, y+1pt, wire-style.stroke, wire-style.count, wire-distance: wire-style.distance)
+          place(dx: x1 + 2pt, dy: y - 10pt, text(2pt)[#a - #b])
+        }
+        for x in range(start + 1, end) {
+          let w = get-anchor-width(x, row)
+          if w == 0pt { continue }
+          draw-subwire(start, x)
+          start = x
+        }
+        draw-subwire(start, end)
+        
+      }
+    }
   
   }) // end circuit = block(..., {
     
