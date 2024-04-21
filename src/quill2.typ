@@ -5,7 +5,7 @@
 #let signum(x) = if x >= 0. { 1. } else { -1. }
 
 
-#let quantum-circuit1(
+#let quantum-circuit(
   wire: .7pt + black,     
   row-spacing: 12pt,
   column-spacing: 12pt,
@@ -111,12 +111,12 @@
       let size-hint = utility.get-size-hint(item, draw-params)
       let gate-size = size-hint
       if item.floating { size-hint.width = 0pt; }
-      if not item.box { size-hint.height = 0pt; }
 
       matrix.at(y).at(x) = (
         // content: gate,
         size: size-hint,
-        gutter: 0pt
+        gutter: 0pt,
+        box: item.box,
       )
       let gate-info = (
           gate: gate,
@@ -504,12 +504,16 @@
     }
 
 
-
+    let get-anchor-height(x, y) = {
+      let el = matrix.at(y).at(x)
+      if "box" in el and not el.box { return 0pt }
+      return el.size.height
+    }
     vertical-wires.map(((x, y, target, wire-style)) => {
       let (dx, dy1) = (center-x-coords.at(x), center-y-coords.at(y))
       let dy2 = center-y-coords.at(y + target)
-      dy1 += matrix.at(y).at(x).size.height / 2 * signum(target)
-      dy2 -= matrix.at(y + target).at(x).size.height / 2 * signum(target)
+      dy1 += get-anchor-height(x, y) / 2 * signum(target)
+      dy2 -= get-anchor-height(x, y + target) / 2 * signum(target)
       draw-functions.draw-vertical-wire(
         dy1, dy2, dx, 
         red, wire-count: wire-style.count,
