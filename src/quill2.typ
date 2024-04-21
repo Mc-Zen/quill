@@ -108,7 +108,6 @@
       let (x, y) = (gate.x, gate.y)
       if x == auto { 
         x = col 
-        // wire-pieces.push((row, col, col + 1))
         if col != prev-col {
           wire-pieces.push((row, prev-col, col))
         }
@@ -129,7 +128,6 @@
       if item.floating { size-hint.width = 0pt; }
 
       matrix.at(y).at(x) = (
-        // content: gate,
         size: size-hint,
         gutter: 0pt,
         box: item.box,
@@ -164,7 +162,6 @@
     }
   }
 
-  place(dx: 4.4cm, text(2pt)[#wire-pieces])
 
   // finish up matrix
   let num-rows = matrix.len()
@@ -208,7 +205,6 @@
     }
   }
 
-  // place()[#vertical-wires]
 
   let rowheights = matrix.map(row => 
     calc.max(min-row-height, ..row.map(item => item.size.height)) + row-spacing
@@ -236,7 +232,6 @@
 
 
 
-  // return row-heights
   
   //////////
   //////////
@@ -316,7 +311,6 @@
   //   rowheights = rowheights.map(x => max-row-height)
   // }
 
-  // place(dy: -1em,text(red)[#col-gutter, #num-cols])
 
   let center-x-coords = layout.compute-center-coords(colwidths, col-gutter).map(x => x - 0.5 * column-spacing)
   let center-y-coords = layout.compute-center-coords(rowheights, row-gutter).map(x => x - 0.5 * row-spacing)
@@ -516,7 +510,6 @@
         // let t = col
         // if col == center-x-coords.len() { t -= 1}
         let center-x = center-x-coords.at(col - 1)
-        place(dx: 1cm, dy: col * 3pt, text(3pt, repr(col)))
         draw-functions.draw-horizontal-wire(prev-wire-x, center-x, center-y, wire-stroke, wire-count, wire-distance: wire-distance)
         prev-wire-x = center-x
       }
@@ -572,20 +565,49 @@
       }
     }
 
-    
     let get-anchor-width(x, y) = {
-      if x == num-cols {return 0pt }
+      if x == num-cols { return 0pt }
       let el = matrix.at(y).at(x)
       if "box" in el and not el.box { return 0pt }
       return el.size.width
     }
-
 
     let get-anchor-height(x, y) = {
       let el = matrix.at(y).at(x)
       if "box" in el and not el.box { return 0pt }
       return el.size.height
     }
+
+
+    let wire-style = default-wire-style
+    for wire-piece in wire-pieces {
+      if type(wire-piece) == dictionary {
+        wire-style = wire-piece
+      } else {
+        if wire-style.count == 0 { continue }
+        let (row, start, end) = wire-piece
+
+        let draw-subwire(x1, x2) = {
+          let (a, b) = (x1, x2)
+          let g1-w = get-anchor-width(x1, row)
+          let g2-w = get-anchor-width(x2, row)
+          let x1 = center-x-coords.at(x1)
+          let x2 = center-x-coords.at(x2, default: circuit-width)
+          let y = center-y-coords.at(row)
+          x1 += g1-w / 2
+          x2 -= g2-w / 2
+          draw-functions.draw-horizontal-wire(x1, x2, y, wire-style.stroke, wire-style.count, wire-distance: wire-style.distance)
+        }
+        for x in range(start + 1, end) {
+          let w = get-anchor-width(x, row)
+          if w == 0pt { continue }
+          draw-subwire(start, x)
+          start = x
+        }
+        draw-subwire(start, end)
+      }
+    }
+    
     vertical-wires.map(((x, y, target, wire-style)) => {
       let (dx, dy1) = (center-x-coords.at(x), center-y-coords.at(y))
       let dy2 = center-y-coords.at(y + target)
@@ -601,10 +623,6 @@
       let (gate, size2, x, y) = gate-info
       let (dx, dy) = get-gate-pos(x, y, size2)
       let content = utility.get-content(gate, draw-params)
-      // let size = utility.get-size-hint(gate, draw-params)
-      // if size1 != size2 {
-        // assert.eq(size, size1)
-      // }
 
       let (result, gate-bounds) = layout.place-with-labels(
         content, 
@@ -653,36 +671,6 @@
     //     )
     //   }
     // }
-    let wire-style = default-wire-style
-    for wire-piece in wire-pieces {
-      if type(wire-piece) == dictionary {
-        wire-style = wire-piece
-      } else {
-        if wire-style.count == 0 { continue }
-        let (row, start, end) = wire-piece
-
-        let draw-subwire(x1, x2) = {
-          let (a, b) = (x1, x2)
-          let g1-w = get-anchor-width(x1, row)
-          let g2-w = get-anchor-width(x2, row)
-          let x1 = center-x-coords.at(x1)
-          let x2 = center-x-coords.at(x2, default: circuit-width)
-          let y = center-y-coords.at(row)
-          x1 += g1-w / 2
-          x2 -= g2-w / 2
-          draw-functions.draw-horizontal-wire(x1, x2, y+1pt, wire-style.stroke, wire-style.count, wire-distance: wire-style.distance)
-          place(dx: x1 + 2pt, dy: y - 10pt, text(2pt)[#a - #b])
-        }
-        for x in range(start + 1, end) {
-          let w = get-anchor-width(x, row)
-          if w == 0pt { continue }
-          draw-subwire(start, x)
-          start = x
-        }
-        draw-subwire(start, end)
-        
-      }
-    }
   
   }) // end circuit = block(..., {
     
