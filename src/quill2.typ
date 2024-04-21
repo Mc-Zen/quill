@@ -75,6 +75,7 @@
 
   let gates = ()
   let mqgates = ()
+  let meta-instructions = ()
 
   for item in items {
     if item == [\ ] {
@@ -90,6 +91,13 @@
         wire-style.distance = item.wire-distance
         if item.stroke != none { wire-style.stroke = item.stroke }
         wire-pieces.push(wire-style)
+      } else {
+        
+        meta-instructions.push((
+          x: col, 
+          y: row,
+          item: item
+        ))
       }
     } else if utility.is-circuit-drawable(item) {
       let gate = item
@@ -503,6 +511,51 @@
       item
     }
 
+
+    for (item, x, y) in meta-instructions {
+      if item.qc-instr == "gategroup" {
+        assert(item.wires > 0, message: "gategroup: wires arg needs to be > 0")
+        assert(y+item.wires <= rowheights.len(), message: "gategroup: height exceeds range")
+        assert(item.steps > 0, message: "gategroup: steps arg needs to be > 0")
+        assert(x+item.steps <= colwidths.len(), message: "gategroup: width exceeds range")
+        let y1 = layout.get-cell-coords(center-y-coords, rowheights, y)
+        let y2 = layout.get-cell-coords(center-y-coords, rowheights, y + item.wires - 1e-9)
+        let x1 = layout.get-cell-coords(center-x-coords, colwidths, x)
+        let x2 = layout.get-cell-coords(center-x-coords, colwidths, x + item.steps - 1e-9)
+        let (result, b) = draw-functions.draw-gategroup(x1, x2, y1, y2, item, draw-params)
+        bounds = layout.update-bounds(bounds, b, draw-params.em)
+        result
+      } else if item.qc-instr == "slice" {
+        assert(item.wires >= 0, message: "slice: wires arg needs to be > 0")
+        assert(y+item.wires <= rowheights.len(), message: "slice: number of wires exceeds range")
+        let end = if item.wires == 0 {rowheights.len()} else {y+item.wires}
+        let y1 = layout.get-cell-coords(center-y-coords, rowheights, y)
+        let y2 = layout.get-cell-coords(center-y-coords, rowheights, end)
+        let x_ = layout.get-cell-coords(center-x-coords, colwidths, x)
+        let (result, b) = draw-functions.draw-slice(x_, y1, y2, item, draw-params)
+        bounds = layout.update-bounds(bounds, b, draw-params.em)
+        result
+      } else if item.qc-instr == "annotate" {
+        let rows = layout.get-cell-coords(center-y-coords, rowheights, item.rows)
+        let cols = layout.get-cell-coords(center-x-coords, colwidths, item.columns)
+        let annotation = (item.callback)(cols, rows)
+        if type(annotation) == "dictionary" {
+          assert("content" in annotation, message: "Missing field 'content' in annotation")
+          let (content, b) = layout.place-with-labels(
+            annotation.content,
+            dx: annotation.at("dx", default: 0pt),
+            dy: annotation.at("dy", default: 0pt),
+            draw-params: draw-params
+          )
+          content 
+          bounds = layout.update-bounds(bounds, b, draw-params.em)
+        } else if type(annotation) == "content" {
+          place(annotation)
+        } else {
+          assert(false, message: "Unsupported annotation type")
+        }
+      }
+    }
 
     let get-anchor-height(x, y) = {
       let el = matrix.at(y).at(x)
