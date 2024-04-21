@@ -38,7 +38,6 @@
     background: fill,
     color: color,
     styles: styles,
-    // roman-gates: roman-gates,
     x-gate-size: none,
     multi: (wire-distance: 0pt),
     em: measure(line(length: 1em), styles).width
@@ -51,7 +50,7 @@
     return x
   })
   
-  /////////// First pass: Layout (spacing)   ///////////
+  /////////// First part: Layout (spacing)   ///////////
   
   let column-spacing = length-helpers.convert-em-length(column-spacing, draw-params.em)
   let row-spacing = length-helpers.convert-em-length(row-spacing, draw-params.em)
@@ -71,7 +70,7 @@
     stroke: wire
   )
   let wire-style = default-wire-style
-  let wire-pieces = ()
+  let wire-instructions = ()
 
   let gates = ()
   let mqgates = ()
@@ -80,28 +79,24 @@
 
   for item in items {
     if item == [\ ] {
-      row += 1; col = 0
-      prev-col = 0
+      row += 1; col = 0; prev-col = 0
+
       if row >= matrix.len() {
         matrix.push(())
         row-gutter.push(0pt)
       }
       wire-style = default-wire-style
-      wire-pieces.push(default-wire-style)
+      wire-instructions.push(default-wire-style)
       wire-ended = true
     } else if utility.is-circuit-meta-instruction(item) { 
       if item.qc-instr == "setwire" {
         wire-style.count = item.wire-count
         wire-style.distance = item.wire-distance
         if item.stroke != none { wire-style.stroke = item.stroke }
-        wire-pieces.push(wire-style)
+        wire-instructions.push(wire-style)
       } else {
-        
-        meta-instructions.push((
-          x: col, 
-          y: row,
-          item: item
-        ))
+        // Visual meta instructions are handled later
+        meta-instructions.push((x: col, y: row, item: item))
       }
     } else if utility.is-circuit-drawable(item) {
       let gate = item
@@ -109,7 +104,7 @@
       if x == auto { 
         x = col 
         if col != prev-col {
-          wire-pieces.push((row, prev-col, col))
+          wire-instructions.push((row, prev-col, col))
         }
         prev-col = col 
         col += 1
@@ -125,7 +120,7 @@
 
       let size-hint = utility.get-size-hint(item, draw-params)
       let gate-size = size-hint
-      if item.floating { size-hint.width = 0pt; }
+      if item.floating { size-hint.width = 0pt } // floating items
 
       matrix.at(y).at(x) = (
         size: size-hint,
@@ -133,20 +128,16 @@
         box: item.box,
       )
       let gate-info = (
-          gate: gate,
-          size: size-hint,
-          size2: gate-size,
-          x: x,
-          y: y
-        )
-      if gate.multi != none {
-        mqgates.push(gate-info)
-      } else {
-        gates.push(gate-info)
-      }
+        gate: gate,
+        size: gate-size,
+        x: x,
+        y: y
+      )
+      if gate.multi != none { mqgates.push(gate-info) } 
+      else { gates.push(gate-info) }
       wire-ended = false
     } else if type(item) == int {
-      wire-pieces.push((row, prev-col, col + item - 1))
+      wire-instructions.push((row, prev-col, col + item - 1))
       col += item
       prev-col = col - 1
       if col >= matrix.at(row).len() {
@@ -175,9 +166,9 @@
   let vertical-wires = ()
   // account for multi-qubit gates
   for mqgate in mqgates {
-    let multi = mqgate.gate.multi
-    let size = mqgate.size
     let (x, y) = mqgate
+    let size = matrix.at(y).at(x).size
+    let multi = mqgate.gate.multi
     
     if multi.target != none and multi.target != 0 {
       assert(y + multi.target < num-rows, message: "A controlled gate starting at qubit " + str(y) + " with relative target " + str(multi.target) + " exceeds the circuit which has only " + str(num-rows) + " qubits")
@@ -228,28 +219,13 @@
     }))
   )
 
-  if colwidths.len() == 0 {
-    place(horizon, text(red)[#matrix])
-  }
-
-
-
-
   let center-x-coords = layout.compute-center-coords(colwidths, col-gutter).map(x => x - 0.5 * column-spacing)
   let center-y-coords = layout.compute-center-coords(rowheights, row-gutter).map(x => x - 0.5 * row-spacing)
   draw-params.center-y-coords = center-y-coords
   
-  (row, col) = (0, 0)
-  let (x, y) = (0pt, 0pt) // current cell top-left coordinates
-  let center-y = y + rowheights.at(row) / 2 // current cell center y-coordinate
-  let center-y = center-y-coords.at(0) // current cell center y-coordinate
   let circuit-width = colwidths.sum() + col-gutter.slice(0, -1).sum(default: 0pt) - column-spacing
   let circuit-height = rowheights.sum() + row-gutter.sum() - row-spacing
 
-  let wire-count = 1
-  let wire-distance = 1pt
-  let wire-stroke = wire
-  let prev-wire-x = center-x-coords.at(0)
 
 
 
@@ -273,7 +249,7 @@
   }
 
 
-  /////////// Second pass: Generation ///////////
+  /////////// Second part: Generation ///////////
   
   let bounds = (0pt, 0pt, circuit-width, circuit-height)
   
@@ -281,8 +257,6 @@
     width: circuit-width, height: circuit-height, {
     set align(top + left) // quantum-circuit could be called in a scope where these have been changed which would mess up everything
 
-    let to-be-drawn-later = () // dicts with content, x and y
-      
 
     for (item, x, y) in meta-instructions {
       if item.qc-instr == "gategroup" {
@@ -344,7 +318,7 @@
 
 
     let wire-style = default-wire-style
-    for wire-piece in wire-pieces {
+    for wire-piece in wire-instructions {
       if type(wire-piece) == dictionary {
         wire-style = wire-piece
       } else {
@@ -401,13 +375,13 @@
     
     
     for gate-info in gates {
-      let (gate, size2, x, y) = gate-info
-      let (dx, dy) = get-gate-pos(x, y, size2)
+      let (gate, size, x, y) = gate-info
+      let (dx, dy) = get-gate-pos(x, y, size)
       let content = utility.get-content(gate, draw-params)
 
       let (result, gate-bounds) = layout.place-with-labels(
         content, 
-        size: size2,
+        size: size,
         dx: dx, dy: dy, 
         labels: gate.labels, draw-params: draw-params
       )
@@ -416,7 +390,7 @@
     }
     
     for gate-info in mqgates {
-      let (gate, size2, x, y) = gate-info
+      let (gate, size, x, y) = gate-info
       let draw-params = draw-params
       gate.qubit = y
       if gate.multi.num-qubits > 1 {
@@ -427,14 +401,14 @@
       
       // lsticks need their offset to be updated again
       let size1 = utility.get-size-hint(gate, draw-params)
-      size2.offset = size1.offset
+      size.offset = size1.offset
 
-      let (dx, dy) = get-gate-pos(x, y, size2)
+      let (dx, dy) = get-gate-pos(x, y, size)
       let content = utility.get-content(gate, draw-params)
       // let content = none
       let (result, gate-bounds) = layout.place-with-labels(
         content, 
-        size: if gate.multi != none and gate.multi.num-qubits > 1 {auto} else {size2},
+        size: if gate.multi != none and gate.multi.num-qubits > 1 {auto} else {size},
         dx: dx, dy: dy, 
         labels: gate.labels, draw-params: draw-params
       )
