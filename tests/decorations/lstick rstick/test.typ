@@ -45,3 +45,9 @@
 #quantum-circuit(
   lstick($|0〉$, brace: "{"), 1
 )
+
+#pagebreak()
+
+#quantum-circuit(
+  lstick($|0〉$, brace: "{", pad: 10pt), 1, rstick($|0〉$, brace: "{", pad: 10pt)
+)

@@ -3,7 +3,7 @@
 
 // align: "left" (for rstick) or "right" (for lstick)
 // brace: auto, none, "{", "}", "|", "[", ...
-#let lrstick(content, n, align, brace, label) = gate(
+#let lrstick(content, n, align, brace, label, pad: 0pt) = gate(
   content, 
   draw-function: draw-functions.draw-lrstick, 
   size-hint: layout.lrstick-size-hint,
@@ -20,6 +20,7 @@
   data: (
     brace: brace,
     align: align,
+    pad: pad
   ), 
   label: label
 )
@@ -36,7 +37,7 @@
 ///      `brace: none`
 /// - label (array, string, content, dictionary): One or more labels to add to the gate. 
 ///        See @@gate(). . 
-#let lstick(content, n: 1, brace: auto, label: none) = lrstick(content, n, right, brace, label)
+#let lstick(content, n: 1, brace: auto, label: none, pad: 0pt) = lrstick(content, n, right, brace, label, pad: pad)
 
 
 /// Basic command for labelling a wire at the end. 
@@ -48,7 +49,7 @@
 ///      `brace: none`. 
 /// - label (array, string, content, dictionary): One or more labels to add to the gate. 
 ///        See @@gate(). 
-#let rstick(content, n: 1, brace: auto, label: none) = lrstick(content, n, left, brace, label)
+#let rstick(content, n: 1, brace: auto, label: none, pad: 0pt) = lrstick(content, n, left, brace, label, pad: pad)
 
 /// Create a midstick, i.e., a mid-circuit text. 
 /// - content (content): Label to display, e.g., `$|0〉$`.

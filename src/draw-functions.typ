@@ -227,7 +227,7 @@
   }
   
   let brace-size = measure(brace, draw-params.styles)
-  let width = size.width + brace-size.width
+  let width = size.width + brace-size.width + gate.data.pad
   let height = size.height
   let brace-offset-y
   let content-offset-y = 0pt
@@ -243,8 +243,8 @@
     brace-offset-y = -.25em
   }
   
-  let brace-pos-x = if isleftstick { size.width } else { 0pt }
-  let content-pos-x = if isleftstick { 0pt } else { brace-size.width }
+  let brace-pos-x = if isleftstick { size.width } else { gate.data.pad }
+  let content-pos-x = if isleftstick { 0pt } else { width - size.width}
 
   box(
     width: width, 
