@@ -3,8 +3,10 @@
 
 // align: "left" (for rstick) or "right" (for lstick)
 // brace: auto, none, "{", "}", "|", "[", ...
-#let lrstick(content, n, align, brace, label, pad: 0pt) = gate(
+#let lrstick(content, n, align, brace, label, pad: 0pt, x: auto, y: auto) = gate(
   content, 
+  x: x, 
+  y: y,
   draw-function: draw-functions.draw-lrstick, 
   size-hint: layout.lrstick-size-hint,
   box: false, 
@@ -37,7 +39,15 @@
 ///      `brace: none`
 /// - label (array, string, content, dictionary): One or more labels to add to the gate. 
 ///        See @@gate(). . 
-#let lstick(content, n: 1, brace: auto, label: none, pad: 0pt) = lrstick(content, n, right, brace, label, pad: pad)
+#let lstick(
+  content, 
+  n: 1, 
+  brace: auto, 
+  label: none, 
+  pad: 0pt,
+  x: auto,
+  y: auto
+) = lrstick(content, n, right, brace, label, pad: pad, x: x, y: y)
 
 
 /// Basic command for labelling a wire at the end. 
@@ -49,19 +59,33 @@
 ///      `brace: none`. 
 /// - label (array, string, content, dictionary): One or more labels to add to the gate. 
 ///        See @@gate(). 
-#let rstick(content, n: 1, brace: auto, label: none, pad: 0pt) = lrstick(content, n, left, brace, label, pad: pad)
+#let rstick(
+  content, 
+  n: 1, 
+  brace: auto, 
+  label: none, 
+  pad: 0pt, 
+  x: auto,
+  y: auto
+) = lrstick(content, n, left, brace, label, pad: pad, x: x, y: y)
 
 /// Create a midstick, i.e., a mid-circuit text. 
 /// - content (content): Label to display, e.g., `$|0〉$`.
 /// - label (array, string, content, dictionary): One or more labels to add to the gate. 
-#let midstick(content, fill: none, label: none) = gate(content, draw-function: draw-functions.draw-unboxed-gate, label: label, fill: fill)
+#let midstick(
+  content,
+  fill: none,
+  label: none,
+  x: auto,
+  y: auto
+) = gate(content, draw-function: draw-functions.draw-unboxed-gate, label: label, fill: fill, x: x, y: y)
 
 
 
 /// Creates a symbol similar to `\qwbundle` on `quantikz`. Annotates a wire to 
 /// be a bundle of quantum or classical wires. 
 /// - label (integer, content): 
-#let nwire(label) = gate([#label], draw-function: draw-functions.draw-nwire, box: false)
+#let nwire(label, x: auto, y: auto) = gate([#label], draw-function: draw-functions.draw-nwire, box: false, x: x, y: y)
 
 
 
@@ -99,6 +123,8 @@
 #let gategroup(
   wires, 
   steps, 
+  x: auto, 
+  y: auto,
   padding: 0pt, 
   stroke: .7pt, 
   fill: none,
@@ -108,6 +134,8 @@
   qc-instr: "gategroup",
   wires: wires,
   steps: steps,
+  x: x, 
+  y: y,
   padding: process-args.process-padding-arg(padding),
   style: (fill: fill, stroke: stroke, radius: radius),
   labels: process-args.process-label-arg(label, default-pos: top)
@@ -121,11 +149,15 @@
 ///        slice. See @@gate(). 
 #let slice(
   n: 0, 
+  x: auto, 
+  y: auto,
   stroke: (paint: red, thickness: .7pt, dash: "dashed"),
   label: none
 ) = (
   qc-instr: "slice",
   wires: n,
+  x: x,
+  y: y,
   style: (stroke: stroke),
   labels: process-args.process-label-arg(label, default-pos: top)
 )
@@ -149,6 +181,8 @@
 ) = (
   qc-instr: "annotate",
   rows: rows,
+  x: none,
+  y: none,
   columns: columns,
   callback: callback
 )

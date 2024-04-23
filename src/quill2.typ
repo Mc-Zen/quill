@@ -64,7 +64,7 @@
   let mqgates = ()
   let meta-instructions = ()
 
-  let auto-cell = (content: auto, size: (width: 0pt, height: 0pt), gutter: 0pt)
+  let auto-cell = (empty: true, size: (width: 0pt, height: 0pt), gutter: 0pt)
 
   let default-wire-style = (
     count: 1,
@@ -97,7 +97,10 @@
         wire-instructions.push(wire-style)
       } else {
         // Visual meta instructions are handled later
-        meta-instructions.push((x: col, y: row, item: item))
+        let (x, y) = (item.x, item.y)
+        if x == auto { x = col }
+        if y == auto { y = row }
+        meta-instructions.push((x: x, y: y, item: item))
       }
     } else if utility.is-circuit-drawable(item) {
       let gate = item
@@ -117,7 +120,7 @@
         matrix.at(y) += (auto-cell,) * (x - matrix.at(y).len() + 1)
       }
 
-      assert(matrix.at(y).at(x).content == auto, message: "Attempted to place a second gate at column " + str(x) + ", row " + str(y))
+      assert(matrix.at(y).at(x).empty, message: "Attempted to place a second gate at column " + str(x) + ", row " + str(y))
 
       let size-hint = utility.get-size-hint(item, draw-params)
       let gate-size = size-hint
@@ -127,6 +130,7 @@
         size: size-hint,
         gutter: 0pt,
         box: item.box,
+        empty: false
       )
       let gate-info = (
         gate: gate,
@@ -296,7 +300,7 @@
           )
           content 
           bounds = layout.update-bounds(bounds, b, draw-params.em)
-        } else if type(annotation) == "content" {
+        } else if type(annotation) in ("content", "string") {
           place(annotation)
         } else {
           assert(false, message: "Unsupported annotation type")
