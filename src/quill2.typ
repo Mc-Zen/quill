@@ -50,18 +50,20 @@
     return x
   })
   
-  /////////// First part: Layout (spacing)   ///////////
+  /////////// First part: Layout (and spacing)   ///////////
   
   let column-spacing = length-helpers.convert-em-length(column-spacing, draw-params.em)
   let row-spacing = length-helpers.convert-em-length(row-spacing, draw-params.em)
   let min-row-height = length-helpers.convert-em-length(min-row-height, draw-params.em)
   let min-column-width = length-helpers.convert-em-length(min-column-width, draw-params.em)
   
-  let (row-gutter, col-gutter) = ((0pt,), ())
-  let (row, col) = (0, 0)
-  let wire-ended = false
-
+  // All these arrays are gonna be filled up in the loop over `items`
   let matrix = ((),)
+  let row-gutter = (0pt,)
+  let gates = ()
+  let mqgates = ()
+  let meta-instructions = ()
+
   let auto-cell = (content: auto, size: (width: 0pt, height: 0pt), gutter: 0pt)
 
   let default-wire-style = (
@@ -72,10 +74,9 @@
   let wire-style = default-wire-style
   let wire-instructions = ()
 
-  let gates = ()
-  let mqgates = ()
-  let meta-instructions = ()
+  let (row, col) = (0, 0)
   let prev-col = 0
+  let wire-ended = false
 
   for item in items {
     if item == [\ ] {
@@ -86,7 +87,7 @@
         row-gutter.push(0pt)
       }
       wire-style = default-wire-style
-      wire-instructions.push(default-wire-style)
+      wire-instructions.push(wire-style)
       wire-ended = true
     } else if utility.is-circuit-meta-instruction(item) { 
       if item.qc-instr == "setwire" {
@@ -113,14 +114,14 @@
 
       if y >= matrix.len() { matrix += ((),) * (y - matrix.len() + 1) }
       if x >= matrix.at(y).len() {
-        matrix.at(y) +=  (auto-cell,) * (x - matrix.at(y).len() + 1)
+        matrix.at(y) += (auto-cell,) * (x - matrix.at(y).len() + 1)
       }
 
-      assert(matrix.at(y).at(x).content == auto, message: "Attempted to place a second gate at column " + str(y) + ", row " + str(x))
+      assert(matrix.at(y).at(x).content == auto, message: "Attempted to place a second gate at column " + str(x) + ", row " + str(y))
 
       let size-hint = utility.get-size-hint(item, draw-params)
       let gate-size = size-hint
-      if item.floating { size-hint.width = 0pt } // floating items
+      if item.floating { size-hint.width = 0pt } // floating items don't take width in the layout
 
       matrix.at(y).at(x) = (
         size: size-hint,
@@ -164,7 +165,7 @@
   row-gutter += (0pt,) * (matrix.len() - row-gutter.len())
 
   let vertical-wires = ()
-  // account for multi-qubit gates
+  // Treat multi-qubit gates (and controlled gates)
   for mqgate in mqgates {
     let (x, y) = mqgate
     let size = matrix.at(y).at(x).size
