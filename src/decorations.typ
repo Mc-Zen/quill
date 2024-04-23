@@ -95,10 +95,10 @@
 /// The wire style is reset for each row.
 ///
 /// - wire-count (integer): Number of wires to display. 
-/// - stroke (none, stroke): When given, the stroke is applied to the wire. 
+/// - stroke (auto, none, stroke): When given, the stroke is applied to the wire. 
 ///                Otherwise the current stroke is kept. 
 /// - wire-distance (length): Distance between wires. 
-#let setwire(wire-count, stroke: none, wire-distance: 1pt) = (
+#let setwire(wire-count, stroke: auto, wire-distance: auto) = (
   qc-instr: "setwire",
   wire-count: wire-count,
   stroke: stroke,

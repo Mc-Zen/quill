@@ -8,3 +8,10 @@
   1, [\ ],
   2, setwire(2), 1, setwire(3), 1, setwire(4), 1, setwire(5), 1
 )
+
+#pagebreak()
+
+
+#quantum-circuit(
+  2, setwire(1, stroke: blue), 1, setwire(1, stroke: 1pt), 1, setwire(1, stroke: red), setwire(1, stroke: stroke(dash: "dotted")), 1, setwire(2), 1, setwire(2, wire-distance: 2pt), 1, setwire(2, stroke: stroke(dash: "solid")), 1
+)

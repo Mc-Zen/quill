@@ -141,8 +141,9 @@
     } else if utility.is-circuit-meta-instruction(item) { 
       if item.qc-instr == "setwire" {
         wire-style.count = item.wire-count
-        wire-style.distance = item.wire-distance
-        if item.stroke != none { wire-style.stroke = item.stroke }
+
+        wire-style.distance = utility.if-auto(item.wire-distance, wire-style.distance)
+        wire-style.stroke = utility.if-auto(utility.update-stroke(wire-style.stroke, item.stroke), wire-style.stroke)
         wire-instructions.push(wire-style)
       } else {
         // Visual meta instructions are handled later
