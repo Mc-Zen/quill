@@ -13,8 +13,8 @@
 /// //#example(`quill.quantum-circuit(1, quill.gate($H$), 1)`)
 ///
 /// - content (content): What to show in the gate (may be none for special gates like @@ctrl() ).
-/// - x (auto, integer): The column to put the gate in. 
-/// - y (auto, integer): The row to put the gate in. 
+/// - x (auto, int): The column to put the gate in. 
+/// - y (auto, int): The row to put the gate in. 
 /// - fill (none, color): Gate backgrond fill color.
 /// - radius (length, dictionary): Gate rectangle border radius. 
 ///             Allows the same values as the builtin `rect()` function.
@@ -78,10 +78,10 @@
 /// Basic command for creating multi-qubit or controlled gates. See also @@ctrl() and @@swap(). 
 ///
 /// - content (content):
-/// - n (integer): Number of wires the multi-qubit gate spans. 
-/// - x (auto, integer): The column to put the gate in. 
-/// - y (auto, integer): The row to put the gate in. 
-/// - target (none, integer): If specified, a control wire is drawn from the gate up 
+/// - n (int): Number of wires the multi-qubit gate spans. 
+/// - x (auto, int): The column to put the gate in. 
+/// - y (auto, int): The row to put the gate in. 
+/// - target (none, int): If specified, a control wire is drawn from the gate up 
 ///        or down this many wires counted from the wire this `mqgate()` is placed on. 
 /// - fill (none, color): Gate backgrond fill color.
 /// - radius (length, dictionary): Gate rectangle border radius. 
@@ -89,7 +89,7 @@
 /// - width (auto, length): The width of the gate can be specified manually with this property. 
 /// - box (boolean): Whether this is a boxed gate (determines whether the 
 ///        outgoing wire will be drawn all through the gate (`box: false`) or not).
-/// - wire-count (integer): Wire count for control wires.
+/// - wire-count (int): Wire count for control wires.
 /// - inputs (none, array): You can put labels inside the gate to label the input wires with 
 ///        this argument. It accepts a list of labels, each of which has to be a dictionary
 ///        with the keys `qubit` (denoting the qubit to label, starting at 0) and `content`
@@ -160,10 +160,10 @@
 // SPECIAL GATES
 
 /// Draw a meter box representing a measurement. 
-/// - target (none, integer): If given, draw a control wire to the given target
+/// - target (none, int): If given, draw a control wire to the given target
 ///                           qubit the specified number of wires up or down.
-/// - wire-count (integer):   Wire count for the (optional) control wire. 
-/// - n (integer):            Number of wires to span this meter across. 
+/// - wire-count (int):   Wire count for the (optional) control wire. 
+/// - n (int):            Number of wires to span this meter across. 
 /// - label (array, string, content, dictionary): One or more labels to add to the gate. 
 ///        See @@gate(). 
 #let meter(
@@ -288,7 +288,7 @@
 
 /// Creates a #smallcaps("swap") operation with another qubit. 
 /// 
-/// - n (integer): How many wires up or down the target wire lives. 
+/// - n (int): How many wires up or down the target wire lives. 
 /// - size (length): Size of the target symbol. 
 /// - wire-label (array, string, content, dictionary): One or more labels 
 ///        to add to the control wire. See @@mqgate(). 
@@ -317,8 +317,8 @@
 
 /// Creates a control with a vertical wire to another qubit. 
 /// 
-/// - n (integer): How many wires up or down the target wire lives. 
-/// - wire-count (integer): Wire count for the control wire.  
+/// - n (int): How many wires up or down the target wire lives. 
+/// - wire-count (int): Wire count for the control wire.  
 /// - open (boolean): Whether to draw an open dot. 
 /// - fill (none, color): Fill color for the circle or stroke color if
 ///        `open: true`. 
