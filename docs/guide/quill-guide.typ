@@ -18,8 +18,6 @@
 #v(4em)
 
 #outline(depth: 2, indent: 2em)
-
-
 #pagebreak()
 
 = Introduction
@@ -230,6 +228,43 @@ Labels for slices and gate groups work just the same. In order to place a label 
 
 
 #pagebreak()
+= Gate Placement <gate-placement>
+By default, all gates are placed automatically and sequentially. In this, `quantum-circuit()` behaves similar to the built-in `table()` and `grid()` functions. However, just like with `table.cell` and `grid.cell`, it is also possible to place any gate at a certain column `x` and row `y`. This makes it possible to simplify redundant code. 
+
+Let's look at an example of preparing a certain graph state:
+
+#example(
+  ```typ
+  #quantum-circuit(
+    ..range(4).map(i => lstick($|0〉$, y: i, x: 0)),
+    ..range(4).map(i => gate($H$, y: i, x: 1)),
+    2,
+    ctrl(2), 1, ctrl(1), 1, [\ ],
+    3, ctrl(2), ctrl(0), [\ ],
+    2, ctrl(0), [\ ],
+    3, ctrl(0)
+  )
+  ```
+)
+Note, that it is not possible to add a second gate to a cell that is already occupied. 
+
+Manual placement can also be helpful to keep the source code a bit more cleaner. For example, it is possible to move the code for a `gategroup()` or `slice()` command entirely to the bottom to enhance readability. 
+
+#example(text-size: .9em,
+  ```typ
+  #quantum-circuit(
+    1, $S^dagger$, $H$, ctrl(0), $H$, $S$, 1, [\ ],
+    3, ctrl(-1),
+    gategroup(2, 5, x: 1, y: 0, stroke: purple, 
+      label: (pos: bottom, content: text(purple)[CY gate])),
+    gategroup(2, 3, x: 2, y: 0, stroke: blue, 
+      label: text(blue)[CX gate]),
+  )
+  ```
+)
+
+
+#pagebreak()
 = Circuit Styling <circuit-styling>
 
 The #ref-fn("quantum-circuit()") command provides several options for styling the entire circuit. The parameters `row-spacing` and `column-spacing` allow changing the optical density of the circuit by adjusting the spacing between circuit elements vertically and horizontically. 
@@ -398,7 +433,7 @@ Let's look at an example:
     1, ctrl(1), $H$, meter(), [\ ],
     1, targ(), 1, meter(),
     annotate((2, 4), 0, ((x1, x2), y) => { 
-        let brace = math.lr($#block(height: x2 - x1)$)
+        let brace = math.lr($#block(height: x2 - x1)}$)
         place(dx: x1, dy: y, rotate(brace, -90deg, origin: top))
         let content = [Readout circuit]
         style(styles => {
@@ -413,9 +448,9 @@ Let's look at an example:
   ```
 )
 
-First, the call to `annotate()` asks for the $x$ coordinates of the second and forth column and the $y$ coordinate of the zeroth row (first wire). The draw callback function then gets the corresponding coordinates as arguments and uses them to draw a brace and some text above the cells. 
+First, the call to `annotate()` asks for the $x$ coordinates of the second and forth column and the $y$ coordinate of the zeroth row (first wire). The draw callback function then gets the corresponding coordinates as arguments and uses them to draw a brace and some text above the cells. Optionally, you can specify whether the annotation should be drawn above or below the circuit by adding `z: above` or `z: "below"`. The default is `"below"`. 
 
-Note, that the circuit does not know how large the annotation is. If it goes beyond the circuits bounds, you may want to adjust the parameter `circuit-padding` of #ref-fn("quantum-circuit()") appropriately. 
+Note, that the circuit does not know how large the annotation is by default. For this reason, the annotation may exceed the bounds of the circuit. This can be fixed by letting the callback return a dictionary with the keys `content`, `dx` and `dy` (the latter two are optional). The content should be measurable, i.e., not be wrapped in a call to `place()`. Instead the placing coordinates can be specified via the keys `dx` and `dy`. 
 
 Another example, here we want to obtain coordinates for the cell centers. We can achieve this by adding $0.5$ to the cell index. The fractional part of the number represents a percentage of the cell width/height. 
 
@@ -425,12 +460,14 @@ Another example, here we want to obtain coordinates for the cell centers. We can
     1, $X$, 2, [\ ],
     1, 2, $Y$, [\ ],
     1, 1, $H$, meter(), 
-    annotate((1.5, 3.5, 2.5), (0.5, 1.5, 2.5), 
+    annotate((1.5, 3.5, 2.5), (0.5, 1.5, 2.5), z: "above",
       ((x0, x1, x2), (y0, y1, y2)) => { 
-        path(
-          (x0, y0), (x1, y1), (x2, y2), 
-          closed: true, 
-          fill: rgb("#1020EE50"), stroke: .5pt + black
+        (
+          content: path(
+            (x0, y0), (x1, y1), (x2, y2), 
+            closed: true, 
+            fill: rgb("#1020EE50"), stroke: .5pt + black
+          ), 
         )
     })
   )

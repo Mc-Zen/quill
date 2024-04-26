@@ -87,7 +87,7 @@
   )
 }
 
-#let example(code, vertical: false, scope: (:)) = {
+#let example(code, vertical: false, scope: (:), text-size: 1em) = {
   figure(
     pad(y: 1em,
       box(fill: gray.lighten(90%), inset: .8em, {
@@ -96,7 +96,11 @@
           columns: if vertical { 1 } else { 2 }, 
           gutter: 1em,
           stroke: none,
-          box(code), block(eval("#import quill: *\n" + code.text, mode: "markup", scope: (quill: quill) + scope))
+          {
+            set text(size: text-size)
+            box(code)
+          }, 
+          block(eval("#import quill: *\n" + code.text, mode: "markup", scope: (quill: quill) + scope))
         )
       })
     )
