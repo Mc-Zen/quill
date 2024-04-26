@@ -112,6 +112,9 @@
 /// 
 /// - wires (int): Number of wires to include.
 /// - steps (int): Number of columns to include.
+/// - x (auto, int): The starting column of the gategroup. 
+/// - y (auto, int): The starting wire of the gategroup. 
+/// - z (string): The gategroup can be placed `"below"` or `"above"` the circuit. 
 /// - padding (length, dictionary): Padding of rectangle. May be one length
 ///     for all sides or a dictionary with the keys `left`, `right`, `top`, 
 ///     `bottom` and `default`. Not all keys need to be specified. The value 
@@ -127,6 +130,7 @@
   steps, 
   x: auto, 
   y: auto,
+  z: "below",
   padding: 0pt, 
   stroke: .7pt, 
   fill: none,
@@ -138,6 +142,7 @@
   steps: steps,
   x: x, 
   y: y,
+  z: z,
   padding: process-args.process-padding-arg(padding),
   style: (fill: fill, stroke: stroke, radius: radius),
   labels: process-args.process-label-arg(label, default-pos: top)
@@ -146,6 +151,9 @@
 /// Slice the circuit vertically, showing a separation line between columns. 
 /// 
 /// - n (int): Number of wires to slice.
+/// - x (auto, int): The starting column of the slice. 
+/// - y (auto, int): The starting wire of the slice. 
+/// - z (string): The slice can be placed `"below"` or `"above"` the circuit. 
 /// - stroke (stroke): Line style for the slice. 
 /// - label (array, string, content, dictionary): One or more labels to add to the  
 ///        slice. See @@gate(). 
@@ -153,6 +161,7 @@
   n: 0, 
   x: auto, 
   y: auto,
+  z: "below",
   stroke: (paint: red, thickness: .7pt, dash: "dashed"),
   label: none
 ) = (
@@ -160,6 +169,7 @@
   wires: n,
   x: x,
   y: y,
+  z: z,
   style: (stroke: stroke),
   labels: process-args.process-label-arg(label, default-pos: top)
 )
@@ -176,15 +186,18 @@
 ///     signature should be with signature `(col-coords, row-coords) => {}`. 
 ///     This function is expected to display the content to draw in absolute 
 ///     coordinates within the circuit. 
+/// - z (string): The annotation can be placed `"below"` or `"above"` the circuit. 
 #let annotate(
   columns,
   rows,
-  callback 
+  callback,
+  z: "below",
 ) = (
   qc-instr: "annotate",
   rows: rows,
   x: none,
   y: none,
+  z: z,
   columns: columns,
   callback: callback
 )
