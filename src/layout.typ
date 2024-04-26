@@ -51,8 +51,8 @@
 
 
 #let default-size-hint(item, draw-params) = {
-  let func = item.draw-function
-  let hint = measure(func(item, draw-params), draw-params.styles)
+  let content = (item.draw-function)(item, draw-params)
+  let hint = measure(content, draw-params.styles)
   hint.offset = auto
   return hint
 }
@@ -61,10 +61,11 @@
 
 
 
-#let lrstick-size-hint(gate, draw-params) = {
-  let hint = measure((gate.draw-function)(gate, draw-params), draw-params.styles)
+#let lrstick-size-hint(item, draw-params) = {
+  let content = (item.draw-function)(item, draw-params)
+  let hint = measure(content, draw-params.styles)
   let dx = 0pt
-  if gate.data.align == right { dx = hint.width } 
+  if item.data.align == right { dx = hint.width } 
   hint.offset = (x: dx, y: auto)
   return hint
 }
@@ -105,7 +106,6 @@
     return (place(content, dx: dx, dy: dy), bounds)    
   }
   
-  let offset = (dx, dy)
   let placed-labels = place(dx: dx, dy: dy, 
     box({
       for label in labels {

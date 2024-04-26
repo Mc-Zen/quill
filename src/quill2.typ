@@ -1,4 +1,5 @@
 #import "utility.typ"
+#import "verifications.typ"
 #import "length-helpers.typ"
 #import "decorations.typ": *
 
@@ -106,8 +107,8 @@
   // All these arrays are gonna be filled up in the loop over `items`
   let matrix = ((),)
   let row-gutter = (0pt,)
-  let gates = ()
-  let mqgates = ()
+  let single-qubit-gates = ()
+  let multi-qubit-gates = ()
   let meta-instructions = ()
 
   let auto-cell = (empty: true, size: (width: 0pt, height: 0pt), gutter: 0pt)
@@ -188,8 +189,8 @@
         x: x,
         y: y
       )
-      if gate.multi != none { mqgates.push(gate-info) } 
-      else { gates.push(gate-info) }
+      if gate.multi != none { multi-qubit-gates.push(gate-info) } 
+      else { single-qubit-gates.push(gate-info) }
       wire-ended = false
     } else if type(item) == int {
       wire-instructions.push((row, prev-col, col + item - 1))
@@ -226,13 +227,16 @@
 
   let vertical-wires = ()
   // Treat multi-qubit gates (and controlled gates)
-  for mqgate in mqgates {
-    let (x, y) = mqgate
+  // - extract and store all necessary vertical control wires
+  // - Apply same size-hints to all cells that a mqgate spans (without the control wire). 
+  for gate in multi-qubit-gates {
+    let (x, y) = gate
     let size = matrix.at(y).at(x).size
-    let multi = mqgate.gate.multi
+    let multi = gate.gate.multi
     
     if multi.target != none and multi.target != 0 {
-      assert(y + multi.target < num-rows, message: "A controlled gate starting at qubit " + str(y) + " with relative target " + str(multi.target) + " exceeds the circuit which has only " + str(num-rows) + " qubits")
+      verifications.verify-controlled-gate(gate.gate, x, y, num-rows, num-cols)
+
       let diff = if multi.target > 0 {multi.num-qubits - 1} else {0}
       vertical-wires.push((
         x: x, 
@@ -244,7 +248,9 @@
     }
     let nq = multi.num-qubits
     if nq == 1 { continue }
-    assert(y + nq - 1 < num-rows, message: "A " + str(nq) + "-qubit gate starting at qubit " + str(y) + " exceeds the circuit which has only " + str(num-rows) + " qubits")
+
+    verifications.verify-mqgate(gate.gate, x, y, num-rows, num-cols)
+
     for qubit in range(y, y + nq) {
       matrix.at(qubit).at(x).size.width = size.width
     }
@@ -260,15 +266,15 @@
   }
 
 
-  let rowheights = matrix.map(row => 
+  let row-heights = matrix.map(row => 
     calc.max(min-row-height, ..row.map(item => item.size.height)) + row-spacing
   )
   if equal-row-heights {
-    let max-row-height = calc.max(..rowheights)
-    rowheights = (max-row-height,) * rowheights.len()
+    let max-row-height = calc.max(..row-heights)
+    row-heights = (max-row-height,) * row-heights.len()
   }
 
-  let colwidths = range(num-cols).map(j => 
+  let col-widths = range(num-cols).map(j => 
     calc.max(min-column-width, ..range(num-rows).map(i => {
         matrix.at(i).at(j).size.width
     })) + column-spacing 
@@ -280,34 +286,13 @@
     }))
   )
 
-  let center-x-coords = layout.compute-center-coords(colwidths, col-gutter).map(x => x - 0.5 * column-spacing)
-  let center-y-coords = layout.compute-center-coords(rowheights, row-gutter).map(x => x - 0.5 * row-spacing)
+  let center-x-coords = layout.compute-center-coords(col-widths, col-gutter).map(x => x - 0.5 * column-spacing)
+  let center-y-coords = layout.compute-center-coords(row-heights, row-gutter).map(x => x - 0.5 * row-spacing)
   draw-params.center-y-coords = center-y-coords
   
-  let circuit-width = colwidths.sum() + col-gutter.slice(0, -1).sum(default: 0pt) - column-spacing
-  let circuit-height = rowheights.sum() + row-gutter.sum() - row-spacing
+  let circuit-width = col-widths.sum() + col-gutter.slice(0, -1).sum(default: 0pt) - column-spacing
+  let circuit-height = row-heights.sum() + row-gutter.sum() - row-spacing
 
-
-
-
-  let get-gate-pos(x, y, size-hint) = {
-    let dx = center-x-coords.at(x)
-    let dy = center-y-coords.at(y)
-    let (width, height) = size-hint
-    let offset = size-hint.at("offset", default: auto)
-
-    if offset == auto { return (dx - width / 2, dy - height / 2) } 
-
-    assert(type(offset) == "dictionary", message: "Unexpected type `" + type(offset) + "` for parameter `offset`") 
-    
-    let offset-x = offset.at("x", default: auto)
-    let offset-y = offset.at("y", default: auto)
-    if offset-x == auto { dx -= width / 2}
-    else if type(offset-x) == "length" { dx -= offset-x }
-    if offset-y == auto { dy -= height / 2}
-    else if type(offset-y) == "length" { dy -= offset-y }
-    return (dx, dy)
-  }
 
 
   /////////// Second part: Generation ///////////
@@ -318,33 +303,32 @@
     width: circuit-width, height: circuit-height, {
     set align(top + left) // quantum-circuit could be called in a scope where these have been changed which would mess up everything
 
-
     for (item, x, y) in meta-instructions {
       if item.qc-instr == "gategroup" {
         assert(item.wires > 0, message: "gategroup: wires arg needs to be > 0")
-        assert(y+item.wires <= rowheights.len(), message: "gategroup: height exceeds range")
+        assert(y+item.wires <= row-heights.len(), message: "gategroup: height exceeds range")
         assert(item.steps > 0, message: "gategroup: steps arg needs to be > 0")
-        assert(x+item.steps <= colwidths.len(), message: "gategroup: width exceeds range")
-        let y1 = layout.get-cell-coords(center-y-coords, rowheights, y)
-        let y2 = layout.get-cell-coords(center-y-coords, rowheights, y + item.wires - 1e-9)
-        let x1 = layout.get-cell-coords(center-x-coords, colwidths, x)
-        let x2 = layout.get-cell-coords(center-x-coords, colwidths, x + item.steps - 1e-9)
+        assert(x+item.steps <= col-widths.len(), message: "gategroup: width exceeds range")
+        let y1 = layout.get-cell-coords(center-y-coords, row-heights, y)
+        let y2 = layout.get-cell-coords(center-y-coords, row-heights, y + item.wires - 1e-9)
+        let x1 = layout.get-cell-coords(center-x-coords, col-widths, x)
+        let x2 = layout.get-cell-coords(center-x-coords, col-widths, x + item.steps - 1e-9)
         let (result, b) = draw-functions.draw-gategroup(x1, x2, y1, y2, item, draw-params)
         bounds = layout.update-bounds(bounds, b, draw-params.em)
         result
       } else if item.qc-instr == "slice" {
         assert(item.wires >= 0, message: "slice: wires arg needs to be > 0")
-        assert(y+item.wires <= rowheights.len(), message: "slice: number of wires exceeds range")
-        let end = if item.wires == 0 {rowheights.len()} else {y+item.wires}
-        let y1 = layout.get-cell-coords(center-y-coords, rowheights, y)
-        let y2 = layout.get-cell-coords(center-y-coords, rowheights, end)
-        let x_ = layout.get-cell-coords(center-x-coords, colwidths, x)
+        assert(y+item.wires <= row-heights.len(), message: "slice: number of wires exceeds range")
+        let end = if item.wires == 0 {row-heights.len()} else {y+item.wires}
+        let y1 = layout.get-cell-coords(center-y-coords, row-heights, y)
+        let y2 = layout.get-cell-coords(center-y-coords, row-heights, end)
+        let x_ = layout.get-cell-coords(center-x-coords, col-widths, x)
         let (result, b) = draw-functions.draw-slice(x_, y1, y2, item, draw-params)
         bounds = layout.update-bounds(bounds, b, draw-params.em)
         result
       } else if item.qc-instr == "annotate" {
-        let rows = layout.get-cell-coords(center-y-coords, rowheights, item.rows)
-        let cols = layout.get-cell-coords(center-x-coords, colwidths, item.columns)
+        let rows = layout.get-cell-coords(center-y-coords, row-heights, item.rows)
+        let cols = layout.get-cell-coords(center-x-coords, col-widths, item.columns)
         let annotation = (item.callback)(cols, rows)
         if type(annotation) == "dictionary" {
           assert("content" in annotation, message: "Missing field 'content' in annotation")
@@ -363,6 +347,26 @@
         }
       }
     }
+
+    let get-gate-pos(x, y, size-hint) = {
+      let dx = center-x-coords.at(x)
+      let dy = center-y-coords.at(y)
+      let (width, height) = size-hint
+      let offset = size-hint.at("offset", default: auto)
+
+      if offset == auto { return (dx - width / 2, dy - height / 2) } 
+
+      assert(type(offset) == "dictionary", message: "Unexpected type `" + type(offset) + "` for parameter `offset`") 
+      
+      let offset-x = offset.at("x", default: auto)
+      let offset-y = offset.at("y", default: auto)
+      if offset-x == auto { dx -= width / 2}
+      else if type(offset-x) == "length" { dx -= offset-x }
+      if offset-y == auto { dy -= height / 2}
+      else if type(offset-y) == "length" { dy -= offset-y }
+      return (dx, dy)
+    }
+
 
     let get-anchor-width(x, y) = {
       if x == num-cols { return 0pt }
@@ -384,32 +388,30 @@
         wire-style = wire-piece
       } else {
         if wire-style.count == 0 { continue }
-        let (row, start, end) = wire-piece
+        let (row, start-x, end-x) = wire-piece
 
         let draw-subwire(x1, x2) = {
-          let (a, b) = (x1, x2)
-          let g1-w = get-anchor-width(x1, row)
-          let g2-w = get-anchor-width(x2, row)
-          let x1 = center-x-coords.at(x1)
-          let x2 = center-x-coords.at(x2, default: circuit-width)
-          let y = center-y-coords.at(row)
-          x1 += g1-w / 2
-          x2 -= g2-w / 2
-          draw-functions.draw-horizontal-wire(x1, x2, y, wire-style.stroke, wire-style.count, wire-distance: wire-style.distance)
+          let dx1 = center-x-coords.at(x1)
+          let dx2 = center-x-coords.at(x2, default: circuit-width)
+          let dy = center-y-coords.at(row)
+          dx1 += get-anchor-width(x1, row) / 2
+          dx2 -= get-anchor-width(x2, row) / 2
+          draw-functions.draw-horizontal-wire(dx1, dx2, dy, wire-style.stroke, wire-style.count, wire-distance: wire-style.distance)
         }
-        for x in range(start + 1, end) {
-          let w = get-anchor-width(x, row)
-          if w == 0pt { continue }
-          draw-subwire(start, x)
-          start = x
+        // Draw wire pieces and take care not to draw through gates. 
+        for x in range(start-x + 1, end-x) {
+          let anchor-width = get-anchor-width(x, row)
+          if anchor-width == 0pt { continue } // no gate or `box: false` gate. 
+          draw-subwire(start-x, x)
+          start-x = x
         }
-        draw-subwire(start, end)
+        draw-subwire(start-x, end-x)
       }
     }
     
     for (x, y, target, wire-style, labels) in vertical-wires {
-      let (dx, dy1) = (center-x-coords.at(x), center-y-coords.at(y))
-      let dy2 = center-y-coords.at(y + target)
+      let dx = center-x-coords.at(x)
+      let (dy1, dy2) = (center-y-coords.at(y), center-y-coords.at(y + target))
       dy1 += get-anchor-height(x, y) / 2 * signum(target)
       dy2 -= get-anchor-height(x, y + target) / 2 * signum(target)
       
@@ -428,14 +430,10 @@
         result
         bounds = layout.update-bounds(bounds, gate-bounds, draw-params.em)
       }
-      // draw-functions.draw-vertical-wire(
-      //   dy1, dy2, dx, 
-      //   wire, wire-count: wire-style.count,
-      // )
     }
     
     
-    for gate-info in gates {
+    for gate-info in single-qubit-gates {
       let (gate, size, x, y) = gate-info
       let (dx, dy) = get-gate-pos(x, y, size)
       let content = utility.get-content(gate, draw-params)
@@ -450,23 +448,23 @@
       result
     }
     
-    for gate-info in mqgates {
+    for gate-info in multi-qubit-gates {
       let (gate, size, x, y) = gate-info
       let draw-params = draw-params
       gate.qubit = y
       if gate.multi.num-qubits > 1 {
-        let y1 = center-y-coords.at(y + gate.multi.num-qubits - 1)
-        let y2 = center-y-coords.at(y)
-        draw-params.multi.wire-distance = y1 - y2
+        let dy1 = center-y-coords.at(y + gate.multi.num-qubits - 1)
+        let dy2 = center-y-coords.at(y)
+        draw-params.multi.wire-distance = dy1 - dy2
       }
       
-      // lsticks need their offset to be updated again
-      let size1 = utility.get-size-hint(gate, draw-params)
-      size.offset = size1.offset
+      // lsticks need their offset to be updated again (but don't update the height!)
+      let content = utility.get-content(gate, draw-params)
+      let new-size = utility.get-size-hint(gate, draw-params)
+      size.offset = new-size.offset
+      size.width = new-size.width
 
       let (dx, dy) = get-gate-pos(x, y, size)
-      let content = utility.get-content(gate, draw-params)
-      // let content = none
       let (result, gate-bounds) = layout.place-with-labels(
         content, 
         size: if gate.multi != none and gate.multi.num-qubits > 1 {auto} else {size},
@@ -476,6 +474,7 @@
       bounds = layout.update-bounds(bounds, gate-bounds, draw-params.em)
       result
     }
+
 
     // show matrix
     // for (i, row) in matrix.enumerate() {
@@ -510,7 +509,7 @@
     thebaseline = height/2 - measure(thebaseline, styles).height/2
   }
   if type(thebaseline) == "fraction" {
-    thebaseline = 100% - layout.get-cell-coords1(center-y-coords, rowheights, thebaseline / 1fr) + bounds.at(1)
+    thebaseline = 100% - layout.get-cell-coords1(center-y-coords, row-heights, thebaseline / 1fr) + bounds.at(1)
   }
   box(baseline: thebaseline,
     width: final-width,

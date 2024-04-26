@@ -11,8 +11,7 @@
 #let get-content(item, draw-params) = {
   if is-gate(item) { 
     if item.draw-function != none {
-      let func = item.draw-function
-      return func(item, draw-params)
+      return (item.draw-function)(item, draw-params)
     }
   } else { return item }
 }
@@ -20,8 +19,7 @@
 // Get size hint for a gate or plain content item
 #let get-size-hint(item, draw-params) = {
   if is-gate(item) { 
-    let func = item.size-hint
-    return func(item, draw-params) 
+    return (item.size-hint)(item, draw-params) 
   } 
   measure(item, draw-params.styles)
 }
