@@ -70,5 +70,5 @@
 
 #quantum-circuit(
   1, $H$, 1, $H$,[H],$I$, $S$, "H", [\ ],
-  lstick($|0〉$, label: "System 1"), gate($H$, label: "a"), 1, midstick("mid", label: (content: "r", pos: bottom)), 1, rstick($F$, label: "a")
+  lstick($|0〉$, label: "System 1"), gate($H$, label: "a"), 1, midstick("mid", label: (content: "r", pos: bottom)), 1, rstick($F$, label: "a"), setwire(0)
 )

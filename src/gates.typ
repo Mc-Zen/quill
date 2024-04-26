@@ -13,6 +13,8 @@
 /// //#example(`quill.quantum-circuit(1, quill.gate($H$), 1)`)
 ///
 /// - content (content): What to show in the gate (may be none for special gates like @@ctrl() ).
+/// - x (auto, int): The column to put the gate in. 
+/// - y (auto, int): The row to put the gate in. 
 /// - fill (none, color): Gate backgrond fill color.
 /// - radius (length, dictionary): Gate rectangle border radius. 
 ///             Allows the same values as the builtin `rect()` function.
@@ -41,6 +43,8 @@
 ///             `draw-function`.
 #let gate(
   content,
+  x: auto,
+  y: auto,
   fill: none,
   radius: 0pt,
   width: auto,
@@ -54,6 +58,8 @@
   label: none
 ) = (
   content: content, 
+  x: x, 
+  y: y,
   fill: fill,
   radius: radius,
   width: width,
@@ -72,8 +78,10 @@
 /// Basic command for creating multi-qubit or controlled gates. See also @@ctrl() and @@swap(). 
 ///
 /// - content (content):
-/// - n (integer): Number of wires the multi-qubit gate spans. 
-/// - target (none, integer): If specified, a control wire is drawn from the gate up 
+/// - n (int): Number of wires the multi-qubit gate spans. 
+/// - x (auto, int): The column to put the gate in. 
+/// - y (auto, int): The row to put the gate in. 
+/// - target (none, int): If specified, a control wire is drawn from the gate up 
 ///        or down this many wires counted from the wire this `mqgate()` is placed on. 
 /// - fill (none, color): Gate backgrond fill color.
 /// - radius (length, dictionary): Gate rectangle border radius. 
@@ -81,7 +89,7 @@
 /// - width (auto, length): The width of the gate can be specified manually with this property. 
 /// - box (boolean): Whether this is a boxed gate (determines whether the 
 ///        outgoing wire will be drawn all through the gate (`box: false`) or not).
-/// - wire-count (integer): Wire count for control wires.
+/// - wire-count (int): Wire count for control wires.
 /// - inputs (none, array): You can put labels inside the gate to label the input wires with 
 ///        this argument. It accepts a list of labels, each of which has to be a dictionary
 ///        with the keys `qubit` (denoting the qubit to label, starting at 0) and `content`
@@ -107,6 +115,8 @@
 ///        `draw-function`.
 #let mqgate(
   content,
+  x: auto,
+  y: auto,
   n: 1, 
   target: none,
   fill: none, 
@@ -124,6 +134,8 @@
   data: none,
 ) = gate(
   content, 
+  x: x, 
+  y: y, 
   fill: fill, box: box, 
   width: width,
   radius: radius,
@@ -148,18 +160,27 @@
 // SPECIAL GATES
 
 /// Draw a meter box representing a measurement. 
-/// - target (none, integer): If given, draw a control wire to the given target
+/// - target (none, int): If given, draw a control wire to the given target
 ///                           qubit the specified number of wires up or down.
-/// - wire-count (integer):   Wire count for the (optional) control wire. 
-/// - n (integer):            Number of wires to span this meter across. 
+/// - wire-count (int):   Wire count for the (optional) control wire. 
+/// - n (int):            Number of wires to span this meter across. 
 /// - label (array, string, content, dictionary): One or more labels to add to the gate. 
 ///        See @@gate(). 
-#let meter(target: none, n: 1, wire-count: 2, label: none, fill: none, radius: 0pt) = {
+#let meter(
+  target: none, 
+  n: 1,
+  x: auto,
+  y: auto,
+  wire-count: 2, 
+  label: none, 
+  fill: none, 
+  radius: 0pt
+) = {
   label = if label != none {(content: label, pos: top, dy: -0.5em)} else { () }
   if target == none and n == 1 {
-    gate(none, fill: fill, radius: radius, draw-function: draw-functions.draw-meter, data: (meter-label: label), label: label)
+    gate(none, x: x, y: y, fill: fill, radius: radius, draw-function: draw-functions.draw-meter, data: (meter-label: label), label: label)
   } else {
-     mqgate(none, n: n, target: target, fill: fill, radius: radius, box: true, wire-count: wire-count, draw-function: draw-functions.draw-meter, data: (meter-label: label), label: label)
+     mqgate(none, x: x, y: y, n: n, target: target, fill: fill, radius: radius, box: true, wire-count: wire-count, draw-function: draw-functions.draw-meter, data: (meter-label: label), label: label)
   }
 }
 
@@ -180,7 +201,14 @@
 /// - width (length): Width of the permutation gate. 
 /// - bend (ratio): How much to bend the wires. With `0%`, the wires are straight. 
 /// - separation (auto, none, length, color, stroke): Overlapping wires are separated by drawing a thicker line below. With this option, this line can be customized in color or thickness. 
-#let permute(..qubits, width: 30pt, bend: 100%, separation: auto) = {
+#let permute(
+  ..qubits, 
+  width: 30pt, 
+  bend: 100%, 
+  separation: auto,
+  x: auto,
+  y: auto,
+) = {
   if qubits.named().len() != 0 {
     assert(false, message: "Unexpected named argument `" + qubits.named().keys().first() + "` in function `permute()`")
   }
@@ -208,7 +236,13 @@
 /// - fill (none, color, boolean): Fill color for the target circle. If set 
 ///        to `true`, the target is filled with the circuits background color.
 /// - size (length): Size of the target symbol. 
-#let targ(fill: none, size: 4.3pt, label: none) = gate(none, box: false, draw-function: draw-functions.draw-targ, fill: fill, data: (size: size), label: label)
+#let targ(
+  fill: none,
+  size: 4.3pt,
+  label: none, 
+  x: auto,
+  y: auto,
+) = gate(none, x: x, y: y, box: false, draw-function: draw-functions.draw-targ, fill: fill, data: (size: size), label: label)
 
 /// Target element for controlled-Z operations (#sym.bullet). 
 ///
@@ -220,7 +254,7 @@
 
 /// Target element for #smallcaps("swap") operations (#sym.times) without vertical wire). 
 /// - size (length): Size of the target symbol. 
-#let targX(size: 7pt, label: none) = gate(none, box: false, draw-function: draw-functions.draw-swap, data: (size: size), label: label)
+#let targX(size: 7pt, label: none, x: auto, y: auto) = gate(none, x: x, y: y, box: false, draw-function: draw-functions.draw-swap, data: (size: size), label: label)
 
 /// Create a phase gate shown as a point on the wire together with a label. 
 ///
@@ -229,8 +263,17 @@
 /// - fill (none, color): Fill color for the circle or stroke color if
 ///        `open: true`. 
 /// - size (length): Size of the circle. 
-#let phase(label, open: false, fill: none, size: 2.3pt) = gate(
+#let phase(
+  label,
+  open: false,
+  fill: none,
+  size: 2.3pt,
+  x: auto,
+  y: auto
+) = gate(
   none, 
+  x: x, 
+  y: y,
   box: false,
   draw-function: (gate, draw-params) => box(
     inset: (x: .6em), 
@@ -245,12 +288,22 @@
 
 /// Creates a #smallcaps("swap") operation with another qubit. 
 /// 
-/// - n (integer): How many wires up or down the target wire lives. 
+/// - n (int): How many wires up or down the target wire lives. 
 /// - size (length): Size of the target symbol. 
 /// - wire-label (array, string, content, dictionary): One or more labels 
 ///        to add to the control wire. See @@mqgate(). 
-#let swap(n, wire-count: 1, size: 7pt, label: none, wire-label: none) = mqgate(
+#let swap(
+  n, 
+  wire-count: 1, 
+  size: 7pt, 
+  label: none, 
+  wire-label: none,
+  x: auto,
+  y: auto
+) = mqgate(
   none,
+  x: x, 
+  y: y,
   target: n,
   box: false,
   draw-function: draw-functions.draw-swap,
@@ -264,8 +317,8 @@
 
 /// Creates a control with a vertical wire to another qubit. 
 /// 
-/// - n (integer): How many wires up or down the target wire lives. 
-/// - wire-count (integer): Wire count for the control wire.  
+/// - n (int): How many wires up or down the target wire lives. 
+/// - wire-count (int): Wire count for the control wire.  
 /// - open (boolean): Whether to draw an open dot. 
 /// - fill (none, color): Fill color for the circle or stroke color if
 ///        `open: true`. 
@@ -283,8 +336,12 @@
   show-dot: true,
   label: none,
   wire-label: none,
+  x: auto,
+  y: auto
 ) = mqgate(
   none,
+  x: x, 
+  y: y,
   target: n,
   box: false,
   draw-function: draw-functions.draw-ctrl,

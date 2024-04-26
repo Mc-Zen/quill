@@ -21,5 +21,5 @@
   color: red,
   // scale-factor: 200%,
   1, meter(label: $y$), 1, meter(n: 1, label: $lr(|plus.minus〉)$), meter(label: $phi/2$, n: 1, wire-count: 1), meter(target: 1, label: "a"), meter(n: 2, label: "a"), [\ ],
-  1, gate($H$), ctrl(0), 2
+  1, gate($H$), 3, ctrl(0), 2
 )

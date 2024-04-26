@@ -3,8 +3,10 @@
 
 // align: "left" (for rstick) or "right" (for lstick)
 // brace: auto, none, "{", "}", "|", "[", ...
-#let lrstick(content, n, align, brace, label) = gate(
+#let lrstick(content, n, align, brace, label, pad: 0pt, x: auto, y: auto) = gate(
   content, 
+  x: x, 
+  y: y,
   draw-function: draw-functions.draw-lrstick, 
   size-hint: layout.lrstick-size-hint,
   box: false, 
@@ -20,6 +22,7 @@
   data: (
     brace: brace,
     align: align,
+    pad: pad
   ), 
   label: label
 )
@@ -34,33 +37,57 @@
 ///      is shown only if `n > 1`. A brace is always shown when 
 ///      explicitly given, e.g., `"}"`, `"["` or `"|"`. No brace is shown for 
 ///      `brace: none`
+/// - pad (length): Adds a padding between the label and the connected wire to the right. 
 /// - label (array, string, content, dictionary): One or more labels to add to the gate. 
-///        See @@gate(). . 
-#let lstick(content, n: 1, brace: auto, label: none) = lrstick(content, n, right, brace, label)
+///        See @@gate(). 
+#let lstick(
+  content, 
+  n: 1, 
+  brace: auto, 
+  pad: 0pt,
+  label: none, 
+  x: auto,
+  y: auto
+) = lrstick(content, n, right, brace, label, pad: pad, x: x, y: y)
 
 
 /// Basic command for labelling a wire at the end. 
 /// - content (content): Label to display, e.g., `$|0〉$`.
 /// - n (content): How many wires the `rstick` should span. 
+/// - pad (length): Adds a padding between the label and the connected wire to the left. 
 /// - brace (auto, none, string): If `brace` is `auto`, then a default `}` brace
 ///      is shown only if `n > 1`. A brace is always shown when 
 ///      explicitly given, e.g., `"}"`, `"["` or `"|"`. No brace is shown for 
 ///      `brace: none`. 
 /// - label (array, string, content, dictionary): One or more labels to add to the gate. 
 ///        See @@gate(). 
-#let rstick(content, n: 1, brace: auto, label: none) = lrstick(content, n, left, brace, label)
+#let rstick(
+  content, 
+  n: 1, 
+  brace: auto, 
+  pad: 0pt, 
+  label: none, 
+  x: auto,
+  y: auto
+) = lrstick(content, n, left, brace, label, pad: pad, x: x, y: y)
 
 /// Create a midstick, i.e., a mid-circuit text. 
 /// - content (content): Label to display, e.g., `$|0〉$`.
 /// - label (array, string, content, dictionary): One or more labels to add to the gate. 
-#let midstick(content, fill: none, label: none) = gate(content, draw-function: draw-functions.draw-unboxed-gate, label: label, fill: fill)
+#let midstick(
+  content,
+  fill: none,
+  label: none,
+  x: auto,
+  y: auto
+) = gate(content, draw-function: draw-functions.draw-unboxed-gate, label: label, fill: fill, x: x, y: y)
 
 
 
 /// Creates a symbol similar to `\qwbundle` on `quantikz`. Annotates a wire to 
 /// be a bundle of quantum or classical wires. 
-/// - label (integer, content): 
-#let nwire(label) = gate([#label], draw-function: draw-functions.draw-nwire, box: false)
+/// - label (int, content): 
+#let nwire(label, x: auto, y: auto) = gate([#label], draw-function: draw-functions.draw-nwire, box: false, x: x, y: y)
 
 
 
@@ -69,11 +96,11 @@
 ///
 /// The wire style is reset for each row.
 ///
-/// - wire-count (integer): Number of wires to display. 
-/// - stroke (none, stroke): When given, the stroke is applied to the wire. 
+/// - wire-count (int): Number of wires to display. 
+/// - stroke (auto, none, stroke): When given, the stroke is applied to the wire. 
 ///                Otherwise the current stroke is kept. 
 /// - wire-distance (length): Distance between wires. 
-#let setwire(wire-count, stroke: none, wire-distance: 1pt) = (
+#let setwire(wire-count, stroke: auto, wire-distance: auto) = (
   qc-instr: "setwire",
   wire-count: wire-count,
   stroke: stroke,
@@ -83,8 +110,11 @@
 /// Highlight a group of circuit elements by drawing a rectangular box around
 /// them. 
 /// 
-/// - wires (integer): Number of wires to include.
-/// - steps (integer): Number of columns to include.
+/// - wires (int): Number of wires to include.
+/// - steps (int): Number of columns to include.
+/// - x (auto, int): The starting column of the gategroup. 
+/// - y (auto, int): The starting wire of the gategroup. 
+/// - z (string): The gategroup can be placed `"below"` or `"above"` the circuit. 
 /// - padding (length, dictionary): Padding of rectangle. May be one length
 ///     for all sides or a dictionary with the keys `left`, `right`, `top`, 
 ///     `bottom` and `default`. Not all keys need to be specified. The value 
@@ -98,6 +128,9 @@
 #let gategroup(
   wires, 
   steps, 
+  x: auto, 
+  y: auto,
+  z: "below",
   padding: 0pt, 
   stroke: .7pt, 
   fill: none,
@@ -107,6 +140,9 @@
   qc-instr: "gategroup",
   wires: wires,
   steps: steps,
+  x: x, 
+  y: y,
+  z: z,
   padding: process-args.process-padding-arg(padding),
   style: (fill: fill, stroke: stroke, radius: radius),
   labels: process-args.process-label-arg(label, default-pos: top)
@@ -114,17 +150,26 @@
 
 /// Slice the circuit vertically, showing a separation line between columns. 
 /// 
-/// - n (integer): Number of wires to slice.
+/// - n (int): Number of wires to slice.
+/// - x (auto, int): The starting column of the slice. 
+/// - y (auto, int): The starting wire of the slice. 
+/// - z (string): The slice can be placed `"below"` or `"above"` the circuit. 
 /// - stroke (stroke): Line style for the slice. 
 /// - label (array, string, content, dictionary): One or more labels to add to the  
 ///        slice. See @@gate(). 
 #let slice(
   n: 0, 
+  x: auto, 
+  y: auto,
+  z: "below",
   stroke: (paint: red, thickness: .7pt, dash: "dashed"),
   label: none
 ) = (
   qc-instr: "slice",
   wires: n,
+  x: x,
+  y: y,
+  z: z,
   style: (stroke: stroke),
   labels: process-args.process-label-arg(label, default-pos: top)
 )
@@ -135,19 +180,24 @@
 /// This function is passed the coordinates of the specified cell rows 
 /// and columns. 
 /// 
-/// - columns (integer, array): Column indices for which to obtain coordinates. 
-/// - rows (integer, array): Row indices for which to obtain coordinates. 
+/// - columns (int, array): Column indices for which to obtain coordinates. 
+/// - rows (int, array): Row indices for which to obtain coordinates. 
 /// - callback (function): Function to call with the obtained coordinates. The
 ///     signature should be with signature `(col-coords, row-coords) => {}`. 
 ///     This function is expected to display the content to draw in absolute 
 ///     coordinates within the circuit. 
+/// - z (string): The annotation can be placed `"below"` or `"above"` the circuit. 
 #let annotate(
   columns,
   rows,
-  callback 
+  callback,
+  z: "below",
 ) = (
   qc-instr: "annotate",
   rows: rows,
+  x: none,
+  y: none,
+  z: z,
   columns: columns,
   callback: callback
 )

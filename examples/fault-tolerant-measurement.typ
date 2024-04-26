@@ -4,6 +4,7 @@
 
 #quantum-circuit(
   row-spacing: 6pt,
+  fill-wires: false,
   lstick($|0〉$), 10pt, group(3, 2, label: (content: "Prepare")), $H$, ctrl(2), 3pt, 
     group(4, 2, label: (content: "Verify")), 3,
     group(7, 3, label: (content: [Controlled-$M$])),
