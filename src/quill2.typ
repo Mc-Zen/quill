@@ -158,11 +158,13 @@
       let (x, y) = (gate.x, gate.y)
       if x == auto { 
         x = col 
-        if col != prev-col {
-          wire-instructions.push((row, prev-col, col))
+        if y == auto {
+          if col != prev-col {
+            wire-instructions.push((row, prev-col, col))
+          }
+          prev-col = col 
+          col += 1
         }
-        prev-col = col 
-        col += 1
       }
       if y == auto { y = row }
 
