@@ -91,7 +91,7 @@ This package uses [typst-test](https://github.com/tingerrr/typst-test/) for runn
   - `slice()` has no `dx` and `dy` parameters anymore. Instead, labels are handled through `label` exactly as in `gate()`. Also the `wires` parameter is replaced with `n` for consistency with other multi-qubit gates. 
   - Swap order of row and column parameters in `annotate()` to make it consistent with built-in Typst functions. 
 - Improvements: 
-  - Improve layout (allow row/column spacing and min lengths to be specified in em-lenghts).
+  - Improve layout (allow row/column spacing and min lengths to be specified in em-lengths).
   - Automatic bounds computation, even for labels. 
   - Improve meter (allow multi-qubit gate meters and respect global (per-circuit) gate padding).d
 - Fixes:
