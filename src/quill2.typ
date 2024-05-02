@@ -387,6 +387,10 @@
       } else {
         if wire-style.count == 0 { continue }
         let (row, start-x, end-x) = wire-piece
+        if end-x == -1 {
+          end-x = num-cols - 1
+        }
+        if start-x == end-x { continue }
 
         let draw-subwire(x1, x2) = {
           let dx1 = center-x-coords.at(x1)
