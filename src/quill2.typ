@@ -63,7 +63,6 @@
   fill: white,
   font-size: 10pt,
   scale: 100%,
-  scale-factor: 100%,
   baseline: 0pt,
   circuit-padding: .4em,
   fill-wires: true,
@@ -495,7 +494,6 @@
   /////////// END Second pass: Generation ///////////
   // grace period backwards-compatibility:
   let scale = scale
-  if scale-factor != 100% { scale = scale-factor }
   let scale-float = scale / 100%
   if circuit-padding != none {
     let circuit-padding = process-args.process-padding-arg(circuit-padding)

@@ -4,7 +4,7 @@
 setwire(0), 5, lstick($|0〉$), setwire(1), 1, targ(), 1)
 
 #quantum-circuit(
-  scale-factor: 80%,
+  scale: 80%,
   lstick($|ψ〉$), 1, 10pt, ctrl(3), ctrl(6), $H$, 1, 15pt, 
     ctrl(1), ctrl(2), 1, [\ ],
   ..ancillas, [\ ],
