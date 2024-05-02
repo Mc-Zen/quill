@@ -40,7 +40,7 @@
 ///            content or a string is given, the baseline will be adjusted auto-
 ///            matically to align with the center of it. One useful application is 
 ///            `"="` so the circuit aligns with the equals symbol. 
-/// - circuit-padding (dictionary): Padding for the circuit (e.g., to accomodate 
+/// - circuit-padding (dictionary): Padding for the circuit (e.g., to accommodate 
 ///            for annotations) in form of a dictionary with possible keys 
 ///            `left`, `right`, `top` and `bottom`. Not all of those need to be 
 ///            specified. 

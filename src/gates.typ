@@ -15,7 +15,7 @@
 /// - content (content): What to show in the gate (may be none for special gates like @@ctrl() ).
 /// - x (auto, int): The column to put the gate in. 
 /// - y (auto, int): The row to put the gate in. 
-/// - fill (none, color): Gate backgrond fill color.
+/// - fill (none, color): Gate background fill color.
 /// - radius (length, dictionary): Gate rectangle border radius. 
 ///             Allows the same values as the builtin `rect()` function.
 /// - width (auto, length): The width of the gate can be specified manually with this property. 
@@ -83,7 +83,7 @@
 /// - y (auto, int): The row to put the gate in. 
 /// - target (none, int): If specified, a control wire is drawn from the gate up 
 ///        or down this many wires counted from the wire this `mqgate()` is placed on. 
-/// - fill (none, color): Gate backgrond fill color.
+/// - fill (none, color): Gate background fill color.
 /// - radius (length, dictionary): Gate rectangle border radius. 
 ///        Allows the same values as the builtin `rect()` function.
 /// - width (auto, length): The width of the gate can be specified manually with this property. 

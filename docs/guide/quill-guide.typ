@@ -482,7 +482,7 @@ Quill allows you to create totally customized gates by specifying the `draw-func
 
 _Note, that the interface for custom gates might still change a bit. _
 
-When the circuit is layed out, the draw function is called with two (read-only) arguments: the gate itself and a dictionary that contains information about the circuit style and more. 
+When the circuit is laid out, the draw function is called with two (read-only) arguments: the gate itself and a dictionary that contains information about the circuit style and more. 
 
 Let us look at a little example for a custom gate that just shows the vertical lines of the box but not the horizontal ones. 
 
