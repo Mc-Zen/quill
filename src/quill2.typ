@@ -525,3 +525,17 @@
   
 })
 }
+
+#let help(..args) = {
+  import "@local/tidy:0.3.0"
+
+  let namespace = (
+    ".": (
+      read.with("/src/quill2.typ"), 
+      read.with("/src/gates.typ"),
+      read.with("/src/decorations.typ"),
+    ),
+    "gates": read.with("/src/gates.typ"),
+  )
+  tidy.generate-help(namespace: namespace, package-name: "quill")(..args)
+}

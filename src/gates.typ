@@ -45,7 +45,7 @@
   content,
   x: auto,
   y: auto,
-  fill: none,
+  fill: auto,
   radius: 0pt,
   width: auto,
   box: true,
@@ -119,7 +119,7 @@
   y: auto,
   n: 1, 
   target: none,
-  fill: none, 
+  fill: auto, 
   radius: 0pt,
   width: auto,
   box: true, 
@@ -173,7 +173,7 @@
   y: auto,
   wire-count: 2, 
   label: none, 
-  fill: none, 
+  fill: auto, 
   radius: 0pt
 ) = {
   label = if label != none {(content: label, pos: top, dy: -0.5em)} else { () }
@@ -233,8 +233,8 @@
 }
 
 /// Target element for controlled-X operations (#sym.plus.circle). 
-/// - fill (none, color, boolean): Fill color for the target circle. If set 
-///        to `true`, the target is filled with the circuits background color.
+/// - fill (none, color, auto): Fill color for the target circle. If set 
+///        to `auto`, the target is filled with the circuits background color.
 /// - size (length): Size of the target symbol. 
 #let targ(
   fill: none,
@@ -242,7 +242,16 @@
   label: none, 
   x: auto,
   y: auto,
-) = gate(none, x: x, y: y, box: false, draw-function: draw-functions.draw-targ, fill: fill, data: (size: size), label: label)
+) = gate(
+  none, 
+  x: x, 
+  y: y, 
+  box: false, 
+  draw-function: draw-functions.draw-targ, 
+  fill: if fill == true {auto} else if fill == false {none} else {fill}, 
+  data: (size: size), 
+  label: label
+)
 
 /// Target element for controlled-Z operations (#sym.bullet). 
 ///
@@ -266,7 +275,7 @@
 #let phase(
   label,
   open: false,
-  fill: none,
+  fill: auto,
   size: 2.3pt,
   x: auto,
   y: auto
@@ -331,7 +340,7 @@
   n,
   wire-count: 1,
   open: false,
-  fill: none,
+  fill: auto,
   size: 2.3pt,
   show-dot: true,
   label: none,

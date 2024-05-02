@@ -5,7 +5,7 @@
   scale: 150%,
   1, targ(), ctrl(0, open: true), phase($α$, open: true), 1, [\ ],
   setwire(2),
-  1, targ(fill: true), ctrl(0, open: true), phase($α$, open: true), 1, [\ ],
+  1, targ(fill: auto), ctrl(0, open: true), phase($α$, open: true), 1, [\ ],
   setwire(3),
-  1, targ(fill: true), ctrl(0, open: true), phase($α$, open: true), 1,
+  1, targ(fill: auto), ctrl(0, open: true), phase($α$, open: true), 1,
 )

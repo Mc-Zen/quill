@@ -18,14 +18,14 @@
   width: gate.width,
   radius: gate.radius,
   stroke: if gate.box { draw-params.wire }, 
-  fill: utility.if-none(gate.fill, if gate.box {draw-params.background}),
+  fill: utility.if-auto(gate.fill, if gate.box {draw-params.background}),
   gate.content,
 ))
 
 // Same but without displaying a box
 #let draw-unboxed-gate(gate, draw-params) = box(
   inset: draw-params.padding, 
-  fill: utility.if-none(gate.fill, draw-params.background),
+  fill: utility.if-auto(gate.fill, draw-params.background),
   gate.content
 )
 
@@ -39,7 +39,7 @@
       width: gate.width,
       stroke: draw-params.wire, 
       radius: gate.radius,
-      fill: utility.if-none(gate.fill, draw-params.background), 
+      fill: utility.if-auto(gate.fill, draw-params.background), 
       inset: draw-params.padding, 
   )
   align(center + horizon, box(
@@ -93,11 +93,7 @@
     circle(
       radius: size, 
       stroke: draw-params.wire, 
-      fill: if item.fill == none {none} 
-        else { 
-          if item.fill == true {draw-params.background} 
-          else if type(item.fill) == "color" {item.fill} 
-        }
+      fill: utility.if-auto(item.fill, draw-params.background)
     )
     place(line(start: (size, 0pt), length: 2*size, angle: -90deg, stroke: draw-params.wire))
     place(line(start: (0pt, -size), length: 2*size, stroke: draw-params.wire))
@@ -105,10 +101,10 @@
 }
 
 #let draw-ctrl(gate, draw-params) = {
-  let color = utility.if-none(gate.fill, draw-params.color)
+  let color = utility.if-auto(gate.fill, draw-params.color)
   if "show-dot" in gate.data and not gate.data.show-dot { return none }
   if gate.data.open {
-    let stroke = utility.if-none(gate.fill, draw-params.wire)
+    let stroke = utility.if-auto(gate.fill, draw-params.wire)
     box(circle(stroke: stroke, fill: draw-params.background, radius: gate.data.size))
   } else {
     box(circle(fill: color, radius: gate.data.size))
