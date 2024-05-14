@@ -37,7 +37,7 @@
 /// - font-size (length): Default font size for text in the circuit. 
 /// - scale (ratio): Total scale factor applied to the entire 
 ///            circuit without changing proportions
-/// - baseline (length, content, string): Set the baseline for the circuit. If a 
+/// - baseline (length, content, str): Set the baseline for the circuit. If a 
 ///            content or a string is given, the baseline will be adjusted auto-
 ///            matically to align with the center of it. One useful application is 
 ///            `"="` so the circuit aligns with the equals symbol. 

@@ -33,12 +33,12 @@
 /// Basic command for labelling a wire at the start. 
 /// - content (content): Label to display, e.g., `$|0〉$`.
 /// - n (content): How many wires the `lstick` should span. 
-/// - brace (auto, none, string): If `brace` is `auto`, then a default `{` brace
+/// - brace (auto, none, str): If `brace` is `auto`, then a default `{` brace
 ///      is shown only if `n > 1`. A brace is always shown when 
 ///      explicitly given, e.g., `"}"`, `"["` or `"|"`. No brace is shown for 
 ///      `brace: none`
 /// - pad (length): Adds a padding between the label and the connected wire to the right. 
-/// - label (array, string, content, dictionary): One or more labels to add to the gate. 
+/// - label (array, str, content, dictionary): One or more labels to add to the gate. 
 ///        See @@gate(). 
 #let lstick(
   content, 
@@ -55,11 +55,11 @@
 /// - content (content): Label to display, e.g., `$|0〉$`.
 /// - n (content): How many wires the `rstick` should span. 
 /// - pad (length): Adds a padding between the label and the connected wire to the left. 
-/// - brace (auto, none, string): If `brace` is `auto`, then a default `}` brace
+/// - brace (auto, none, str): If `brace` is `auto`, then a default `}` brace
 ///      is shown only if `n > 1`. A brace is always shown when 
 ///      explicitly given, e.g., `"}"`, `"["` or `"|"`. No brace is shown for 
 ///      `brace: none`. 
-/// - label (array, string, content, dictionary): One or more labels to add to the gate. 
+/// - label (array, str, content, dictionary): One or more labels to add to the gate. 
 ///        See @@gate(). 
 #let rstick(
   content, 
@@ -73,7 +73,7 @@
 
 /// Create a midstick, i.e., a mid-circuit text. 
 /// - content (content): Label to display, e.g., `$|0〉$`.
-/// - label (array, string, content, dictionary): One or more labels to add to the gate. 
+/// - label (array, str, content, dictionary): One or more labels to add to the gate. 
 #let midstick(
   content,
   fill: none,
@@ -114,7 +114,7 @@
 /// - steps (int): Number of columns to include.
 /// - x (auto, int): The starting column of the gategroup. 
 /// - y (auto, int): The starting wire of the gategroup. 
-/// - z (string): The gategroup can be placed `"below"` or `"above"` the circuit. 
+/// - z (str): The gategroup can be placed `"below"` or `"above"` the circuit. 
 /// - padding (length, dictionary): Padding of rectangle. May be one length
 ///     for all sides or a dictionary with the keys `left`, `right`, `top`, 
 ///     `bottom` and `default`. Not all keys need to be specified. The value 
@@ -123,7 +123,7 @@
 /// - stroke (stroke): Stroke for rectangle.
 /// - fill (color): Fill color for rectangle.
 /// - radius (length, dictionary): Corner radius for rectangle.
-/// - label (array, string, content, dictionary): One or more labels to add to the  
+/// - label (array, str, content, dictionary): One or more labels to add to the  
 ///        group. See @@gate(). 
 #let gategroup(
   wires, 
@@ -153,9 +153,9 @@
 /// - n (int): Number of wires to slice.
 /// - x (auto, int): The starting column of the slice. 
 /// - y (auto, int): The starting wire of the slice. 
-/// - z (string): The slice can be placed `"below"` or `"above"` the circuit. 
+/// - z (str): The slice can be placed `"below"` or `"above"` the circuit. 
 /// - stroke (stroke): Line style for the slice. 
-/// - label (array, string, content, dictionary): One or more labels to add to the  
+/// - label (array, str, content, dictionary): One or more labels to add to the  
 ///        slice. See @@gate(). 
 #let slice(
   n: 0, 
@@ -186,7 +186,7 @@
 ///     signature should be with signature `(col-coords, row-coords) => {}`. 
 ///     This function is expected to display the content to draw in absolute 
 ///     coordinates within the circuit. 
-/// - z (string): The annotation can be placed `"below"` or `"above"` the circuit. 
+/// - z (str): The annotation can be placed `"below"` or `"above"` the circuit. 
 #let annotate(
   columns,
   rows,

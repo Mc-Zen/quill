@@ -30,7 +30,7 @@
 ///             Signature: `(gate, draw-params) => {}`.
 /// - draw-function (function): Drawing function that produces the displayed content.
 ///             Signature: `(gate, draw-params) => {}`.
-/// - label (array, string, content, dictionary): One or more labels to add to the gate.
+/// - label (array, str, content, dictionary): One or more labels to add to the gate.
 ///             Usually, a label consists of a dictionary with entries for the keys 
 ///             `content` (the label content), `pos` (2d alignment specifying the 
 ///             position of the label) and optionally `dx` and/or `dy` (lengths, ratios 
@@ -105,9 +105,9 @@
 ///          - Affect height on only the first and last wire (`false`)
 ///          - Affect the height of all wires (`true`)
 ///          - Affect the height on no wire (`none`)
-/// - label (array, string, content, dictionary): One or more labels to add to the gate. 
+/// - label (array, str, content, dictionary): One or more labels to add to the gate. 
 ///        See @@gate(). 
-/// - wire-label (array, string, content, dictionary): One or more labels to add to the 
+/// - wire-label (array, str, content, dictionary): One or more labels to add to the 
 ///        control wire. Works analogous to `labels` but with default positioning to the 
 ///        right of the wire. 
 /// - data (any): Optional additional gate data. This can for example be a dictionary
@@ -164,7 +164,7 @@
 ///                           qubit the specified number of wires up or down.
 /// - wire-count (int):   Wire count for the (optional) control wire. 
 /// - n (int):            Number of wires to span this meter across. 
-/// - label (array, string, content, dictionary): One or more labels to add to the gate. 
+/// - label (array, str, content, dictionary): One or more labels to add to the gate. 
 ///        See @@gate(). 
 #let meter(
   target: none, 
@@ -299,7 +299,7 @@
 /// 
 /// - n (int): How many wires up or down the target wire lives. 
 /// - size (length): Size of the target symbol. 
-/// - wire-label (array, string, content, dictionary): One or more labels 
+/// - wire-label (array, str, content, dictionary): One or more labels 
 ///        to add to the control wire. See @@mqgate(). 
 #let swap(
   n, 
@@ -334,7 +334,7 @@
 /// - size (length): Size of the control circle. 
 /// - show-dot (boolean): Whether to show the control dot. Set this to 
 ///        false to obtain a vertical wire with no dots at all. 
-/// - wire-label (array, string, content, dictionary): One or more labels 
+/// - wire-label (array, str, content, dictionary): One or more labels 
 ///        to add to the control wire. See @@mqgate(). 
 #let ctrl(
   n,
