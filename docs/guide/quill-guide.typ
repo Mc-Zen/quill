@@ -561,7 +561,7 @@ All built-in gates are drawn with a dedicated `draw-function` and you can also t
       )
       let show-outline = tidy.styles.default.show-outline
       
-      let docs = parse-module(read("/src/quill.typ"))
+      let docs = parse-module(read("/src/quantum-circuit.typ"))
       let docs-gates = parse-module(read("/src/gates.typ"))
       let docs-decorations = parse-module(read("/src/decorations.typ"))
     
