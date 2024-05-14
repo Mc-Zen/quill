@@ -1,7 +1,5 @@
 #import "template.typ": *
-#import "typst-doc.typ": show-outline
-#show link: underline.with(offset: 1.2pt)
-#show link: set text(fill: purple.darken(30%))
+#import "@preview/tidy:0.3.0"
 
 
 #let version = toml("/typst.toml").package.version
@@ -10,7 +8,7 @@
   title: "Guide for the Quill Package ",
   authors: ("Mc-Zen",),
   abstract: [Quill is a library for creating quantum circuit diagrams in #link("https://typst.app/", [Typst]). ],
-  date: "March 11, 2024",
+  date: datetime.today().display("[month repr:long] [day], [year]"),
   version: version,
   url: "https://github.com/Mc-Zen/quill"
 )
@@ -120,19 +118,19 @@ Just as multi-qubit gates, #ref-fn("lstick()") and #ref-fn("rstick()") can span 
 
 
 == All about Wires
-In many circuits, we need classical wires. This library generalizes the concept of quantum, classical and bundled wires and provides the #ref-fn("setwire()") command that allows all sorts of changes to the current wire setting. You may call `setwire()` with the number of wires to display:
+In many circuits, we need classical wires. This library generalizes the concept of quantum, classical and bundled wires and provides the #ref-fn("setwire()") command that allows all sorts of changes to the current wire setting. You may call `setwire()` with the number of wires to display and optionally a `stroke` setting:
 
 #example(vertical: false,
   ```typ
   #quantum-circuit(
     1, $A$, meter(n: 1), [\ ],
-    setwire(2), 2, ctrl(0), 2, [\ ],
+    setwire(2, stroke: blue), 2, ctrl(0), 2, [\ ],
     1, $X$, setwire(0), 1, lstick($|0〉$), setwire(1), $Y$,
   )
   ```
 )
 
-The `setwire()` command produces no cells and can be called at any point on the wire. When a new wire is started, the default wire setting is restored automatically (quantum wire with default wire style, see @circuit-styling on how to customize the default). Calling `setwire(0)` removes the wire altogether until `setwire()` is called with different arguments. More than two wires are possible and it lies in your hands to decide how many wires still look good. The distance between wires can also be specified:
+The `setwire()` command produces no cells and can be called at any point on the wire. When a new wire is started, the default wire setting is restored automatically (see @circuit-styling on how to customize the default). Calling `setwire(0)` removes the wire altogether until `setwire()` is called with different arguments. More than two wires are possible and it lies in your hands to decide how many wires still look good. The distance between bundled wires can also be specified:
 
 #example(vertical: false,
   ```typ
@@ -246,7 +244,7 @@ Let's look at an example of preparing a certain graph state:
   )
   ```
 )
-Note, that it is not possible to add a second gate to a cell that is already occupied. 
+Note, that it is not possible to add a second gate to a cell that is already occupied. However, it is allowed to leave either `x` or `y` at `auto` and manually set the other. In the case that `x` is set but `y: auto`, the gate is placed at the current wire and the specified column. In the case that `y` is set and `x: auto`, the gate is placed at the current column and the specified wire but the current column is not advanced to the next column. The parameters `x` and `y` are available for all gates and decorations. 
 
 Manual placement can also be helpful to keep the source code a bit more cleaner. For example, it is possible to move the code for a `gategroup()` or `slice()` command entirely to the bottom to enhance readability. 
 
@@ -504,7 +502,7 @@ We can now use it like this:
 
 #example(scope: (draw-quill-gate: (gate, draw-params) => {
     let stroke = draw-params.wire
-    let fill = if gate.fill != none { gate.fill } else { draw-params.background }
+    let fill = if gate.fill != auto { gate.fill } else { draw-params.background }
 
     box(
       gate.content, 
@@ -534,7 +532,7 @@ All built-in gates are drawn with a dedicated `draw-function` and you can also t
   
   #set text(size: 9pt)
   
-  #show raw.where(block: false): box.with(
+  #show raw.where(block: false, lang: "typc"): box.with(
     fill: luma(240),
     inset: (x: 3pt, y: 0pt),
     outset: (y: 3pt),
@@ -551,7 +549,6 @@ All built-in gates are drawn with a dedicated `draw-function` and you can also t
     // #set raw(lang: none)
     #set heading(numbering: none)
     #{
-      import "@preview/tidy:0.2.0"
       let parse-module = tidy.parse-module.with(
         label-prefix: "quill:",
         scope: (quill: quill)
@@ -559,7 +556,8 @@ All built-in gates are drawn with a dedicated `draw-function` and you can also t
       let show-module = tidy.show-module.with(
         show-module-name: false, 
         first-heading-level: 2,
-        show-outline: false
+        show-outline: false,
+        style: tidy.styles.default
       )
       let show-outline = tidy.styles.default.show-outline
       
@@ -573,8 +571,13 @@ All built-in gates are drawn with a dedicated `draw-function` and you can also t
       show-outline(docs-gates)
       [*Decorations*]
       show-outline(docs-decorations)
+
+      set text(size: .9em)
+
       show-module(docs)
+      v(1cm)
       show-module(docs-gates)
+      v(1cm)
       show-module(docs-decorations)
     }
   ])
@@ -633,5 +636,7 @@ The following two circuits reproduce figures from Exercise 10.66 and 10.68 on co
 #insert-example("../../examples/fault-tolerant-toffoli1.typ")
 #insert-example("../../examples/fault-tolerant-toffoli2.typ")
 
+
+#pagebreak()
 
 #bibliography("references.bib")

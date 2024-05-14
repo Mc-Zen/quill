@@ -67,6 +67,9 @@
   show raw.where(block: true) : set par(justify: false)
 
 
+  show link: underline.with(offset: 1.2pt)
+  show link: set text(fill: purple.darken(30%))
+
   body
 }
 
