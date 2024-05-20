@@ -2,18 +2,15 @@
   <img alt="Quill" src="docs/images/logo.svg" style="max-width: 100%; width: 300pt">
 </h1>
 
+<div align="center">
 
-<p align="center">
-  <a href="https://typst.app/docs/packages/">
-    <img alt="Typst Package" src="https://img.shields.io/badge/dynamic/toml?url=https%3A%2F%2Fraw.githubusercontent.com%2FMc-Zen%2Fquill%2Fmain%2Ftypst.toml&query=%24.package.version&prefix=v&logo=typst&label=package&color=239DAD"/>
-  </a>
-  <a href="https://github.com/Mc-Zen/quill/actions/workflows/run_tests.yml">
-    <img alt="Test Status" src="https://github.com/Mc-Zen/quill/actions/workflows/run_tests.yml/badge.svg"/>
-  </a>
-  <a href="https://github.com/Mc-Zen/quill/blob/main/LICENSE">
-    <img alt="MIT License" src="https://img.shields.io/badge/license-MIT-blue"/>
-  </a>
-</p>
+[![Typst Package](https://img.shields.io/badge/dynamic/toml?url=https%3A%2F%2Fraw.githubusercontent.com%2FMc-Zen%2Fquill%2Fmain%2Ftypst.toml&query=%24.package.version&prefix=v&logo=typst&label=package&color=239DAD)](https://typst.app/universe/package/quill)
+[![Test Status](https://github.com/Mc-Zen/quill/actions/workflows/run_tests.yml/badge.svg)](https://github.com/Mc-Zen/quill/actions/workflows/run_tests.yml)
+[![MIT License](https://img.shields.io/badge/license-MIT-blue)](https://github.com/Mc-Zen/quill/blob/main/LICENSE)
+[![User Manual](https://img.shields.io/badge/manual-.pdf-purple)][guide]
+
+</div>
+
 
 **Quill** is a package for creating quantum circuit diagrams in [Typst](https://typst.app/). 
 
@@ -23,13 +20,13 @@ _Note, that this package is in beta and may still be undergoing breaking changes
 _Meanwhile, we suggest importing everything from the package in a local scope to avoid polluting the global namespace (see example below)._
 
 
-## Usage
+## Basic usage
 
-Create circuit diagrams by calling the function `quantum-circuit()` with any number of positional arguments — just like the built-in Typst functions `table()` or `grid()`. A variety of different gate and instruction commands are available for adding elements and plain numbers can be used to produce any number of empty cells filled with the current wire style. A new wire is started by adding a `[\ ]` item. 
+The function `quantum-circuit()` takes any number of positional gates and works somewhat similarly to the built-int Typst functions `table()` or `grid()`. A variety of different gate and instruction commands are available for adding elements and integers can be used to produce any number of empty cells (filled with the current wire style). A new wire is started by adding a `[\ ]` item. 
 
 ```typ
 #{
-  import "@preview/quill:0.2.1": *
+  import "@preview/quill:0.3.0": *
 
   quantum-circuit(
     lstick($|0〉$), $H$, ctrl(1), rstick($(|00〉+|11〉)/√2$, n: 2), [\ ],
@@ -41,19 +38,23 @@ Create circuit diagrams by calling the function `quantum-circuit()` with any num
   <img alt="Bell Circuit" src="docs/images/bell.svg">
 </h3>
 
-Plain quantum gates — such as a Hadamard gate — can be written with the shorthand notation `$H$` instead of the more lengthy `gate($H$)`. The latter offers more options. 
+Plain quantum gates — such as a Hadamard gate — can be written with the shorthand notation `$H$` instead of the more lengthy `gate($H$)`. The latter offers more options, however. 
 
-Refer to the [user guide](docs/guide/quill-guide.pdf) for a full documentation of this package.
+Refer to the [user guide][guide] for a full documentation of this package. You can also look up the documentation of any function by calling the help module, e.g., `help("gate")` in order to print the signature and description of the `gate` command, just where you are currently typing (powered by [tidy][tidy]). 
 
 ## Gallery
+
+Instead of listing every featured gate (as is done in the [user guide][guide]), this gallery quickly showcases a large selection of possible gates and decorations that can be added to any quantum circuit. 
 
 <h3 align="center">
   <img alt="Gallery" src="docs/images/gallery.svg" />
 </h3>
 
+
+
 ## Examples
 
-Some show-off examples, loosely replicating figures from [Quantum Computation and Quantum Information by M. Nielsen and I. Chuang](https://www.cambridge.org/highereducation/books/quantum-computation-and-quantum-information/01E10196D0A682A6AEFFEA52D53BE9AE#overview).
+Some show-off examples, loosely replicating figures from [Quantum Computation and Quantum Information by M. Nielsen and I. Chuang](https://www.cambridge.org/highereducation/books/quantum-computation-and-quantum-information/01E10196D0A682A6AEFFEA52D53BE9AE#overview). The code for these examples can be found in the [example folder](./examples/) or in the [user guide][guide]. 
 
 <h3 align="center">
   <img alt="Quantum teleportation circuit" src="docs/images/teleportation.svg">
@@ -65,12 +66,29 @@ Some show-off examples, loosely replicating figures from [Quantum Computation an
   <img alt="Quantum fourier transformation circuit" src="docs/images/qft.svg">
 </h3>
 
+## Contribution
+
+If you spot an issue or have a suggestion, you are invited to [post it](https://github.com/Mc-Zen/quill/issues) or to contribute. In [architecture.md](docs/architecture.md), you can also find a description of the algorithm that forms the base of `quantum-circuit()`. 
+
 ## Tests
 This package uses [typst-test](https://github.com/tingerrr/typst-test/) for running [tests](tests/). 
 
 
 ## Changelog
 
+### v0.3.0
+- New features
+  - Enable manual placement of gates, `gate($X$, x: 3, y: 1)`, similar to built-in `table()` in addition to automatic placement. This works for most elements, not only gates. 
+  - Add parameter `pad` to `lstick()` and `rstick()`. 
+  - Add parameter `fill-wires` to `quantum-circuit()`. All wires are filled unto the end (determined by the longest wire) by default (breaking change ⚠️). This behavior can be reverted by setting `fill-wires: false`. 
+  - `gategroup()` `slice()` and `annotate()` can now be placed above or below the circuit with `z: "above"` and `z: "below"`.
+  - `help()` command for quickly displaying the documentation of a given function, e.g., `help("gate")`. Powered by [tidy][tidy]. 
+- Improvements:
+  - Complete rework of circuit layout implementation
+    - allows transparent gates since wires are not drawn through gates anymore. 
+  - `setwire()` can now be used to override only partial wire settings, such as wire color `setwire(1, stroke: blue)`, width `setwire(1, stroke: 1pt)` or wire distance, all separately. Before, some settings were reset. 
+- Fixes:
+  - Fixed `lstick`/`rstick` when equation numbering is turned on. 
 
 ### v0.2.1
 - Improvements:
@@ -106,3 +124,7 @@ This package uses [typst-test](https://github.com/tingerrr/typst-test/) for runn
 ### v0.1.0
 
 Initial Release
+
+
+[guide]: https://github.com/Mc-Zen/quill/releases/download/v0.3.0/quill-guide.pdf
+[tidy]: https://github.com/Mc-Zen/tidy
