@@ -85,10 +85,13 @@ This package uses [typst-test](https://github.com/tingerrr/typst-test/) for runn
   - `help()` command for quickly displaying the documentation of a given function, e.g., `help("gate")`. Powered by [tidy][tidy]. 
 - Improvements:
   - Complete rework of circuit layout implementation
-    - allows transparent gates since wires are not drawn through gates anymore. 
+    - allows transparent gates since wires are not drawn through gates anymore. The default fill is now `auto` and using `none` sets the background to transparent. 
+    - `midstick` is now transparent by default. 
   - `setwire()` can now be used to override only partial wire settings, such as wire color `setwire(1, stroke: blue)`, width `setwire(1, stroke: 1pt)` or wire distance, all separately. Before, some settings were reset. 
 - Fixes:
   - Fixed `lstick`/`rstick` when equation numbering is turned on. 
+- Removed:
+  - The already deprecated `scale-factor` (use `scale` instead)
 
 ### v0.2.1
 - Improvements:
