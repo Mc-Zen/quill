@@ -1,6 +1,6 @@
 #import "utility.typ"
-#import "length-helpers.typ"
-#import "decorations.typ": *
+#import "decorations.typ": lstick, rstick, midstick, nwire, annotate, slice, setwire, gategroup
+#import "gates.typ": gate, mqgate, ctrl, swap, targ, meter, phantom, permute, phase, targX
 #import "quantum-circuit.typ": quantum-circuit
 
 
