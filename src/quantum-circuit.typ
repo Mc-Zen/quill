@@ -491,10 +491,7 @@
   
   }) // end circuit = block(..., {
     
-  /////////// END Second pass: Generation ///////////
-  // grace period backwards-compatibility:
   let scale = scale
-  let scale-float = scale / 100%
   if circuit-padding != none {
     let circuit-padding = process-args.process-padding-arg(circuit-padding)
     bounds.at(0) -= circuit-padding.left
@@ -502,8 +499,8 @@
     bounds.at(2) += circuit-padding.right
     bounds.at(3) += circuit-padding.bottom
   }
-  let final-height = scale-float * (bounds.at(3) - bounds.at(1))
-  let final-width = scale-float * (bounds.at(2) - bounds.at(0))
+  let final-height = scale * (bounds.at(3) - bounds.at(1))
+  let final-width = scale * (bounds.at(2) - bounds.at(0))
   
   let thebaseline = baseline
   if type(thebaseline) in ("content", "string") {
@@ -516,7 +513,7 @@
     width: final-width,
     height: final-height, 
     // stroke: 1pt + gray,
-    align(left + top, move(dy: -scale-float * bounds.at(1), dx: -scale-float * bounds.at(0), 
+    align(left + top, move(dy: -scale * bounds.at(1), dx: -scale * bounds.at(0), 
       layout.std-scale(
         x: scale, 
         y: scale, 
