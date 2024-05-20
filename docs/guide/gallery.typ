@@ -12,7 +12,7 @@
     
     [Normal gate], quantum-circuit(1, gate($H$), 1), raw("gate($H$), $H$"), 
     [Round gate], quantum-circuit(1, gate($X$, radius: 100%), 1), raw("gate($X$, \nradius: 100%)"), 
-    [D gate], quantum-circuit(1, gate($Y$, radius: (right: 100%)), 1), raw("gate($Y$, radius: \n(right: 100%))"), 
+    [D-shaped gate], quantum-circuit(1, gate($Y$, radius: (right: 100%)), 1), raw("gate($Y$, radius: \n(right: 100%))"), 
     [Meter], quantum-circuit(1, meter(), 1), raw("meter()"), 
     [Meter with \ label], quantum-circuit(1, meter(label: $lr(|±〉)$), 1), raw("meter(label: \n$lr(|±〉)$)"), 
     [Phase gate], quantum-circuit(1, phase($α$), 1), raw("phase($α$)"), 

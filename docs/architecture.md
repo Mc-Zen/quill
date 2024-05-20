@@ -39,7 +39,7 @@ The padding of the cell is determined by the value of `column-spacing` and `row-
 
 As an example, this code 
 ```typ
-quantum-circuit(
+#quantum-circuit(
     1, $H$, 10pt, ctrl(1), 1, [\ ], 15pt
     2, 5pt, $X$, 1
 )

@@ -390,7 +390,7 @@ There is another option for #ref-fn("quantum-circuit()") that has a lot of impac
 
 = Fine-Tuning <fine-tuning>
 
-The #ref-fn("quantum-circuit()") command allows not only gates as well as content and string items but only length parameters which can be used to tweak the appearance of the circuit. Inserting a length value between gates adds a *horizontal space* of that length between the cells:
+The #ref-fn("quantum-circuit()") command allows not only gates as well as content and string items but only `length` parameters which can be used to tweak the spacing of the circuit. Inserting a `length` value between two gates adds a *horizontal space* of that length between the cells:
 
 #example(
   ```typ
@@ -400,9 +400,9 @@ The #ref-fn("quantum-circuit()") command allows not only gates as well as conten
 ```
 )
 
-In the background, this works like a grid gutter that is set to `0pt` by default. If a length value is inserted between the same two columns on different wires/rows, the maximum value is used for the space. In the same spirit, inserting multiple consecutive length values result in the largest being used, e.g., a `5pt, 10pt, 6pt` results in a `10pt` gutter in the corresponding position. 
+In the background, this works like a grid gutter that is set to `0pt` by default. If a length value is inserted between the same two columns on different wires/rows, the maximum value is used for the space. In the same spirit, inserting multiple consecutive length values result in the largest being used, e.g., inserting `5pt, 10pt, 6pt` results in a `10pt` gutter in the corresponding position. 
 
-Putting a a length after the wire break item `[\ ]` produces a *vertical space* between the corresponding wires:
+Putting a a length after a wire break item `[\ ]` produces a *vertical space* between the corresponding wires:
 
 #example(
   ```typ
@@ -411,6 +411,8 @@ Putting a a length after the wire break item `[\ ]` produces a *vertical space* 
   )
   ```
 )
+
+
 
 
 
