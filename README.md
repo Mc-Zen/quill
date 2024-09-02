@@ -19,6 +19,12 @@ _Note, that this package is in beta and may still be undergoing breaking changes
 
 _Meanwhile, we suggest importing everything from the package in a local scope to avoid polluting the global namespace (see example below)._
 
+- [**Usage**](#basic-usage) _quick introduction_
+- [**Cheat sheet**](#cheat-sheet) _gallery for quickly viewing all kinds of gates_
+- [**Tequila**](#tequila) _building circuits in a way similar to QASM or Qiskit_
+- [**Examples**](#examples)
+- [**Changelog**](#changelog)
+
 
 ## Basic usage
 
@@ -42,7 +48,7 @@ Plain quantum gates — such as a Hadamard gate — can be written with the shor
 
 Refer to the [user guide][guide] for a full documentation of this package. You can also look up the documentation of any function by calling the help module, e.g., `help("gate")` in order to print the signature and description of the `gate` command, just where you are currently typing (powered by [tidy][tidy]). 
 
-## Gallery
+## Cheat Sheet
 
 Instead of listing every featured gate (as is done in the [user guide][guide]), this gallery quickly showcases a large selection of possible gates and decorations that can be added to any quantum circuit. 
 
@@ -51,6 +57,36 @@ Instead of listing every featured gate (as is done in the [user guide][guide]), 
 </h3>
 
 
+## Tequila
+
+_Tequila_ is a submodule that adds a completely different way of building circuits. 
+
+```typ
+#import "@preview/quill:0.3.0" as quill: tequila as tq
+
+#quill.quantum-circuit(
+  ..tq.build(
+    tq.h(0),
+    tq.cx(0, 1),
+    tq.cx(0, 2),
+  ),
+  quill.gategroup(x: 2, y: 0, 3, 2)
+)
+```
+This is similar to how _QASM_ and _Qiskit_ work: gates are successively applied to the circuit and under the hood packed as tightly as possible. We start by calling the `build()` function and filling it with quantum operations. This returns collection of gates which we expand into the circuit with the `..` syntax. 
+Now, we still have the option to add annotations, groups, slices, or even more gates via manual placement. 
+
+The syntax is analog to the one of Qiskit. Available gates are `x`, `y`, `z`, `h`, `s`, `sdg`, `sx`, `sxdg`, `t`, `tdg`, `p`, `rx`, `ry`, `rz`, `u`, `cx`, `cz`, and `swap`. With `barrier`, an invisible barrier can be inserted to prevent gates on different qubits to be packed tightly. Finally, with `tq.gate` and `tq.mqgate`, a generic gate can be created. Both accept the same styling arguments as the normal `gate` (or `mqgate`).
+
+Also like Qiskit, all qubit arguments support ranges, e.g., `tq.h(range(5))` adds a Hadamard gate on the first five qubits and `tq.cx((0, 1), (1, 2))` adds two CX gates: one from qubit 0 to 1 and one from qubit 1 to 2. 
+
+With tequila, it is easy to build templates for quantum circuits. As an example, the provided `graph-state()` template for quickly drawing graph state preparation circuits is in principle implemented like the following:
+```typ
+#let graph-state(..edges) = tq.build(
+    tq.h(range(num-qubits)),
+    edges.map(edge => tq.cz(..edge))
+ )
+```
 
 ## Examples
 
