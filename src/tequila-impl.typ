@@ -26,11 +26,12 @@
   if type(control) == int { control = (control,) }
   if type(target) == int { target = (target,) }
 
-  for c in control {
-    for t in target {
-      assert.ne(t, c, message: "Target and control qubit cannot be the same")
-      gates.push(bgate(c, start, nq: t - c + 1, end: end, t - c) )
-    }
+  for i in range(calc.max(control.len(), target.len())) {
+    let c = control.at(i, default: control.last())
+    let t = target.at(i, default: target.last())
+    assert.ne(t, c, message: "Target and control qubit cannot be the same")
+    gates.push(bgate(c, start, nq: t - c + 1, end: end, t - c) )
+
   }
   gates
 }

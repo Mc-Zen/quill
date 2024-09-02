@@ -1,5 +1,6 @@
 #set page(width: auto, height: auto, margin: 0pt)
-#import "/src/quill.typ" as quill: tequila as tq
+#import "/src/quill.typ"
+#import quill: tequila as tq
 
 #quill.quantum-circuit(
   ..tq.build(
