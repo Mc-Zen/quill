@@ -2,6 +2,7 @@
 #import "decorations.typ": lstick, rstick, midstick, nwire, annotate, slice, setwire, gategroup
 #import "gates.typ": gate, mqgate, ctrl, swap, targ, meter, phantom, permute, phase, targX
 #import "quantum-circuit.typ": quantum-circuit
+#import "tequila.typ"
 
 
 #let help(..args) = {
