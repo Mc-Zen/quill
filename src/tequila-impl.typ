@@ -78,6 +78,9 @@
 )
 
 
+#let ca(control, target, content) = generate-two-qubit-gate(
+  control, target, gates.ctrl, gates.gate.with(content)
+)
 
 
 #let build(
@@ -140,4 +143,19 @@
     h(range(num-qubits)),
     edges.map(edge => cz(..edge))
   )
+}
+
+
+#let qft(n) = {
+  let gates = ()
+  for i in range(n - 1) {
+    gates.push(h(i))
+    for j in range(2, n - i + 1) {
+      gates.push(ca(i + j - 1, i, $R_#j$))
+      gates.push(p(i + j - 1))
+    }
+    gates.push(barrier())
+  }
+  gates.push(h(n - 1))
+  build(n: n, ..gates)
 }
