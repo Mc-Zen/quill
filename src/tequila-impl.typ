@@ -106,7 +106,11 @@
     }
     let max-track-len = calc.max(..tracks.slice(q1, q2 + 1).map(array.len))
     for q in range(q1, q2 + 1) {
-      tracks.at(q) += (1,) * (max-track-len - tracks.at(q).len())
+      let dif = max-track-len - tracks.at(q).len()
+      if gate.constructor != barrier and q not in (q1, q2) {
+         dif += 1
+      }
+      tracks.at(q) += (1,) * dif
     }
     if gate.constructor != barrier {
       tracks.at(start).push((gate.constructor)(..gate.args))

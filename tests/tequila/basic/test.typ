@@ -61,3 +61,13 @@
   tq.x(3),
   tq.cz(0, range(1,5))
 ))
+
+
+
+#pagebreak()
+
+#quill.quantum-circuit(..tq.build(
+  tq.cz(0, 2),
+  tq.h(0, 1, 2)
+))
+
