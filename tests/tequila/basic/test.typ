@@ -71,3 +71,13 @@
   tq.h(0, 1, 2)
 ))
 
+
+
+#pagebreak()
+
+#quill.quantum-circuit(..tq.build(
+  append-wire: false,
+  tq.s(0, 1, 2),
+  tq.meter(range(1,3)),
+))
+

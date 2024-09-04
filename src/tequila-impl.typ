@@ -87,7 +87,7 @@
 
 #let build(
   n: auto, 
-  x: 0, 
+  x: 1, 
   y: 0,
   append-wire: true,
   ..args
@@ -97,7 +97,7 @@
   if num-qubits == auto {
     num-qubits = calc.max(..operations.map(x => x.qubit + calc.max(0, x.n - 1))) + 1
   }
-  let tracks = ((1,),) * num-qubits
+  let tracks = ((),) * num-qubits
   
   for op in operations {
     let start = op.qubit
@@ -145,7 +145,7 @@
 
 
 
-#let graph-state(..edges, n: auto, x: 0, y: 0, invert: false) = {
+#let graph-state(..edges, n: auto, x: 1, y: 0, invert: false) = {
   edges = edges.pos()
   let max-qubit = 0
   for edge in edges {
