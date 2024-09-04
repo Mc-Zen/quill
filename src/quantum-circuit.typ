@@ -182,7 +182,7 @@
         size: size-hint,
         gutter: 0pt,
         box: item.box,
-        empty: false
+        empty: gate.data == "placeholder"
       )
       let gate-info = (
         gate: gate,

@@ -85,37 +85,40 @@
 
 #let build(
   n: auto, 
+  x: 0, 
+  y: 0,
+  append-wire: true,
   ..args
 ) = {
-  let gates = args.pos().flatten()
+  let operations = args.pos().flatten()
   let num-qubits = n
   if num-qubits == auto {
-    num-qubits = calc.max(..gates.map(x => x.qubit + calc.max(0, x.n - 1))) + 1
+    num-qubits = calc.max(..operations.map(x => x.qubit + calc.max(0, x.n - 1))) + 1
   }
   let tracks = ((1,),) * num-qubits
   
-  for gate in gates {
-    let start = gate.qubit
+  for op in operations {
+    let start = op.qubit
     // if start < 0 { start = num-qubits + start }
-    let end = start + gate.n - 1
+    let end = start + op.n - 1
     assert(start >= 0 and start < num-qubits, message: "The qubit `" + str(start) + "` is out of range. Leave `n` at `auto` if you want to automatically resize the circuit. ")
     assert(end >= 0 and end < num-qubits, message: "The qubit `" + str(end) + "` is out of range. Leave `n` at `auto` if you want to automatically resize the circuit. ")
     let (q1, q2) = (start, end).sorted()
-    if gate.constructor == barrier {
+    if op.constructor == barrier {
       (q1, q2) = (0, num-qubits - 1)
     }
     let max-track-len = calc.max(..tracks.slice(q1, q2 + 1).map(array.len))
     for q in range(q1, q2 + 1) {
       let dif = max-track-len - tracks.at(q).len()
-      if gate.constructor != barrier and q not in (q1, q2) {
+      if op.constructor != barrier and q not in (q1, q2) {
          dif += 1
       }
       tracks.at(q) += (1,) * dif
     }
-    if gate.constructor != barrier {
-      tracks.at(start).push((gate.constructor)(..gate.args))
-      if gate.end != none {
-        tracks.at(end).push((gate.end)())
+    if op.constructor != barrier {
+      tracks.at(start).push((op.constructor)(..op.args, x: x + tracks.at(start).len(), y: y + start))
+      if op.end != none {
+        tracks.at(end).push((op.end)(x: x + tracks.at(end).len(), y: y + end))
       }
     }
   }
@@ -124,13 +127,23 @@
   for q in range(tracks.len()) {
     tracks.at(q) += (1,) * (max-track-len - tracks.at(q).len())
   }
-  tracks.join(([\ ],))
+  
+  let num-cols = x + calc.max(..tracks.map(array.len)) - 2
+  if append-wire { num-cols += 1 }
+  let placeholder = gates.gate(
+    none, 
+    x: num-cols, y: y + num-qubits - 1, 
+    data: "placeholder", box: false, floating: true, 
+    size-hint: (it, i) => (width: 0pt, height: 0pt)
+  )
+
+  (placeholder,) + tracks.flatten().filter(x => type(x) != int) 
 }
 
 
 
 
-#let graph-state(..edges, n: auto) = {
+#let graph-state(..edges, n: auto, x: 0, y: 0, invert: false) = {
   edges = edges.pos()
   let max-qubit = 0
   for edge in edges {
@@ -143,14 +156,22 @@
     num-qubits = n
     assert(n > max-qubit, message: "")
   }
-  build(
+  let gates = (
     h(range(num-qubits)),
+    barrier(),
     edges.map(edge => cz(..edge))
+  )
+  if invert {
+    gates = gates.rev()
+  }
+  build(
+    x: x, y: y, 
+    ..gates
   )
 }
 
 
-#let qft(n) = {
+#let qft(n, x: 0, y: 0) = {
   let gates = ()
   for i in range(n - 1) {
     gates.push(h(i))
@@ -161,5 +182,5 @@
     gates.push(barrier())
   }
   gates.push(h(n - 1))
-  build(n: n, ..gates)
+  build(n: n, x: x, y: y, ..gates)
 }
