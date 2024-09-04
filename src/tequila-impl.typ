@@ -8,14 +8,14 @@
   args: args
 ),)
 
-#let generate-single-qubit-gate(qubit, content) = {
+#let generate-single-qubit-gate(qubit, constructor: gates.gate, ..args) = {
   if qubit.named().len() != 0 {
     assert(false, message: "Unexpected argument `" + qubit.named().pairs().first().first() + "`")
   }
   qubit = qubit.pos()
   if qubit.len() == 1 { qubit = qubit.first() }
-  if type(qubit) == int { return bgate(qubit, gates.gate, content) }
-  qubit.map(qubit => bgate(qubit, gates.gate, content))
+  if type(qubit) == int { return bgate(qubit, constructor, ..args) }
+  qubit.map(qubit => bgate(qubit, constructor, ..args))
 }
 
 #let generate-two-qubit-gate(control, target, start, end) = {
@@ -65,6 +65,8 @@
 #let u(theta, phi, lambda, ..qubit) = generate-single-qubit-gate(
   qubit, $U (#theta, #phi, #lambda)$
 )
+
+#let meter(..qubit) = generate-single-qubit-gate(qubit, constructor: gates.meter)
 
 
 #let cx(control, target) = generate-two-qubit-gate(
