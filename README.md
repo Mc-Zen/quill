@@ -73,7 +73,7 @@ _Tequila_ is a submodule that adds a completely different way of building circui
   quill.gategroup(x: 2, y: 0, 3, 2)
 )
 ```
-This is similar to how _QASM_ and _Qiskit_ work: gates are successively applied to the circuit and under the hood packed as tightly as possible. We start by calling the `tq.build()` function and filling it with quantum operations. This returns a collection of gates which we expand into the circuit with the `..` syntax. 
+This is similar to how _QASM_ and _Qiskit_ work: gates are successively applied to the circuit which is then layed out automatically by packing gates as tightly as possible. We start by calling the `tq.build()` function and filling it with quantum operations. This returns a collection of gates which we expand into the circuit with the `..` syntax. 
 Now, we still have the option to add annotations, groups, slices, or even more gates via manual placement. 
 
 The syntax works analog to Qiskit. Available gates are `x`, `y`, `z`, `h`, `s`, `sdg`, `sx`, `sxdg`, `t`, `tdg`, `p`, `rx`, `ry`, `rz`, `u`, `cx`, `cz`, and `swap`. With `barrier`, an invisible barrier can be inserted to prevent gates on different qubits to be packed tightly. Finally, with `tq.gate` and `tq.mqgate`, a generic gate can be created. These two accept the same styling arguments as the normal `gate` (or `mqgate`).
