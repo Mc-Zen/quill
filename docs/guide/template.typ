@@ -89,8 +89,9 @@
     })
   )
 }
+#let stdscale = scale
 
-#let example(code, vertical: false, scope: (:), text-size: 1em) = {
+#let example(code, vertical: false, scope: (:), text-size: 1em, scale: 100%) = {
   figure(
     pad(y: 1em,
       box(fill: gray.lighten(90%), inset: .8em, {
@@ -103,7 +104,7 @@
             set text(size: text-size)
             box(code)
           }, 
-          block(eval("#import quill: *\n" + code.text, mode: "markup", scope: (quill: quill) + scope))
+          block(stdscale(scale, reflow: true, eval("#import quill: *\n" + code.text, mode: "markup", scope: (quill: quill) + scope)))
         )
       })
     )

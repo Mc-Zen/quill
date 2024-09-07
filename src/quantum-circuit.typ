@@ -50,7 +50,7 @@
 ///            for the circuit and can be used to increase it when labels or 
 ///            annotations extend beyond the actual circuit. 
 /// - fill-wires (boolean): Whether to automatically fill up all wires until the end. 
-/// - ..children (array): Items, gates and circuit commands (see description). 
+/// - ..children (any): Items, gates and circuit commands (see description). 
 #let quantum-circuit(
   wire: .7pt + black,     
   row-spacing: 12pt,

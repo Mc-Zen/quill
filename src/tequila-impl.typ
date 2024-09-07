@@ -194,6 +194,9 @@
 
 
 /// Template for the quantum fourier transform (QFT). 
+/// - n (auto, int): Number of qubits. 
+/// - x (int): Determines at which column the QFT routine will be placed in the circuit. 
+/// - y (int): Determines at which row the QFT routine will be placed in the circuit. 
 #let qft(
   n, 
   x: 1, 

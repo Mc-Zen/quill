@@ -21,7 +21,7 @@ _Meanwhile, we suggest importing everything from the package in a local scope to
 
 - [**Usage**](#basic-usage) _quick introduction_
 - [**Cheat sheet**](#cheat-sheet) _gallery for quickly viewing all kinds of gates_
-- [**Tequila**](#tequila) _building circuits in a way similar to QASM or Qiskit_
+- [**Tequila**](#tequila) _building (sub-)circuits in a way similar to QASM or Qiskit_
 - [**Examples**](#examples)
 - [**Changelog**](#changelog)
 
