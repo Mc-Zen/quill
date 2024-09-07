@@ -20,7 +20,7 @@
 
 = Introduction
 
-#pad(x: 1cm)[_@gate-gallery features a gallery of many gates and symbols and how to create them. In @demo, you can find a variety of example figures along with the code. _]
+#pad(x: 1cm)[_@gate-gallery features a gallery of many gates and symbols and how to create them. In @demo, you can find a variety of example figures along with the code. @tequila introduces an alternative model for creating and composing circuits._]
 
 Would you like to create quantum circuits directly in Typst? Maybe a circuit for quantum teleportation?
 #figure[#include("../../examples/teleportation.typ")]
@@ -586,7 +586,7 @@ All built-in gates are drawn with a dedicated `draw-function` and you can also t
 
       colbreak()
 
-      [== Tequila]
+      heading(outlined: false)[Tequila]
       v(2mm)
       show-outline(docs-tequila)
       show-module(docs-tequila)
@@ -653,7 +653,7 @@ The following two circuits reproduce figures from Exercise 10.66 and 10.68 on co
 
 
 
-= Tequila
+= Tequila <tequila>
 
 _Tequila_ is a submodule of *Quill* that adds a completely different way of building circuits. 
 
@@ -677,7 +677,7 @@ The syntax works analog to Qiskit. Available gates are `x`, `y`, `z`, `h`, `s`, 
 
 Also like Qiskit, all qubit arguments support ranges, e.g., `tq.h(range(5))` adds a Hadamard gate on the first five qubits and `tq.cx((0, 1), (1, 2))` adds two #smallcaps[cx] gates: one from qubit 0 to 1 and one from qubit 1 to 2. 
 
-With Tequila, it is easy to build templates for quantum circuits and to compose circuits of various building blocks. For this purpose, `tq.build()` and the build-in templates all feature optional `x` and `y` arguments to allow placing a subcircuit at an arbitrary position of the circuit. 
+With Tequila, it is easy to build templates for quantum circuits and to compose circuits of various building blocks. For this purpose, `tq.build()` and the built-in templates all feature optional `x` and `y` arguments to allow placing a subcircuit at an arbitrary position of the circuit. 
 As an example, Tequila provides a `tq.graph-state()` template for quickly drawing graph state preparation circuits. The following example demonstrates how to compose multiple subcircuits. 
 
 #example(scale: 74%,

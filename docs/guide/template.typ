@@ -20,6 +20,7 @@
   set text(font: "Linux Libertine", lang: "en")
   set heading(numbering: "I.a")
   show heading.where(level: 1): it => block(smallcaps(it), below: 1em)
+  show link: underline.with(offset: 1.2pt)
 
   v(4em)
 
@@ -67,7 +68,6 @@
   show raw.where(block: true) : set par(justify: false)
 
 
-  show link: underline.with(offset: 1.2pt)
   show link: set text(fill: purple.darken(30%))
 
   body
