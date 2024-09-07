@@ -20,7 +20,7 @@
 
 = Introduction
 
-#pad(x: 1cm)[_@gate-gallery features a gallery of many gates and symbols and how to create them. In @demo, you can find a variety of example figures along with the code. _]
+#pad(x: 1cm)[_@gate-gallery features a gallery of many gates and symbols and how to create them. In @demo, you can find a variety of example figures along with the code. @tequila introduces an alternative model for creating and composing circuits._]
 
 Would you like to create quantum circuits directly in Typst? Maybe a circuit for quantum teleportation?
 #figure[#include("../../examples/teleportation.typ")]
@@ -581,6 +581,16 @@ All built-in gates are drawn with a dedicated `draw-function` and you can also t
       show-module(docs-gates)
       v(1cm)
       show-module(docs-decorations)
+
+      let docs-tequila = parse-module(read("/src/tequila-impl.typ"))
+
+      colbreak()
+
+      heading(outlined: false)[Tequila]
+      v(2mm)
+      show-outline(docs-tequila)
+      show-module(docs-tequila)
+
     }
   ])
 
@@ -640,5 +650,79 @@ The following two circuits reproduce figures from Exercise 10.66 and 10.68 on co
 
 
 #pagebreak()
+
+
+
+= Tequila <tequila>
+
+_Tequila_ is a submodule of *Quill* that adds a completely different way of building circuits. 
+
+#example(
+```typ
+#import tequila as tq
+
+#quantum-circuit(
+  ..tq.build(
+    tq.h(0),
+    tq.cx(0, 1),
+    tq.cx(0, 2),
+  ),
+)
+```
+)
+This is similar to how _QASM_ and _Qiskit_ work: gates are successively applied to the circuit and under the hood packed as tightly as possible. We start by calling the `tq.build()` function and filling it with quantum operations. This returns a collection of gates which we expand into the circuit with the `..` syntax. 
+Now, we still have the option to add annotations, groups, slices, or even more gates via manual placement. 
+
+The syntax works analog to Qiskit. Available gates are `x`, `y`, `z`, `h`, `s`, `sdg`, `sx`, `sxdg`, `t`, `tdg`, `p`, `rx`, `ry`, `rz`, `u`, `cx`, `cz`, and `swap`. With `barrier`, an invisible barrier can be inserted to prevent gates on different qubits to be packed tightly. Finally, with `tq.gate` and `tq.mqgate`, a generic gate can be created. These two accept the same styling arguments as the normal `gate` (or `mqgate`).
+
+Also like Qiskit, all qubit arguments support ranges, e.g., `tq.h(range(5))` adds a Hadamard gate on the first five qubits and `tq.cx((0, 1), (1, 2))` adds two #smallcaps[cx] gates: one from qubit 0 to 1 and one from qubit 1 to 2. 
+
+With Tequila, it is easy to build templates for quantum circuits and to compose circuits of various building blocks. For this purpose, `tq.build()` and the built-in templates all feature optional `x` and `y` arguments to allow placing a subcircuit at an arbitrary position of the circuit. 
+As an example, Tequila provides a `tq.graph-state()` template for quickly drawing graph state preparation circuits. The following example demonstrates how to compose multiple subcircuits. 
+
+#example(scale: 74%,
+```typ
+#import tequila as tq
+
+#quantum-circuit(
+  ..tq.graph-state((0, 1), (1,2)),
+  ..tq.build(y: 3, 
+      tq.p($pi$, 0), 
+      tq.cx(0, (1, 2)), 
+    ),
+  ..tq.graph-state(x: 6, y: 2, invert: true, (0, 1), (0, 2)),
+  gategroup(x: 1, 3, 3),
+  gategroup(x: 1, y: 3, 3, 3),
+  gategroup(x: 6, y: 2, 3, 3),
+  slice(x: 5)
+)
+```
+)
+
+#block(breakable: false)[
+To demonstrate the creation of templates, we give the (simplified) implementation of `tq.graph-state()` in the following:
+
+#example(
+```typ
+#let graph-state(..edges, x: 1, y: 0) = tq.build(
+  x: x, y: y,
+  tq.h(range(num-qubits)),
+  edges.map(edge => tq.cz(..edge))
+)
+```
+)
+]
+
+// This makes it easier to generate certain classes of circuits, for example in order to have a good starting point for a more complex circuit. 
+
+Another built-in building block is `tq.qft(n)` for inserting a quantum fourier transform (QFT) on $n$ qubits. 
+
+#example(scale: 80%,
+```typ
+#quantum-circuit(..tequila.qft(y: 1, 4))
+```
+)
+
+
 
 #bibliography("references.bib")

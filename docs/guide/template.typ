@@ -20,6 +20,7 @@
   set text(font: "Linux Libertine", lang: "en")
   set heading(numbering: "I.a")
   show heading.where(level: 1): it => block(smallcaps(it), below: 1em)
+  show link: underline.with(offset: 1.2pt)
 
   v(4em)
 
@@ -67,7 +68,6 @@
   show raw.where(block: true) : set par(justify: false)
 
 
-  show link: underline.with(offset: 1.2pt)
   show link: set text(fill: purple.darken(30%))
 
   body
@@ -89,8 +89,9 @@
     })
   )
 }
+#let stdscale = scale
 
-#let example(code, vertical: false, scope: (:), text-size: 1em) = {
+#let example(code, vertical: false, scope: (:), text-size: 1em, scale: 100%) = {
   figure(
     pad(y: 1em,
       box(fill: gray.lighten(90%), inset: .8em, {
@@ -103,7 +104,7 @@
             set text(size: text-size)
             box(code)
           }, 
-          block(eval("#import quill: *\n" + code.text, mode: "markup", scope: (quill: quill) + scope))
+          block(stdscale(scale, reflow: true, eval("#import quill: *\n" + code.text, mode: "markup", scope: (quill: quill) + scope)))
         )
       })
     )
