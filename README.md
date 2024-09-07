@@ -32,7 +32,7 @@ The function `quantum-circuit()` takes any number of positional gates and works 
 
 ```typ
 #{
-  import "@preview/quill:0.3.0": *
+  import "@preview/quill:0.4.0": *
 
   quantum-circuit(
     lstick($|0〉$), $H$, ctrl(1), rstick($(|00〉+|11〉)/√2$, n: 2), [\ ],
@@ -62,7 +62,7 @@ Instead of listing every featured gate (as is done in the [user guide][guide]), 
 _Tequila_ is a submodule that adds a completely different way of building circuits. 
 
 ```typ
-#import "@preview/quill:0.3.0" as quill: tequila as tq
+#import "@preview/quill:0.4.0" as quill: tequila as tq
 
 #quill.quantum-circuit(
   ..tq.build(
@@ -78,10 +78,12 @@ Now, we still have the option to add annotations, groups, slices, or even more g
 
 The syntax works analog to Qiskit. Available gates are `x`, `y`, `z`, `h`, `s`, `sdg`, `sx`, `sxdg`, `t`, `tdg`, `p`, `rx`, `ry`, `rz`, `u`, `cx`, `cz`, and `swap`. With `barrier`, an invisible barrier can be inserted to prevent gates on different qubits to be packed tightly. Finally, with `tq.gate` and `tq.mqgate`, a generic gate can be created. These two accept the same styling arguments as the normal `gate` (or `mqgate`).
 
-Also like Qiskit, all qubit arguments support ranges, e.g., `tq.h(range(5))` adds a Hadamard gate on the first five qubits and `tq.cx((0, 1), (1, 2))` adds two #smallcaps[cx] gates: one from qubit 0 to 1 and one from qubit 1 to 2. 
+Also like Qiskit, all qubit arguments support ranges, e.g., `tq.h(range(5))` adds a Hadamard gate on the first five qubits and `tq.cx((0, 1), (1, 2))` adds two CX gates: one from qubit 0 to 1 and one from qubit 1 to 2. 
 
 With Tequila, it is easy to build templates for quantum circuits and to compose circuits of various building blocks. For this purpose, `tq.build()` and the built-in templates all feature optional `x` and `y` arguments to allow placing a subcircuit at an arbitrary position of the circuit. 
-As an example, Tequila provides a `tq.graph-state()` template for quickly drawing graph state preparation circuits. The following example demonstrates how to compose multiple subcircuits. 
+As an example, Tequila provides a `tq.graph-state()` template for quickly drawing graph state preparation circuits. 
+
+The following example demonstrates how to compose multiple subcircuits. 
 
 
 ```typ
@@ -118,6 +120,7 @@ Some show-off examples, loosely replicating figures from [Quantum Computation an
 <h3 align="center">
   <img alt="Quantum fourier transformation circuit" src="docs/images/qft.svg">
 </h3>
+
 
 ## Contribution
 
@@ -177,12 +180,11 @@ This package uses [typst-test](https://github.com/tingerrr/typst-test/) for runn
   - Add section on creating custom gates. 
   - Add section on using labels. 
   - Explain usage of `slice()` and `gategroup()`.
-  <!-- - Add Tips and tricks section -->
 
 ### v0.1.0
 
 Initial Release
 
 
-[guide]: https://github.com/Mc-Zen/quill/releases/download/v0.3.0/quill-guide.pdf
+[guide]: https://github.com/Mc-Zen/quill/releases/download/v0.4.0/quill-guide.pdf
 [tidy]: https://github.com/Mc-Zen/tidy

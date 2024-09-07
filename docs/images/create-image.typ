@@ -1,7 +1,7 @@
 #set page(width: auto, height: auto, margin: 0pt)
 
-#let scale-factor = 130%
-#let content = include("/examples/qft.typ")
+#let scale-factor = 100%
+#let content = include("/examples/composition.typ")
 
 #style(styles => {
     let size = measure(content, styles)
