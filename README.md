@@ -128,6 +128,8 @@ This package uses [typst-test](https://github.com/tingerrr/typst-test/) for runn
 
 
 ## Changelog
+### v0.4.0
+- Alternative model for creating and composing circuits: [Tequila](#tequila). 
 
 ### v0.3.0
 - New features
