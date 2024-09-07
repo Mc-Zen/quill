@@ -3,9 +3,10 @@
 
 
 #let version = toml("/typst.toml").package.version
+#show link: set text(fill: rgb("#1e8f6f"))
 
 #show: project.with(
-  title: "Guide for the Quill Package ",
+  title: "Quill",
   authors: ("Mc-Zen",),
   abstract: [Quill is a library for creating quantum circuit diagrams in #link("https://typst.app/", [Typst]). ],
   date: datetime.today().display("[month repr:long] [day], [year]"),
@@ -561,7 +562,7 @@ All built-in gates are drawn with a dedicated `draw-function` and you can also t
         show-outline: false,
         style: tidy.styles.default
       )
-      let show-outline = tidy.styles.default.show-outline
+      let show-outline = tidy.styles.default.show-outline.with(style-args: (enable-cross-references: true))
       
       let docs = parse-module(read("/src/quantum-circuit.typ"))
       let docs-gates = parse-module(read("/src/gates.typ"))
@@ -687,7 +688,7 @@ The following example demonstrates how to compose multiple subcircuits.
 #import tequila as tq
 
 #quantum-circuit(
-  ..tq.graph-state((0, 1), (1,2)),
+  ..tq.graph-state((0, 1), (1, 2)),
   ..tq.build(y: 3, 
       tq.p($pi$, 0), 
       tq.cx(0, (1, 2)), 

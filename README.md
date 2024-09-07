@@ -90,7 +90,7 @@ The following example demonstrates how to compose multiple subcircuits.
 #import tequila as tq
 
 #quantum-circuit(
-  ..tq.graph-state((0, 1), (1,2)),
+  ..tq.graph-state((0, 1), (1, 2)),
   ..tq.build(y: 3, 
       tq.p($pi$, 0), 
       tq.cx(0, (1, 2)), 
