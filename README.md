@@ -73,20 +73,37 @@ _Tequila_ is a submodule that adds a completely different way of building circui
   quill.gategroup(x: 2, y: 0, 3, 2)
 )
 ```
-This is similar to how _QASM_ and _Qiskit_ work: gates are successively applied to the circuit and under the hood packed as tightly as possible. We start by calling the `build()` function and filling it with quantum operations. This returns a collection of gates which we expand into the circuit with the `..` syntax. 
+This is similar to how _QASM_ and _Qiskit_ work: gates are successively applied to the circuit and under the hood packed as tightly as possible. We start by calling the `tq.build()` function and filling it with quantum operations. This returns a collection of gates which we expand into the circuit with the `..` syntax. 
 Now, we still have the option to add annotations, groups, slices, or even more gates via manual placement. 
 
 The syntax works analog to Qiskit. Available gates are `x`, `y`, `z`, `h`, `s`, `sdg`, `sx`, `sxdg`, `t`, `tdg`, `p`, `rx`, `ry`, `rz`, `u`, `cx`, `cz`, and `swap`. With `barrier`, an invisible barrier can be inserted to prevent gates on different qubits to be packed tightly. Finally, with `tq.gate` and `tq.mqgate`, a generic gate can be created. These two accept the same styling arguments as the normal `gate` (or `mqgate`).
 
-Also like Qiskit, all qubit arguments support ranges, e.g., `tq.h(range(5))` adds a Hadamard gate on the first five qubits and `tq.cx((0, 1), (1, 2))` adds two CX gates: one from qubit 0 to 1 and one from qubit 1 to 2. 
+Also like Qiskit, all qubit arguments support ranges, e.g., `tq.h(range(5))` adds a Hadamard gate on the first five qubits and `tq.cx((0, 1), (1, 2))` adds two #smallcaps[cx] gates: one from qubit 0 to 1 and one from qubit 1 to 2. 
 
-With tequila, it is easy to build templates for quantum circuits. As an example, the provided `graph-state()` template for quickly drawing graph state preparation circuits is in principle implemented like the following:
+With Tequila, it is easy to build templates for quantum circuits and to compose circuits of various building blocks. For this purpose, `tq.build()` and the build-in templates all feature optional `x` and `y` arguments to allow placing a subcircuit at an arbitrary position of the circuit. 
+As an example, Tequila provides a `tq.graph-state()` template for quickly drawing graph state preparation circuits. The following example demonstrates how to compose multiple subcircuits. 
+
+
 ```typ
-#let graph-state(..edges) = tq.build(
-  tq.h(range(num-qubits)),
-  edges.map(edge => tq.cz(..edge))
+#import tequila as tq
+
+#quantum-circuit(
+  ..tq.graph-state((0, 1), (1,2)),
+  ..tq.build(y: 3, 
+      tq.p($pi$, 0), 
+      tq.cx(0, (1, 2)), 
+    ),
+  ..tq.graph-state(x: 6, y: 2, invert: true, (0, 1), (0, 2)),
+  gategroup(x: 1, 3, 3),
+  gategroup(x: 1, y: 3, 3, 3),
+  gategroup(x: 6, y: 2, 3, 3),
+  slice(x: 5)
 )
 ```
+<div align="center">
+  <img alt="Gallery" src="docs/images/composition.svg" />
+</div>
+
 
 ## Examples
 
