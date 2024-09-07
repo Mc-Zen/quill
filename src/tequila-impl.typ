@@ -85,14 +85,21 @@
 )
 
 
+/// Constructs a circuit from operation instructions. 
+/// 
+/// - n (auto, int): Number of qubits. Can be inferred automatically. 
+/// - x (int): Determines at which column the subcircuit will be put in the circuit. 
+/// - y (int): Determines at which row the subcircuit will be put in the circuit. 
+/// - append-wire (boolean): If set to `true`, the a last column of outgoing wires will be added. 
+/// - ..children (any): Sequence of instructions. 
 #let build(
   n: auto, 
   x: 1, 
   y: 0,
   append-wire: true,
-  ..args
+  ..children
 ) = {
-  let operations = args.pos().flatten()
+  let operations = children.pos().flatten()
   let num-qubits = n
   if num-qubits == auto {
     num-qubits = calc.max(..operations.map(x => x.qubit + calc.max(0, x.n - 1))) + 1
@@ -144,8 +151,21 @@
 
 
 
-
-#let graph-state(..edges, n: auto, x: 1, y: 0, invert: false) = {
+/// Constructs a graph state preparation circuit. 
+/// 
+/// - n (auto, int): Number of qubits. Can be inferred automatically. 
+/// - x (int): Determines at which column the subcircuit will be put in the circuit. 
+/// - y (int): Determines at which row the subcircuit will be put in the circuit. 
+/// - invert (boolean): If set to `true`, the circuit will be inverted, i.e., a circuit for
+///     "uncomputing" the corresponding graph state. 
+/// ..edges (array): 
+#let graph-state(
+  n: auto,
+  x: 1,
+  y: 0,
+  invert: false,
+  ..edges
+) = {
   edges = edges.pos()
   let max-qubit = 0
   for edge in edges {
@@ -173,7 +193,12 @@
 }
 
 
-#let qft(n, x: 0, y: 0) = {
+/// Template for the quantum fourier transform (QFT). 
+#let qft(
+  n, 
+  x: 1, 
+  y: 0
+) = {
   let gates = ()
   for i in range(n - 1) {
     gates.push(h(i))
