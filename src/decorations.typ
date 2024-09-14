@@ -76,11 +76,19 @@
 /// - label (array, str, content, dictionary): One or more labels to add to the gate. 
 #let midstick(
   content,
+  n: 1,
   fill: none,
   label: none,
   x: auto,
   y: auto
-) = gate(content, draw-function: draw-functions.draw-unboxed-gate, label: label, fill: fill, x: x, y: y)
+) = {
+  if n == 1 { 
+    gate(content, draw-function: draw-functions.draw-unboxed-gate, label: label, fill: fill, x: x, y: y) 
+  } else {
+    mqgate(content, n: n, draw-function: draw-functions.draw-boxed-multigate, label: label, fill: fill, x: x, y: y, stroke: none) 
+  }
+}
+
 
 
 
