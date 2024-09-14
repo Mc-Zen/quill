@@ -37,7 +37,7 @@
   
   let style-params = (
       width: gate.width,
-      stroke: draw-params.wire, 
+      stroke: utility.if-auto(gate.stroke, draw-params.wire), 
       radius: gate.radius,
       fill: utility.if-auto(gate.fill, draw-params.background), 
       inset: draw-params.padding, 
