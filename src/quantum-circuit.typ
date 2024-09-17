@@ -307,25 +307,25 @@
     let layer-below-circuit
     let layer-above-circuit
     for (item, x, y) in meta-instructions {
-      let (content, decoration-bounds) = (none, none)
+      let (the-content, decoration-bounds) = (none, none)
       if item.qc-instr == "gategroup" {
         verifications.verify-gategroup(item, x, y, num-rows, num-cols)
         let (dy1, dy2) = layout.get-cell-coords(center-y-coords, row-heights, (y, y + item.wires - 1e-9))
         let (dx1, dx2) = layout.get-cell-coords(center-x-coords, col-widths, (x, x + item.steps - 1e-9))
-        (content, decoration-bounds) = draw-functions.draw-gategroup(dx1, dx2, dy1, dy2, item, draw-params)
+        (the-content, decoration-bounds) = draw-functions.draw-gategroup(dx1, dx2, dy1, dy2, item, draw-params)
       } else if item.qc-instr == "slice" {
         verifications.verify-slice(item, x, y, num-rows, num-cols)
         let end = if item.wires == 0 { row-heights.len() } else { y + item.wires }
         let (dy1, dy2) = layout.get-cell-coords(center-y-coords, row-heights, (y, end))
         let dx = layout.get-cell-coords(center-x-coords, col-widths, x)
-        (content, decoration-bounds) = draw-functions.draw-slice(dx, dy1, dy2, item, draw-params)
+        (the-content, decoration-bounds) = draw-functions.draw-slice(dx, dy1, dy2, item, draw-params)
       } else if item.qc-instr == "annotate" {
         let rows = layout.get-cell-coords(center-y-coords, row-heights, item.rows)
         let cols = layout.get-cell-coords(center-x-coords, col-widths, item.columns)
         let annotation = (item.callback)(cols, rows)
         verifications.verify-annotation-content(annotation)
         if type(annotation) == dictionary {
-          (content, decoration-bounds) = layout.place-with-labels(
+          (the-content, decoration-bounds) = layout.place-with-labels(
             annotation.content,
             dx: annotation.at("dx", default: 0pt),
             dy: annotation.at("dy", default: 0pt),
@@ -338,8 +338,8 @@
       if decoration-bounds != none {
         bounds = layout.update-bounds(bounds, decoration-bounds, draw-params.em)
       }
-      if item.at("z", default: "below") == "below" { layer-below-circuit += content  }
-      else { layer-above-circuit += content  }
+      if item.at("z", default: "below") == "below" { layer-below-circuit += the-content  }
+      else { layer-above-circuit += the-content  }
     }
 
     layer-below-circuit
