@@ -1,9 +1,9 @@
 
 #let if-none(a, b) = { if a != none { a } else { b } }
 #let if-auto(a, b) = { if a != auto { a } else { b } }
-#let is-gate(item) = { type(item) == "dictionary" and "gate-type" in item }
-#let is-circuit-drawable(item) = { is-gate(item) or type(item) in ("string", "content") }
-#let is-circuit-meta-instruction(item) = { type(item) == "dictionary" and "qc-instr" in item }
+#let is-gate(item) = { type(item) == dictionary and "gate-type" in item }
+#let is-circuit-drawable(item) = { is-gate(item) or type(item) in (str, content) }
+#let is-circuit-meta-instruction(item) = { type(item) == dictionary and "qc-instr" in item }
 
 
 

@@ -92,7 +92,7 @@
   draw-params.x-gate-size = layout.default-size-hint(gate($X$), draw-params)
   
   let items = children.pos().map( x => {
-    if type(x) in ("content", "string") and x != [\ ] { return gate(x) }
+    if type(x) in (content, str) and x != [\ ] { return gate(x) }
     return x
   })
   
@@ -324,14 +324,14 @@
         let cols = layout.get-cell-coords(center-x-coords, col-widths, item.columns)
         let annotation = (item.callback)(cols, rows)
         verifications.verify-annotation-content(annotation)
-        if type(annotation) == "dictionary" {
+        if type(annotation) == dictionary {
           (content, decoration-bounds) = layout.place-with-labels(
             annotation.content,
             dx: annotation.at("dx", default: 0pt),
             dy: annotation.at("dy", default: 0pt),
             draw-params: draw-params
           )
-        } else if type(annotation) in ("content", "string") {
+        } else if type(annotation) in (content, str) {
           layer-below-circuit += place(annotation)
         } 
       }
@@ -353,14 +353,14 @@
 
       if offset == auto { return (dx - width / 2, dy - height / 2) } 
 
-      assert(type(offset) == "dictionary", message: "Unexpected type `" + type(offset) + "` for parameter `offset`") 
+      assert(type(offset) == dictionary, message: "Unexpected type `" + type(offset) + "` for parameter `offset`") 
       
       let offset-x = offset.at("x", default: auto)
       let offset-y = offset.at("y", default: auto)
       if offset-x == auto { dx -= width / 2}
-      else if type(offset-x) == "length" { dx -= offset-x }
+      else if type(offset-x) == length { dx -= offset-x }
       if offset-y == auto { dy -= height / 2}
-      else if type(offset-y) == "length" { dy -= offset-y }
+      else if type(offset-y) == length { dy -= offset-y }
       return (dx, dy)
     }
 
@@ -503,10 +503,10 @@
   let final-width = scale * (bounds.at(2) - bounds.at(0))
   
   let thebaseline = baseline
-  if type(thebaseline) in ("content", "string") {
+  if type(thebaseline) in (content, str) {
     thebaseline = height/2 - measure(thebaseline, styles).height/2
   }
-  if type(thebaseline) == "fraction" {
+  if type(thebaseline) == fraction {
     thebaseline = 100% - layout.get-cell-coords1(center-y-coords, row-heights, thebaseline / 1fr) + bounds.at(1)
   }
   box(baseline: thebaseline,
