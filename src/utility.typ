@@ -21,7 +21,7 @@
   if is-gate(item) { 
     return (item.size-hint)(item, draw-params) 
   } 
-  measure(item, draw-params.styles)
+  measure(item)
 }
 
 

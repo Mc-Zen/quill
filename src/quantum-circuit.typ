@@ -75,18 +75,17 @@
   set text(color, size: font-size)
   set math.equation(numbering: none)
 
-  style(styles => {
+  context {
   
   // Parameter object to pass to draw-function containing current style info
   let draw-params = (
     wire: wire,
-    padding: measure(line(length: gate-padding), styles).width,
+    padding: measure(line(length: gate-padding)).width,
     background: fill,
     color: color,
-    styles: styles,
     x-gate-size: none,
     multi: (wire-distance: 0pt),
-    em: measure(line(length: 1em), styles).width
+    em: measure(line(length: 1em)).width
   )
 
   draw-params.x-gate-size = layout.default-size-hint(gate($X$), draw-params)
@@ -504,7 +503,7 @@
   
   let thebaseline = baseline
   if type(thebaseline) in (content, str) {
-    thebaseline = height/2 - measure(thebaseline, styles).height/2
+    thebaseline = height/2 - measure(thebaseline).height/2
   }
   if type(thebaseline) == fraction {
     thebaseline = 100% - layout.get-cell-coords1(center-y-coords, row-heights, thebaseline / 1fr) + bounds.at(1)
@@ -522,5 +521,5 @@
     )))
   )
   
-})
+}
 }

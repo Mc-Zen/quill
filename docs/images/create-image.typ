@@ -3,8 +3,8 @@
 #let scale-factor = 100%
 #let content = include("/examples/composition.typ")
 
-#style(styles => {
-    let size = measure(content, styles)
+#context {
+    let size = measure(content)
     rect(
         stroke: none,
         radius: 3pt,
@@ -17,4 +17,4 @@
         )
     )
 
-})
+}
