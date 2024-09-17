@@ -459,7 +459,7 @@
         draw-params.multi.wire-distance = dy1 - dy2
       }
       
-      // lsticks need their offset to be updated again (but don't update the height!)
+      // lsticks need their offset/width to be updated again (but don't update the height!)
       let content = utility.get-content(gate, draw-params)
       let new-size = utility.get-size-hint(gate, draw-params)
       size.offset = new-size.offset

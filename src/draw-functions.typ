@@ -198,17 +198,13 @@
 // Draw an lstick (align: "right") or rstick (align: "left")
 #let draw-lrstick(gate, draw-params) = {
 
-  assert(gate.data.align in (left, right), message: "Only left and right are allowed")
-  let isleftstick = (gate.data.align == right)
-  let draw-brace = gate.data.brace != none
+  assert(gate.data.align in (left, right), message: "`lstick`/`rstick`: Only left and right are allowed for parameter align")
     
   let content = box(inset: draw-params.padding, gate.content)
   let size = measure(content, draw-params.styles)
-  
- 
   let brace = none
   
-  if draw-brace {
+  if gate.data.brace != none {
     let brace-height
     if gate.multi == none {
       brace-height = 1em + 2 * draw-params.padding
@@ -219,7 +215,7 @@
     if brace-symbol == auto and gate.multi == none {
       brace-symbol = none
     }
-    brace = utility.create-brace(brace-symbol, if isleftstick {right}else{left}, brace-height)
+    brace = utility.create-brace(brace-symbol, gate.data.align, brace-height)
   }
   
   let brace-size = measure(brace, draw-params.styles)
@@ -229,18 +225,18 @@
   let content-offset-y = 0pt
   
   if gate.multi == none {
-    brace-offset-y = size.height/2 - brace-size.height/2
+    brace-offset-y = size.height / 2 - brace-size.height / 2
   } else {
     let dy = draw-params.multi.wire-distance
-    // at layout stage:
+    // at first (layout) stage:
     if dy == 0pt { return box(width: 2 * width, height: 0pt, content) }
     height = dy
-    content-offset-y = -size.height/2 + height/2
+    content-offset-y = -size.height / 2 + height / 2
     brace-offset-y = -.25em
   }
   
-  let brace-pos-x = if isleftstick { size.width } else { gate.data.pad }
-  let content-pos-x = if isleftstick { 0pt } else { width - size.width}
+  let brace-pos-x = if gate.data.align == right { size.width } else { gate.data.pad }
+  let content-pos-x = if gate.data.align == right { 0pt } else { width - size.width }
 
   box(
     width: width, 
