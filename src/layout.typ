@@ -28,7 +28,6 @@
 /// Take an alignment or 2d alignment and return a 2d alignment with the possibly 
 /// unspecified axis set to a default value. 
 #let make-2d-alignment(alignment, default-vertical: horizon, default-horizontal: center) = {
-  if type(alignment) == "2d alignment" { return alignment }
   let axis = alignment.axis()
   if axis == none { return alignment }
   if alignment.axis() == "horizontal" { return alignment + default-vertical }
@@ -167,8 +166,8 @@
     let cell-width = cell-sizes.at(integral, default: 0pt)
     return center-coords.at(integral, default: last) + cell-width * (fractional - 0.5)
   }
-  if type(cells) in ("integer", "float") { get(cells)  }
-  else if type(cells) == "array" { cells.map(x => get(x)) }
+  if type(cells) in (int, float) { get(cells)  }
+  else if type(cells) == array { cells.map(x => get(x)) }
   else { panic("Unsupported coordinate type") }
 }
 
@@ -182,8 +181,8 @@
     let c2 = center-coords.at(integral + 1, default: last)
     return c1 + (c2 - c1) * (fractional)
   }
-  if type(cells) in ("integer", "float") { get(cells)  }
-  else if type(cells) == "array" { cells.map(x => get(x)) }
+  if type(cells) in (int, float) { get(cells)  }
+  else if type(cells) == array { cells.map(x => get(x)) }
   else { panic("Unsupported coordinate type") }
 }
 

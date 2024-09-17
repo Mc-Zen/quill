@@ -7,10 +7,10 @@
 
 #let process-padding-arg(padding) = {
   let type = type(padding)
-  if type == "length" { 
+  if type == length { 
     return (left: padding, top: padding, right: padding, bottom: padding)
   }
-  if type == "dictionary" {
+  if type == dictionary {
     let rest = padding.at("rest", default: 0pt)
     let x = padding.at("x", default: rest)
     let y = padding.at("y", default: rest)
@@ -38,9 +38,9 @@
 ) = {
   if labels == none {  return () }
   let type = type(labels)
-  if type == "dictionary" { labels = (labels,) } 
-  else if type in ("content", "string") { labels = ((content: labels),) } 
-  else if type == "dictionary" { labels = ((content: labels),) } 
+  if type == dictionary { labels = (labels,) } 
+  else if type in (content, str) { labels = ((content: labels),) } 
+  else if type == dictionary { labels = ((content: labels),) } 
   let processed-labels = ()
   for label in labels {
     let alignment = layout.make-2d-alignment(label.at("pos", default: default-pos))
