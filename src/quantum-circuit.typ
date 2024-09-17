@@ -84,8 +84,7 @@
     background: fill,
     color: color,
     x-gate-size: none,
-    multi: (wire-distance: 0pt),
-    em: measure(line(length: 1em)).width
+    multi: (wire-distance: 0pt)
   )
 
   draw-params.x-gate-size = layout.default-size-hint(gate($X$), draw-params)
@@ -97,10 +96,10 @@
   
   /////////// First part: Layout (and spacing)   ///////////
   
-  let column-spacing = length-helpers.convert-em-length(column-spacing, draw-params.em)
-  let row-spacing = length-helpers.convert-em-length(row-spacing, draw-params.em)
-  let min-row-height = length-helpers.convert-em-length(min-row-height, draw-params.em)
-  let min-column-width = length-helpers.convert-em-length(min-column-width, draw-params.em)
+  let column-spacing = column-spacing.to-absolute()
+  let row-spacing = row-spacing.to-absolute()
+  let min-row-height = min-row-height.to-absolute()
+  let min-column-width = min-column-width.to-absolute()
   
   // All these arrays are gonna be filled up in the loop over `items`
   let matrix = ((),)
@@ -335,7 +334,7 @@
         } 
       }
       if decoration-bounds != none {
-        bounds = layout.update-bounds(bounds, decoration-bounds, draw-params.em)
+        bounds = layout.update-bounds(bounds, decoration-bounds)
       }
       if item.at("z", default: "below") == "below" { layer-below-circuit += the-content  }
       else { layer-above-circuit += the-content  }
@@ -428,7 +427,7 @@
           draw-params: draw-params
         )
         result
-        bounds = layout.update-bounds(bounds, gate-bounds, draw-params.em)
+        bounds = layout.update-bounds(bounds, gate-bounds)
       }
     }
     
@@ -444,7 +443,7 @@
         dx: dx, dy: dy, 
         labels: gate.labels, draw-params: draw-params
       )
-      bounds = layout.update-bounds(bounds, gate-bounds, draw-params.em)
+      bounds = layout.update-bounds(bounds, gate-bounds)
       result
     }
     
@@ -471,7 +470,7 @@
         dx: dx, dy: dy, 
         labels: gate.labels, draw-params: draw-params
       )
-      bounds = layout.update-bounds(bounds, gate-bounds, draw-params.em)
+      bounds = layout.update-bounds(bounds, gate-bounds)
       result
     }
 
