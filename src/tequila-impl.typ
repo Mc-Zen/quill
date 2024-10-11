@@ -1,9 +1,10 @@
 #import "gates.typ"
 
-#let bgate(qubit, constructor, nq: 1, end: none, ..args) = ((
+#let bgate(qubit, constructor, nq: 1, supplements: (), end: none, ..args) = ((
   qubit: qubit,
   n: nq,
   end: end,
+  supplements: supplements,
   constructor: constructor,
   args: args
 ),)
@@ -20,7 +21,15 @@
 
 #let generate-two-qubit-gate(control, target, start, end) = {
   if type(control) == int and type(target) == int { 
-    return bgate(control, start, nq: target - control + 1, end: end, target - control) 
+    assert.ne(target, control, message: "Target and control qubit cannot be the same")
+    return bgate(
+      control,
+      start,
+      target - control,
+      nq: target - control + 1,
+      end: end,
+      supplements: ((target, end),)
+    ) 
   }
   let gates = ()
   if type(control) == int { control = (control,) }
@@ -30,8 +39,47 @@
     let c = control.at(i, default: control.last())
     let t = target.at(i, default: target.last())
     assert.ne(t, c, message: "Target and control qubit cannot be the same")
-    gates.push(bgate(c, start, nq: t - c + 1, end: end, t - c) )
+    gates.push(bgate(c, start, nq: t - c + 1, end: end, t - c, supplements: ((t, end),)))
+  }
+  gates
+}
 
+#let generate-doubly-controlled-gate(control1, control2, target, end) = {
+  let sort-targets(c1, c2, t) = {
+    let k = ((c1, gates.ctrl.with(0)), (c2, gates.ctrl.with(0)), (t, end))
+    k = k.sorted(key: x => x.first())
+    let n = k.at(2).first() - k.at(0).first()
+    if k.at(0).last() == gates.ctrl.with(0) { k.at(0).last() = gates.ctrl.with(n) }
+    else if k.at(2).last() == gates.ctrl.with(0) { k.at(2).last() = gates.ctrl.with(-n) }
+    return k
+  }
+  if type(control1) == int and type(control2) == int and type(target) == int { 
+    assert((target, control1, control2).dedup().len() == 3, message: "Target and control qubits need to be all different")
+    let (a, b, c) = sort-targets(control1, control2, target)
+    return bgate(
+      a.first(), a.last(), 
+      nq: c.first() - a.first() + 1, 
+      end: end, 
+      supplements: (b, c)
+    ) 
+  }
+  let gates = ()
+  if type(control1) == int { control1 = (control1,) }
+  if type(control2) == int { control2 = (control1,) }
+  if type(target) == int { target = (target,) }
+
+  for i in range(calc.max(control1.len(), control2.len(), target.len())) {
+    let c1 = control1.at(i, default: control1.last())
+    let c2 = control2.at(i, default: control2.last())
+    let t = target.at(i, default: target.last())
+    assert((t, c1, c2).dedup().len() == 3, message: "Target and control qubits need to be all different")
+    let (a, b, c) = sort-targets(c1, c2, t)
+    gates.push(bgate(
+      a.first(), a.last(), 
+      nq: c.first() - a.first() + 1, 
+      end: end, 
+      supplements: (b, c)
+    ))
   }
   gates
 }
@@ -78,6 +126,15 @@
 #let swap(control, target) = generate-two-qubit-gate(
   control, target, gates.swap, gates.swap.with(0)
 )
+#let ccx(control1, control2, target) = generate-doubly-controlled-gate(
+  control1, control2, target, gates.targ
+)
+#let ccz(control1, control2, target) = generate-doubly-controlled-gate(
+  control1, control2, target, gates.ctrl.with(0)
+)
+#let cca(control1, control2, target, content) = generate-doubly-controlled-gate(
+  control1, control2, target, gates.gate.with(content)
+)
 
 
 #let ca(control, target, content) = generate-two-qubit-gate(
@@ -117,9 +174,11 @@
       (q1, q2) = (0, num-qubits - 1)
     }
     let max-track-len = calc.max(..tracks.slice(q1, q2 + 1).map(array.len))
+    let h = (q1, q2)
+    let h = (start,) + op.supplements.map(x => x.first())
     for q in range(q1, q2 + 1) {
       let dif = max-track-len - tracks.at(q).len()
-      if op.constructor != barrier and q not in (q1, q2) {
+      if op.constructor != barrier and q not in h {
          dif += 1
       }
       tracks.at(q) += (1,) * dif
@@ -127,7 +186,10 @@
     if op.constructor != barrier {
       tracks.at(start).push((op.constructor)(..op.args, x: x + tracks.at(start).len(), y: y + start))
       if op.end != none {
-        tracks.at(end).push((op.end)(x: x + tracks.at(end).len(), y: y + end))
+        // tracks.at(end).push((op.end)(x: x + tracks.at(end).len(), y: y + end))
+      }
+      for (qubit, supplement) in op.supplements {
+        tracks.at(qubit).push((supplement)(x: x + tracks.at(end).len(), y: y + qubit))
       }
     }
   }
