@@ -86,10 +86,12 @@
 #pagebreak()
 
 #quill.quantum-circuit(..tq.build(
-  tq.ccx((0, 1, 0, 1, 0, 2), (1, 0, 1, 2, 2, 0), (2, 2, 2, 0, 1, 1)),
+  tq.ccx((0, 1, 2, 1, 0, 2), (1, 0, 1, 2, 2, 0), (2, 2, 0, 0, 1, 1)),
   tq.ccx(2, 4, 1),
   tq.ccz(2, 3, 1),
-  tq.cca(1, 4, 2, $H$),
+  tq.y(1),
+  tq.cca(1, 4, 2, $X$),
+  tq.h(range(5))
   // tq.cx(5, 1)
 ))
 
