@@ -91,7 +91,7 @@
   tq.ccz(2, 3, 1),
   tq.y(1),
   tq.cca(1, 4, 2, $X$),
-  tq.h(range(5))
-  // tq.cx(5, 1)
+  tq.h(range(5)),
+  tq.cccx(0, 1, 3, 2)
 ))
 

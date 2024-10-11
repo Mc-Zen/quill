@@ -1,9 +1,8 @@
 #import "gates.typ"
 
-#let bgate(qubit, constructor, nq: 1, supplements: (), end: none, ..args) = ((
+#let bgate(qubit, constructor, nq: 1, supplements: (), ..args) = ((
   qubit: qubit,
   n: nq,
-  end: end,
   supplements: supplements,
   constructor: constructor,
   args: args
@@ -27,7 +26,6 @@
       start,
       target - control,
       nq: target - control + 1,
-      end: end,
       supplements: ((target, end),)
     ) 
   }
@@ -39,46 +37,33 @@
     let c = control.at(i, default: control.last())
     let t = target.at(i, default: target.last())
     assert.ne(t, c, message: "Target and control qubit cannot be the same")
-    gates.push(bgate(c, start, nq: t - c + 1, end: end, t - c, supplements: ((t, end),)))
+    gates.push(bgate(c, start, nq: t - c + 1, t - c, supplements: ((t, end),)))
   }
   gates
 }
 
-#let generate-doubly-controlled-gate(control1, control2, target, end) = {
-  let sort-targets(c1, c2, t) = {
-    let k = ((c1, gates.ctrl.with(0)), (c2, gates.ctrl.with(0)), (t, end))
+#let generate-multi-controlled-gate(controls, qubit, target) = {
+  let sort-ops(cs, q) = {
+    let k = cs.map(c => (c, gates.ctrl.with(0))) + ((q, target),)
     k = k.sorted(key: x => x.first())
-    let n = k.at(2).first() - k.at(0).first()
-    if k.at(0).last() == gates.ctrl.with(0) { k.at(0).last() = gates.ctrl.with(n) }
-    else if k.at(2).last() == gates.ctrl.with(0) { k.at(2).last() = gates.ctrl.with(-n) }
+    let n = k.last().at(0) - k.first().at(0)
+    if k.first().at(1) == gates.ctrl.with(0) { k.first().at(1) = gates.ctrl.with(n) }
+    else if k.last().at(1) == gates.ctrl.with(0) { k.at(2).at(1) = gates.ctrl.with(-n) }
     return k
   }
-  if type(control1) == int and type(control2) == int and type(target) == int { 
-    assert((target, control1, control2).dedup().len() == 3, message: "Target and control qubits need to be all different")
-    let (a, b, c) = sort-targets(control1, control2, target)
-    return bgate(
-      a.first(), a.last(), 
-      nq: c.first() - a.first() + 1, 
-      end: end, 
-      supplements: (b, c)
-    ) 
-  }
   let gates = ()
-  if type(control1) == int { control1 = (control1,) }
-  if type(control2) == int { control2 = (control1,) }
-  if type(target) == int { target = (target,) }
+  controls = controls.map(c => if type(c) == int { (c,)} else { c })
+  if type(qubit) == int { qubit = (qubit,) }
 
-  for i in range(calc.max(control1.len(), control2.len(), target.len())) {
-    let c1 = control1.at(i, default: control1.last())
-    let c2 = control2.at(i, default: control2.last())
-    let t = target.at(i, default: target.last())
-    assert((t, c1, c2).dedup().len() == 3, message: "Target and control qubits need to be all different")
-    let (a, b, c) = sort-targets(c1, c2, t)
+  for i in range(calc.max(qubit.len(), ..controls.map(array.len))) {
+    let q = qubit.at(i, default: qubit.last())
+    let cs = controls.map(c => c.at(i, default: c.last()))
+    assert((cs + (q,)).dedup().len() == cs.len() + 1, message: "Target and control qubits need to be all different (were " + str(q) + " and " + repr(cs) + ")")
+    let ops = sort-ops(cs, q)
     gates.push(bgate(
-      a.first(), a.last(), 
-      nq: c.first() - a.first() + 1, 
-      end: end, 
-      supplements: (b, c)
+      ops.first().at(0), ops.first().at(1), 
+      nq: ops.last().at(0) - ops.first().at(0) + 1, 
+      supplements: ops.slice(1)
     ))
   }
   gates
@@ -126,14 +111,17 @@
 #let swap(control, target) = generate-two-qubit-gate(
   control, target, gates.swap, gates.swap.with(0)
 )
-#let ccx(control1, control2, target) = generate-doubly-controlled-gate(
-  control1, control2, target, gates.targ
+#let ccx(control1, control2, target) = generate-multi-controlled-gate(
+  (control1, control2), target, gates.targ
 )
-#let ccz(control1, control2, target) = generate-doubly-controlled-gate(
-  control1, control2, target, gates.ctrl.with(0)
+#let cccx(control1, control2, control3, target) = generate-multi-controlled-gate(
+  (control1, control2, control3), target, gates.targ
 )
-#let cca(control1, control2, target, content) = generate-doubly-controlled-gate(
-  control1, control2, target, gates.gate.with(content)
+#let ccz(control1, control2, target) = generate-multi-controlled-gate(
+  (control1, control2), target, gates.ctrl.with(0)
+)
+#let cca(control1, control2, target, content) = generate-multi-controlled-gate(
+  (control1, control2), target, gates.gate.with(content)
 )
 
 
@@ -185,9 +173,6 @@
     }
     if op.constructor != barrier {
       tracks.at(start).push((op.constructor)(..op.args, x: x + tracks.at(start).len(), y: y + start))
-      if op.end != none {
-        // tracks.at(end).push((op.end)(x: x + tracks.at(end).len(), y: y + end))
-      }
       for (qubit, supplement) in op.supplements {
         tracks.at(qubit).push((supplement)(x: x + tracks.at(end).len(), y: y + qubit))
       }
