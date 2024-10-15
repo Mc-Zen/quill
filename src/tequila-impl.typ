@@ -1,9 +1,9 @@
 #import "gates.typ"
 
-#let bgate(qubit, constructor, nq: 1, end: none, ..args) = ((
+#let bgate(qubit, constructor, nq: 1, supplements: (), ..args) = ((
   qubit: qubit,
   n: nq,
-  end: end,
+  supplements: supplements,
   constructor: constructor,
   args: args
 ),)
@@ -20,7 +20,14 @@
 
 #let generate-two-qubit-gate(control, target, start, end) = {
   if type(control) == int and type(target) == int { 
-    return bgate(control, start, nq: target - control + 1, end: end, target - control) 
+    assert.ne(target, control, message: "Target and control qubit cannot be the same")
+    return bgate(
+      control,
+      start,
+      target - control,
+      nq: target - control + 1,
+      supplements: ((target, end),)
+    ) 
   }
   let gates = ()
   if type(control) == int { control = (control,) }
@@ -30,8 +37,34 @@
     let c = control.at(i, default: control.last())
     let t = target.at(i, default: target.last())
     assert.ne(t, c, message: "Target and control qubit cannot be the same")
-    gates.push(bgate(c, start, nq: t - c + 1, end: end, t - c) )
+    gates.push(bgate(c, start, nq: t - c + 1, t - c, supplements: ((t, end),)))
+  }
+  gates
+}
 
+#let generate-multi-controlled-gate(controls, qubit, target) = {
+  let sort-ops(cs, q) = {
+    let k = cs.map(c => (c, gates.ctrl.with(0))) + ((q, target),)
+    k = k.sorted(key: x => x.first())
+    let n = k.last().at(0) - k.first().at(0)
+    if k.first().at(1) == gates.ctrl.with(0) { k.first().at(1) = gates.ctrl.with(n) }
+    else if k.last().at(1) == gates.ctrl.with(0) { k.at(2).at(1) = gates.ctrl.with(-n) }
+    return k
+  }
+  let gates = ()
+  controls = controls.map(c => if type(c) == int { (c,)} else { c })
+  if type(qubit) == int { qubit = (qubit,) }
+
+  for i in range(calc.max(qubit.len(), ..controls.map(array.len))) {
+    let q = qubit.at(i, default: qubit.last())
+    let cs = controls.map(c => c.at(i, default: c.last()))
+    assert((cs + (q,)).dedup().len() == cs.len() + 1, message: "Target and control qubits need to be all different (were " + str(q) + " and " + repr(cs) + ")")
+    let ops = sort-ops(cs, q)
+    gates.push(bgate(
+      ops.first().at(0), ops.first().at(1), 
+      nq: ops.last().at(0) - ops.first().at(0) + 1, 
+      supplements: ops.slice(1)
+    ))
   }
   gates
 }
@@ -78,10 +111,26 @@
 #let swap(control, target) = generate-two-qubit-gate(
   control, target, gates.swap, gates.swap.with(0)
 )
+#let ccx(control1, control2, target) = generate-multi-controlled-gate(
+  (control1, control2), target, gates.targ
+)
+#let cccx(control1, control2, control3, target) = generate-multi-controlled-gate(
+  (control1, control2, control3), target, gates.targ
+)
+#let ccz(control1, control2, target) = generate-multi-controlled-gate(
+  (control1, control2), target, gates.ctrl.with(0)
+)
+#let cca(control1, control2, target, content) = generate-multi-controlled-gate(
+  (control1, control2), target, gates.gate.with(content)
+)
 
 
 #let ca(control, target, content) = generate-two-qubit-gate(
   control, target, gates.ctrl, gates.gate.with(content)
+)
+
+#let multi-controlled-gate(controls, qubit, target) = generate-multi-controlled-gate(
+  controls, qubit, target
 )
 
 
@@ -117,17 +166,19 @@
       (q1, q2) = (0, num-qubits - 1)
     }
     let max-track-len = calc.max(..tracks.slice(q1, q2 + 1).map(array.len))
+    let h = (q1, q2)
+    let h = (start,) + op.supplements.map(x => x.first())
     for q in range(q1, q2 + 1) {
       let dif = max-track-len - tracks.at(q).len()
-      if op.constructor != barrier and q not in (q1, q2) {
+      if op.constructor != barrier and q not in h {
          dif += 1
       }
       tracks.at(q) += (1,) * dif
     }
     if op.constructor != barrier {
       tracks.at(start).push((op.constructor)(..op.args, x: x + tracks.at(start).len(), y: y + start))
-      if op.end != none {
-        tracks.at(end).push((op.end)(x: x + tracks.at(end).len(), y: y + end))
+      for (qubit, supplement) in op.supplements {
+        tracks.at(qubit).push((supplement)(x: x + tracks.at(end).len(), y: y + qubit))
       }
     }
   }
