@@ -52,21 +52,21 @@
   let draw-inouts(inouts, alignment) = {
     
     if inouts != none and dy != 0pt {
-      let width = measure(line(length: gate.width), draw-params.styles).width
+      let width = measure(line(length: gate.width)).width
       let y0 = -(dy + extent) - draw-params.center-y-coords.at(0)
       let get-wire-y(qubit) = { draw-params.center-y-coords.at(qubit) + y0 }
       
       set text(size: .8em)
-      style(styles => {
+      context {
         for inout in inouts {
-          let size = measure(inout.label, styles)
+          let size = measure(inout.label)
           let y = get-wire-y(inout.qubit)
           let label-x = draw-params.padding
           if "n" in inout and inout.n > 1 {
             let y2 = get-wire-y(inout.qubit + inout.n - 1)
             let brace = utility.create-brace(auto, alignment, y2 - y + draw-params.padding)
             let brace-x = 0pt
-            let size = measure(brace, styles)
+            let size = measure(brace)
             if alignment == right { brace-x += width - size.width }
             
             place(brace, dy: y - 0.5 * draw-params.padding, dx: brace-x)
@@ -78,7 +78,7 @@
             box(inout.label, width: width, inset: (x: label-x))
           ))
         }
-      })
+      }
       
     }
   
@@ -154,7 +154,7 @@
 
 #let draw-nwire(gate, draw-params) = {
   set text(size: .7em)
-  let size = measure(gate.content, draw-params.styles)
+  let size = measure(gate.content)
   let extent = 2.5pt + size.height
   box(height: 2 * extent, { // box is solely for height hint
     place(dx: 1pt, dy: 0pt, gate.content)
@@ -201,7 +201,7 @@
   assert(gate.data.align in (left, right), message: "`lstick`/`rstick`: Only left and right are allowed for parameter align")
     
   let content = box(inset: draw-params.padding, gate.content)
-  let size = measure(content, draw-params.styles)
+  let size = measure(content)
   let brace = none
   
   if gate.data.brace != none {
@@ -218,7 +218,7 @@
     brace = utility.create-brace(brace-symbol, gate.data.align, brace-height)
   }
   
-  let brace-size = measure(brace, draw-params.styles)
+  let brace-size = measure(brace)
   let width = size.width + brace-size.width + gate.data.pad
   let height = size.height
   let brace-offset-y

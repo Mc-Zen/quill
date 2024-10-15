@@ -3,11 +3,11 @@
 /// Update bounds to contain the given rectangle
 /// - bounds (array): Current bound coordinates x0, y0, x1, y1
 /// - rect (array): Bounds rectangle x0, y0, x1, y1
-#let update-bounds(bounds, rect, em) = (
-  calc.min(bounds.at(0), convert-em-length(rect.at(0), em)), 
-  calc.min(bounds.at(1), convert-em-length(rect.at(1), em)),
-  calc.max(bounds.at(2), convert-em-length(rect.at(2), em)),
-  calc.max(bounds.at(3), convert-em-length(rect.at(3), em)),
+#let update-bounds(bounds, rect) = (
+  calc.min(bounds.at(0), rect.at(0).to-absolute()), 
+  calc.min(bounds.at(1), rect.at(1).to-absolute()),
+  calc.max(bounds.at(2), rect.at(2).to-absolute()),
+  calc.max(bounds.at(3), rect.at(3).to-absolute()),
 )
 
 #let offset-bounds(bounds, offset) = (
@@ -17,11 +17,11 @@
   bounds.at(3) + offset.at(1),
 )
 
-#let make-bounds(x0: 0pt, y0: 0pt, width: 0pt, height: 0pt, x1: none, y1: none, em) = (
-  convert-em-length(x0, em),
-  convert-em-length(y0, em),
-  convert-em-length(if x1 != none { x1 } else { x0 + width }, em),
-  convert-em-length(if y1 != none { y1 } else { y0 + height }, em),
+#let make-bounds(x0: 0pt, y0: 0pt, width: 0pt, height: 0pt, x1: none, y1: none) = (
+  x0.to-absolute(),
+  y0.to-absolute(),
+  (if x1 != none { x1 } else { x0 + width }).to-absolute(),
+  (if y1 != none { y1 } else { y0 + height }).to-absolute(),
 )
 
 
@@ -51,7 +51,7 @@
 
 #let default-size-hint(item, draw-params) = {
   let content = (item.draw-function)(item, draw-params)
-  let hint = measure(content, draw-params.styles)
+  let hint = measure(content)
   hint.offset = auto
   return hint
 }
@@ -62,7 +62,7 @@
 
 #let lrstick-size-hint(item, draw-params) = {
   let content = (item.draw-function)(item, draw-params)
-  let hint = measure(content, draw-params.styles)
+  let hint = measure(content)
   let dx = 0pt
   if item.data.align == right { dx = hint.width } 
   hint.offset = (x: dx, y: auto)
@@ -86,8 +86,7 @@
 /// - labels (array): An array of labels which in turn are dictionaries that must 
 ///           specify values for the keys `content` (content), `pos` (strictly 2d 
 ///           alignment), `dx` and `dy` (both length, ratio or relative length).
-/// - draw-params (dictionary): Drawing parameters. Must contain a styles object at 
-///           the key `styles` and an absolute length at the key `em`. 
+/// - draw-params (dictionary): Drawing parameters. 
 /// -> pair
 #let place-with-labels(
   content, 
@@ -97,9 +96,9 @@
   labels: (),
   draw-params: none,
 ) = {
-  if size == auto { size = measure(content, draw-params.styles) }
+  if size == auto { size = measure(content) }
   let bounds = make-bounds(
-    x0: dx, y0: dy, width: size.width, height: size.height, draw-params.em
+    x0: dx, y0: dy, width: size.width, height: size.height
   )
   if labels.len() == 0 {
     return (place(content, dx: dx, dy: dy), bounds)    
@@ -108,7 +107,7 @@
   let placed-labels = place(dx: dx, dy: dy, 
     box({
       for label in labels {
-        let label-size = measure(label.content, draw-params.styles)
+        let label-size = measure(label.content)
         let ldx = get-length(label.dx, size.width)
         let ldy = get-length(label.dy, size.height)
         
@@ -123,10 +122,9 @@
         let placed-label = place(label.content, dx: ldx, dy: ldy)
         let label-bounds = make-bounds(
           x0: ldx + dx, y0: ldy + dy, 
-          width: label-size.width, height: label-size.height, 
-          draw-params.em
+          width: label-size.width, height: label-size.height
         )
-        bounds = update-bounds(bounds, label-bounds, draw-params.em)
+        bounds = update-bounds(bounds, label-bounds)
         placed-label
       }
     })

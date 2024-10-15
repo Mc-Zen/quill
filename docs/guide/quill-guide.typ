@@ -437,13 +437,13 @@ Let's look at an example:
         let brace = math.lr($#block(height: x2 - x1)}$)
         place(dx: x1, dy: y, rotate(brace, -90deg, origin: top))
         let content = [Readout circuit]
-        style(styles => {
-          let size = measure(content, styles)
+        context {
+          let size = measure(content)
           place(
             dx: x1 + (x2 - x1) / 2 - size.width / 2,
             dy: y - .6em - size.height, content
           )
-        })
+        }
     })
   )
   ```
