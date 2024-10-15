@@ -92,6 +92,7 @@
   tq.y(1),
   tq.cca(1, 4, 2, $X$),
   tq.h(range(5)),
-  tq.cccx(0, 1, 3, 2)
+  tq.cccx(0, 1, 3, 2),
+  tq.multi-controlled-gate((0,1,4), 2, quill.mqgate.with(n:2, $K$))
 ))
 

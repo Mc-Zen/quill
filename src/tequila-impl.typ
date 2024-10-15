@@ -129,6 +129,10 @@
   control, target, gates.ctrl, gates.gate.with(content)
 )
 
+#let multi-controlled-gate(controls, qubit, target) = generate-multi-controlled-gate(
+  controls, qubit, target
+)
+
 
 /// Constructs a circuit from operation instructions. 
 /// 
