@@ -17,7 +17,6 @@
   // Set the document's basic properties.
   set document(author: authors, title: title)
   set page(numbering: "1", number-align: left)
-  set text(font: "Linux Libertine", lang: "en")
   set heading(numbering: "I.a")
   show heading.where(level: 1): it => block(smallcaps(it), below: 1em)
   show link: underline.with(offset: 1.2pt)
