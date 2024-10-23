@@ -72,7 +72,10 @@
   if children.named().len() > 0 { 
     panic("Unexpected named argument '" + children.named().keys().at(0) + "' for quantum-circuit()")
   }
-  set text(color, size: font-size)
+  if type(wire) == color { wire += .7pt }
+  if type(wire) == length { wire += black }
+
+  set text(wire.paint, size: font-size)
   set math.equation(numbering: none)
 
   context {
