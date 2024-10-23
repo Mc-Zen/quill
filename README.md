@@ -40,9 +40,9 @@ The function `quantum-circuit()` takes any number of positional gates and works 
   )
 }
 ```
-<h3 align="center">
+<div align="center">
   <img alt="Bell Circuit" src="docs/images/bell.svg">
-</h3>
+</div>
 
 Plain quantum gates — such as a Hadamard gate — can be written with the shorthand notation `$H$` instead of the more lengthy `gate($H$)`. The latter offers more options, however. 
 
@@ -52,9 +52,9 @@ Refer to the [user guide][guide] for a full documentation of this package. You c
 
 Instead of listing every featured gate (as is done in the [user guide][guide]), this gallery quickly showcases a large selection of possible gates and decorations that can be added to any quantum circuit. 
 
-<h3 align="center">
+<div align="center">
   <img alt="Gallery" src="docs/images/gallery.svg" />
-</h3>
+</div>
 
 
 ## Tequila
@@ -111,15 +111,15 @@ The following example demonstrates how to compose multiple subcircuits.
 
 Some show-off examples, loosely replicating figures from [Quantum Computation and Quantum Information by M. Nielsen and I. Chuang](https://www.cambridge.org/highereducation/books/quantum-computation-and-quantum-information/01E10196D0A682A6AEFFEA52D53BE9AE#overview). The code for these examples can be found in the [example folder](./examples/) or in the [user guide][guide]. 
 
-<h3 align="center">
+<div align="center">
   <img alt="Quantum teleportation circuit" src="docs/images/teleportation.svg">
-</h3>
-<h3 align="center">
+</div>
+<div align="center">
   <img alt="Quantum circuit for phase estimation" src="docs/images/phase-estimation.svg">
-</h3>
-<h3 align="center">
+</div>
+<div align="center">
   <img alt="Quantum fourier transformation circuit" src="docs/images/qft.svg">
-</h3>
+</div>
 
 
 ## Contribution
