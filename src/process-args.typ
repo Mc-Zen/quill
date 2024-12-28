@@ -21,7 +21,7 @@
       bottom: padding.at("bottom", default: y), 
     )
   }
-  assert(false, message: "Unsupported type \"" + type + "\" as argument for padding")
+  assert(false, message: "Unsupported type \"" + str(type) + "\" as argument for padding")
 }
 
 

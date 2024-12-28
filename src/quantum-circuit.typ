@@ -354,7 +354,7 @@
 
       if offset == auto { return (dx - width / 2, dy - height / 2) } 
 
-      assert(type(offset) == dictionary, message: "Unexpected type `" + type(offset) + "` for parameter `offset`") 
+      assert(type(offset) == dictionary, message: "Unexpected type `" + str(type(offset)) + "` for parameter `offset`") 
       
       let offset-x = offset.at("x", default: auto)
       let offset-y = offset.at("y", default: auto)
