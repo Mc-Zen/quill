@@ -139,7 +139,7 @@
 /// - n (auto, int): Number of qubits. Can be inferred automatically. 
 /// - x (int): Determines at which column the subcircuit will be put in the circuit. 
 /// - y (int): Determines at which row the subcircuit will be put in the circuit. 
-/// - append-wire (boolean): If set to `true`, the a last column of outgoing wires will be added. 
+/// - append-wire (bool): If set to `true`, the a last column of outgoing wires will be added. 
 /// - ..children (any): Sequence of instructions. 
 #let build(
   n: auto, 
@@ -207,7 +207,7 @@
 /// - n (auto, int): Number of qubits. Can be inferred automatically. 
 /// - x (int): Determines at which column the subcircuit will be put in the circuit. 
 /// - y (int): Determines at which row the subcircuit will be put in the circuit. 
-/// - invert (boolean): If set to `true`, the circuit will be inverted, i.e., a circuit for
+/// - invert (bool): If set to `true`, the circuit will be inverted, i.e., a circuit for
 ///     "uncomputing" the corresponding graph state. 
 /// ..edges (array): 
 #let graph-state(

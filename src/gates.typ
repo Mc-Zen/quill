@@ -19,9 +19,9 @@
 /// - radius (length, dictionary): Gate rectangle border radius. 
 ///             Allows the same values as the builtin `rect()` function.
 /// - width (auto, length): The width of the gate can be specified manually with this property. 
-/// - box (boolean): Whether this is a boxed gate (determines whether the outgoing 
+/// - box (bool): Whether this is a boxed gate (determines whether the outgoing 
 ///             wire will be drawn all through the gate (`box: false`) or not).
-/// - floating (boolean): Whether the content for this gate will be shown floating 
+/// - floating (bool): Whether the content for this gate will be shown floating 
 ///             (i.e. no width is reserved).
 /// - multi (dictionary): Information for multi-qubit and controlled gates (see @@mqgate() ).
 /// - size-hint (function): Size hint function. This function should return a dictionary
@@ -89,7 +89,7 @@
 /// - radius (length, dictionary): Gate rectangle border radius. 
 ///        Allows the same values as the builtin `rect()` function.
 /// - width (auto, length): The width of the gate can be specified manually with this property. 
-/// - box (boolean): Whether this is a boxed gate (determines whether the 
+/// - box (bool): Whether this is a boxed gate (determines whether the 
 ///        outgoing wire will be drawn all through the gate (`box: false`) or not).
 /// - wire-count (int): Wire count for control wires.
 /// - inputs (none, array): You can put labels inside the gate to label the input wires with 
@@ -101,7 +101,7 @@
 /// - outputs (none, array): Same as `inputs` but for gate outputs. 
 /// - extent (auto, length): How much to extent the gate beyond the first and 
 ///        last wire, default is to make it align with an X gate (so [size of x gate] / 2). 
-/// - size-all-wires (none, boolean): A single-qubit gate affects the height of the row
+/// - size-all-wires (none, bool): A single-qubit gate affects the height of the row
 ///        it is being put on. For multi-qubit gate there are different possible 
 ///        behaviours:
 ///          - Affect height on only the first and last wire (`false`)
@@ -260,7 +260,7 @@
 
 /// Target element for controlled-Z operations (#sym.bullet). 
 ///
-/// - open (boolean): Whether to draw an open dot. 
+/// - open (bool): Whether to draw an open dot. 
 /// - fill (none, color): Fill color for the circle or stroke color if
 ///        `open: true`. 
 /// - size (length): Size of the control circle. 
@@ -273,7 +273,7 @@
 /// Create a phase gate shown as a point on the wire together with a label. 
 ///
 /// - label (content): Angle value to display. 
-/// - open (boolean): Whether to draw an open dot. 
+/// - open (bool): Whether to draw an open dot. 
 /// - fill (none, color): Fill color for the circle or stroke color if
 ///        `open: true`. 
 /// - size (length): Size of the circle. 
@@ -333,11 +333,11 @@
 /// 
 /// - n (int): How many wires up or down the target wire lives. 
 /// - wire-count (int): Wire count for the control wire.  
-/// - open (boolean): Whether to draw an open dot. 
+/// - open (bool): Whether to draw an open dot. 
 /// - fill (none, color): Fill color for the circle or stroke color if
 ///        `open: true`. 
 /// - size (length): Size of the control circle. 
-/// - show-dot (boolean): Whether to show the control dot. Set this to 
+/// - show-dot (bool): Whether to show the control dot. Set this to 
 ///        false to obtain a vertical wire with no dots at all. 
 /// - wire-label (array, str, content, dictionary): One or more labels 
 ///        to add to the control wire. See @@mqgate(). 

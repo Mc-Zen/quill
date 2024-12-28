@@ -27,7 +27,7 @@
 /// - min-column-width (length): Minimum width of a column.
 /// - gate-padding (length): General padding setting including the inset for 
 ///            gate boxes and the distance of @@lstick() and co. to the wire. 
-/// - equal-row-heights (boolean): If true, then all rows will have the same 
+/// - equal-row-heights (bool): If true, then all rows will have the same 
 ///            height and the wires will have equal distances orienting on the
 ///            highest row. 
 /// - color (color): Foreground color, default for strokes, text, controls
@@ -49,7 +49,7 @@
 ///            This setting basically just changes the size of the bounding box 
 ///            for the circuit and can be used to increase it when labels or 
 ///            annotations extend beyond the actual circuit. 
-/// - fill-wires (boolean): Whether to automatically fill up all wires until the end. 
+/// - fill-wires (bool): Whether to automatically fill up all wires until the end. 
 /// - ..children (any): Items, gates and circuit commands (see description). 
 #let quantum-circuit(
   wire: .7pt + black,     
