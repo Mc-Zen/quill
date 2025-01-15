@@ -1,37 +1,55 @@
 #import "gates.typ"
 
-/// A gate instance. 
-#let bgate(
+/// Info about one quantum gate. 
+#let gate-info(
 
-  /// Qubit or first qubit in the case of a multi-qubit gate. -> int
+  /// Qubit or first qubit in the case of a multi-qubit gate. 
+  /// -> int
   qubit, 
-  /// The gate type -> function. 
+  
+  /// The gate function. 
+  /// -> function
   constructor, 
-  /// Number of qubits. -> int
-  nq: 1, 
 
-  /// ? -> array
+  /// Number of qubits. 
+  /// -> int
+  n: 1, 
+
+  /// Additional gates to draw along with the main one given as 
+  /// `(qubit, gate)` tuples. This is used to draw targets or multiple 
+  /// controls. 
+  ///  -> array
   supplements: (), 
 
-) = ((
-  qubit: qubit,
-  n: nq,
-  supplements: supplements,
-  constructor: constructor,
-),)
+) = (
+  (
+    qubit: qubit,
+    n: n,
+    supplements: supplements,
+    constructor: constructor,
+  ),
+)
+
+
 
 #let generate-single-qubit-gate(
+
+  /// One or more qubits. Named arguments are disallowed. 
+  /// -> arguments
   qubit, 
-  constructor: gates.gate, 
-  ..args
+
+  /// Gate function.
+  /// -> function
+  gate
+  
 ) = {
   if qubit.named().len() != 0 {
-    assert(false, message: "Unexpected argument `" + qubit.named().pairs().first().first() + "`")
+    assert(false, message: "Unexpected argument `" + qubit.named().keys().first() + "`")
   }
   qubit = qubit.pos()
   if qubit.len() == 1 { qubit = qubit.first() }
-  if type(qubit) == int { return bgate(qubit, constructor.with(..args)) }
-  qubit.map(qubit => bgate(qubit, constructor.with(..args)))
+  if type(qubit) == int { return gate-info(qubit, gate) }
+  qubit.map(qubit => gate-info(qubit, gate))
 }
 
 
@@ -58,10 +76,10 @@
 ) = {
   if type(qubit1) == int and type(qubit2) == int { 
     assert.ne(qubit2, qubit1, message: "Target and control qubit cannot be the same")
-    return bgate(
+    return gate-info(
       qubit1,
       gate1.with(qubit2 - qubit1),
-      nq: qubit2 - qubit1 + 1,
+      n: qubit2 - qubit1 + 1,
       supplements: ((qubit2, gate2),)
     ) 
   }
@@ -72,10 +90,10 @@
     let c = qubit1.at(i, default: qubit1.last())
     let t = qubit2.at(i, default: qubit2.last())
     assert.ne(t, c, message: "Target and control qubit cannot be the same")
-    bgate(
+    gate-info(
       c, 
       gate1.with(t - c), 
-      nq: t - c + 1, 
+      n: t - c + 1, 
       supplements: ((t, gate2),)
     )
   })
@@ -94,15 +112,20 @@
 
   /// Gate to put at the target. 
   /// -> function
-  gate
+  gate,
+
+  /// Additional arguments to apply to the `ctrl` gate. 
+  /// -> any
+  ..args
 
 ) = {
+  let ctrl = gates.ctrl.with(..args)
   let sort-ops(cs, q) = {
-    let k = cs.map(c => (c, gates.ctrl.with(0))) + ((q, gate),)
+    let k = cs.map(c => (c, ctrl.with(0))) + ((q, gate),)
     k = k.sorted(key: x => x.first())
     let n = k.last().at(0) - k.first().at(0)
-    if k.first().at(1) == gates.ctrl.with(0) { k.first().at(1) = gates.ctrl.with(n) }
-    else if k.last().at(1) == gates.ctrl.with(0) { k.at(2).at(1) = gates.ctrl.with(-n) }
+    if k.first().at(1) == ctrl.with(0) { k.first().at(1) = ctrl.with(n) }
+    else if k.last().at(1) == ctrl.with(0) { k.at(2).at(1) = ctrl.with(-n) }
     return k
   }
   controls = controls.map(c => if type(c) == int { (c,) } else { c })
@@ -111,57 +134,59 @@
   range(calc.max(qubit.len(), ..controls.map(array.len))).map(i => {
     let q = qubit.at(i, default: qubit.last())
     let cs = controls.map(c => c.at(i, default: c.last()))
+
     assert((cs + (q,)).dedup().len() == cs.len() + 1, message: "Target and control qubits need to be all different (were " + str(q) + " and " + repr(cs) + ")")
+
     let ops = sort-ops(cs, q)
-    bgate(
+    gate-info(
       ops.first().at(0), ops.first().at(1), 
-      nq: ops.last().at(0) - ops.first().at(0) + 1, 
+      n: ops.last().at(0) - ops.first().at(0) + 1, 
       supplements: ops.slice(1)
     )
   })
 }
 
 
-#let gate(qubit, ..args) = bgate(qubit, gates.gate.with(..args))
+#let gate(qubit, ..args) = gate-info(qubit, gates.gate.with(..args))
 
 #let mqgate(qubit, n: 1, ..args) = {
-  bgate(qubit, nq: n, gates.mqgate.with(..args, n: n))
+  gate-info(qubit, n: n, gates.mqgate.with(..args, n: n))
 }
 
-#let barrier() = bgate(0, barrier)
+#let barrier() = gate-info(0, barrier)
 
-#let x(..qubit) = generate-single-qubit-gate(qubit, $X$)
-#let y(..qubit) = generate-single-qubit-gate(qubit, $Y$)
-#let z(..qubit) = generate-single-qubit-gate(qubit, $Z$)
+#let x(..qubit) = generate-single-qubit-gate(qubit, gates.gate.with($X$))
+#let y(..qubit) = generate-single-qubit-gate(qubit, gates.gate.with($Y$))
+#let z(..qubit) = generate-single-qubit-gate(qubit, gates.gate.with($Z$))
 
-#let h(..qubit) = generate-single-qubit-gate(qubit, $H$)
-#let s(..qubit) = generate-single-qubit-gate(qubit, $S$)
-#let sdg(..qubit) = generate-single-qubit-gate(qubit, $S^dagger$)
-#let sx(..qubit) = generate-single-qubit-gate(qubit, $sqrt(X)$)
-#let sxdg(..qubit) = generate-single-qubit-gate(qubit, $sqrt(X)^dagger$)
-#let t(..qubit) = generate-single-qubit-gate(qubit, $T$)
-#let tdg(..qubit) = generate-single-qubit-gate(qubit, $T^dagger$)
-#let p(theta, ..qubit) = generate-single-qubit-gate(qubit, $P (#theta)$)
+#let h(..qubit) = generate-single-qubit-gate(qubit, gates.gate.with($H$))
+#let s(..qubit) = generate-single-qubit-gate(qubit, gates.gate.with($S$))
+#let sdg(..qubit) = generate-single-qubit-gate(qubit, gates.gate.with($S^dagger$))
+#let sx(..qubit) = generate-single-qubit-gate(qubit, gates.gate.with($sqrt(X)$))
+#let sxdg(..qubit) = generate-single-qubit-gate(qubit, gates.gate.with($sqrt(X)^dagger$))
+#let t(..qubit) = generate-single-qubit-gate(qubit, gates.gate.with($T$))
+#let tdg(..qubit) = generate-single-qubit-gate(qubit, gates.gate.with($T^dagger$))
+#let p(theta, ..qubit) = generate-single-qubit-gate(qubit, gates.gate.with($P (#theta)$))
 
-#let rx(theta, ..qubit) = generate-single-qubit-gate(qubit, $R_x (#theta)$)
-#let ry(theta, ..qubit) = generate-single-qubit-gate(qubit, $R_y (#theta)$)
-#let rz(theta, ..qubit) = generate-single-qubit-gate(qubit, $R_z (#theta)$)
+#let rx(theta, ..qubit) = generate-single-qubit-gate(qubit, gates.gate.with($R_x (#theta)$))
+#let ry(theta, ..qubit) = generate-single-qubit-gate(qubit, gates.gate.with($R_y (#theta)$))
+#let rz(theta, ..qubit) = generate-single-qubit-gate(qubit, gates.gate.with($R_z (#theta)$))
 
 #let u(theta, phi, lambda, ..qubit) = generate-single-qubit-gate(
-  qubit, $U (#theta, #phi, #lambda)$
+  qubit, gates.gate.with($U (#theta, #phi, #lambda)$)
 )
 
-#let meter(..qubit) = generate-single-qubit-gate(qubit, constructor: gates.meter)
+#let meter(..qubit) = generate-single-qubit-gate(qubit, gates.meter)
 
 
-#let cx(control, target) = generate-two-qubit-gate(
-  control, target, gates.ctrl, gates.targ
+#let cx(control, target, ..args) = generate-two-qubit-gate(
+  control, target, gates.ctrl.with(..args), gates.targ
 )
-#let cz(control, target) = generate-two-qubit-gate(
-  control, target, gates.ctrl, gates.ctrl.with(0)
+#let cz(control, target, ..args) = generate-two-qubit-gate(
+  control, target, gates.ctrl.with(..args), gates.ctrl.with(0)
 )
-#let swap(control, target) = generate-two-qubit-gate(
-  control, target, gates.swap, gates.swap.with(0)
+#let swap(control, target, ..args) = generate-two-qubit-gate(
+  control, target, gates.swap.with(..args), gates.swap.with(0)
 )
 #let ccx(control1, control2, target) = generate-multi-controlled-gate(
   (control1, control2), target, gates.targ
@@ -181,8 +206,8 @@
   control, target, gates.ctrl, gates.gate.with(content)
 )
 
-#let multi-controlled-gate(controls, qubit, target) = generate-multi-controlled-gate(
-  controls, qubit, target
+#let multi-controlled-gate(controls, qubit, target, ..args) = generate-multi-controlled-gate(
+  controls, qubit, target, ..args
 )
 
 
@@ -192,15 +217,19 @@
   /// Number of qubits. Can be inferred automatically. 
   /// -> auto | int 
   n: auto, 
+
   /// Determines at which column the subcircuit will be put in the circuit. 
   /// -> int 
   x: 1, 
+
   /// Determines at which row the subcircuit will be put in the circuit. 
   /// -> int 
   y: 0,
+
   /// If set to `true`, the a last column of outgoing wires will be added. 
   /// -> bool
   append-wire: true,
+  
   /// Sequence of instructions. 
   /// -> any
   ..children
@@ -255,7 +284,7 @@
     size-hint: (it, i) => (width: 0pt, height: 0pt)
   )
 
-  (placeholder,) + tracks.flatten().filter(x => type(x) != int) 
+  (placeholder,) + tracks.join().filter(x => type(x) != int) 
 }
 
 
@@ -266,16 +295,20 @@
   /// Number of qubits. Can be inferred automatically. 
   /// -> auto | int
   n: auto,
+
   /// Determines at which column the subcircuit will be put in the circuit. 
   /// -> int 
   x: 1,
+
   /// Determines at which row the subcircuit will be put in the circuit. 
   /// -> int 
   y: 0,
+
   /// If set to `true`, the circuit will be inverted, i.e., a circuit for
   /// "uncomputing" the corresponding graph state. 
   /// -> bool
   invert: false,
+
   /// -> array
   ..edges
 
@@ -313,13 +346,15 @@
   /// Number of qubits. 
   /// -> auto | int
   n, 
+
   /// - x (int): Determines at which column the QFT routine will be placed in the circuit. 
   /// -> int 
   x: 1, 
+
   /// - y (int): Determines at which row the QFT routine will be placed in the circuit. 
   /// -> int 
   y: 0
-  
+
 ) = {
   let gates = ()
   for i in range(n - 1) {
