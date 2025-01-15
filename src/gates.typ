@@ -258,17 +258,6 @@
   label: label
 )
 
-/// Target element for controlled-Z operations (#sym.bullet). 
-///
-/// - open (bool): Whether to draw an open dot. 
-/// - fill (none, color): Fill color for the circle or stroke color if
-///        `open: true`. 
-/// - size (length): Size of the control circle. 
-// #let ctrl(open: false, fill: none, size: 2.3pt) = gate(none, draw-function: draw-ctrl, fill: fill, size: size, box: false, open: open)
-
-/// Target element for #smallcaps("swap") operations (#sym.times) without vertical wire). 
-/// - size (length): Size of the target symbol. 
-#let targX(size: 7pt, label: none, x: auto, y: auto) = gate(none, x: x, y: y, box: false, draw-function: draw-functions.draw-swap, data: (size: size), label: label)
 
 /// Create a phase gate shown as a point on the wire together with a label. 
 ///

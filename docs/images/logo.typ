@@ -70,5 +70,5 @@
 // #quantum-circuit(
 //   row-spacing: 8pt,
 //   lstick($|psi〉$),  gategroup(2,3, fill:blue.lighten(80%)), gate([Quantum]), control(1),1, swap(1),1, [\ ],
-//   setwire(2), 2, ctrl(), gate("Circuit"), targX,1
+//   setwire(2), 2, ctrl(), gate("Circuit"), swap(0), 1
 // )
