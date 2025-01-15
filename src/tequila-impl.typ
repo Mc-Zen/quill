@@ -188,17 +188,17 @@
 #let swap(control, target, ..args) = generate-two-qubit-gate(
   control, target, gates.swap.with(..args), gates.swap.with(0)
 )
-#let ccx(control1, control2, target) = generate-multi-controlled-gate(
-  (control1, control2), target, gates.targ
+#let ccx(control1, control2, target, ..args) = generate-multi-controlled-gate(
+  (control1, control2), target, gates.targ, ..args
 )
-#let cccx(control1, control2, control3, target) = generate-multi-controlled-gate(
-  (control1, control2, control3), target, gates.targ
+#let cccx(control1, control2, control3, target, ..args) = generate-multi-controlled-gate(
+  (control1, control2, control3), target, gates.targ, ..args
 )
-#let ccz(control1, control2, target) = generate-multi-controlled-gate(
-  (control1, control2), target, gates.ctrl.with(0)
+#let ccz(control1, control2, target, ..args) = generate-multi-controlled-gate(
+  (control1, control2), target, gates.ctrl.with(0), ..args
 )
-#let cca(control1, control2, target, content) = generate-multi-controlled-gate(
-  (control1, control2), target, gates.gate.with(content)
+#let cca(control1, control2, target, content, ..args) = generate-multi-controlled-gate(
+  (control1, control2), target, gates.gate.with(content), ..args
 )
 
 
