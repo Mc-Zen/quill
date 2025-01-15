@@ -332,7 +332,7 @@
             dy: annotation.at("dy", default: 0pt),
             draw-params: draw-params
           )
-        } else if type(annotation) in (content, str) {
+        } else if type(annotation) in (symbol, content, str) {
           layer-below-circuit += place(annotation)
         } 
       }

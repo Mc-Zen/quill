@@ -69,7 +69,7 @@
 
 #let verify-annotation-content(annotation-content) = {
   let content-type = type(annotation-content)
-  assert(content-type in (content, str, dictionary), message: "`annotate`: Unsupported callback return type `" + str(content-type) + "` (can be `dictionary` or `content`")
+  assert(content-type in (symbol, content, str, dictionary), message: "`annotate`: Unsupported callback return type `" + str(content-type) + "` (can be `dictionary` or `content`")
 
   if content-type == dictionary {
     assert("content" in annotation-content, message: "`annotate`: Missing field `content` in annotation. If the callback returns a dictionary, it must contain the key `content` and may specify coordinates with `dx` and `dy`.")

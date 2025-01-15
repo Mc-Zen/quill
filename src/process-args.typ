@@ -39,7 +39,7 @@
   if labels == none {  return () }
   let type = type(labels)
   if type == dictionary { labels = (labels,) } 
-  else if type in (content, str) { labels = ((content: labels),) } 
+  else if type in (symbol, content, str) { labels = ((content: labels),) } 
   else if type == dictionary { labels = ((content: labels),) } 
   let processed-labels = ()
   for label in labels {
