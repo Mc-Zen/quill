@@ -1,79 +1,131 @@
 #import "gates.typ"
 
-#let bgate(qubit, constructor, nq: 1, supplements: (), ..args) = ((
+/// A gate instance. 
+#let bgate(
+
+  /// Qubit or first qubit in the case of a multi-qubit gate. -> int
+  qubit, 
+  /// The gate type -> function. 
+  constructor, 
+  /// Number of qubits. -> int
+  nq: 1, 
+
+  /// ? -> array
+  supplements: (), 
+
+) = ((
   qubit: qubit,
   n: nq,
   supplements: supplements,
   constructor: constructor,
-  args: args
 ),)
 
-#let generate-single-qubit-gate(qubit, constructor: gates.gate, ..args) = {
+#let generate-single-qubit-gate(
+  qubit, 
+  constructor: gates.gate, 
+  ..args
+) = {
   if qubit.named().len() != 0 {
     assert(false, message: "Unexpected argument `" + qubit.named().pairs().first().first() + "`")
   }
   qubit = qubit.pos()
   if qubit.len() == 1 { qubit = qubit.first() }
-  if type(qubit) == int { return bgate(qubit, constructor, ..args) }
-  qubit.map(qubit => bgate(qubit, constructor, ..args))
+  if type(qubit) == int { return bgate(qubit, constructor.with(..args)) }
+  qubit.map(qubit => bgate(qubit, constructor.with(..args)))
 }
 
-#let generate-two-qubit-gate(control, target, start, end) = {
-  if type(control) == int and type(target) == int { 
-    assert.ne(target, control, message: "Target and control qubit cannot be the same")
+
+/// Generates a two-qubit gate with two qubits connected by a wire. 
+#let generate-two-qubit-gate(
+
+  /// Control qubit(s). 
+  /// -> int | array
+  qubit1, 
+
+  /// Target qubit(s). 
+  /// -> int | array
+  qubit2, 
+
+  /// Gate to put at the control qubit. This gate needs to take a
+  /// single positional argument: the relative target number. 
+  /// -> function
+  gate1, 
+
+  /// Gate to put at the target qubit. 
+  /// -> function
+  gate2
+
+) = {
+  if type(qubit1) == int and type(qubit2) == int { 
+    assert.ne(qubit2, qubit1, message: "Target and control qubit cannot be the same")
     return bgate(
-      control,
-      start,
-      target - control,
-      nq: target - control + 1,
-      supplements: ((target, end),)
+      qubit1,
+      gate1.with(qubit2 - qubit1),
+      nq: qubit2 - qubit1 + 1,
+      supplements: ((qubit2, gate2),)
     ) 
   }
-  let gates = ()
-  if type(control) == int { control = (control,) }
-  if type(target) == int { target = (target,) }
+  if type(qubit1) == int { qubit1 = (qubit1,) }
+  if type(qubit2) == int { qubit2 = (qubit2,) }
 
-  for i in range(calc.max(control.len(), target.len())) {
-    let c = control.at(i, default: control.last())
-    let t = target.at(i, default: target.last())
+  range(calc.max(qubit1.len(), qubit2.len())).map(i => {
+    let c = qubit1.at(i, default: qubit1.last())
+    let t = qubit2.at(i, default: qubit2.last())
     assert.ne(t, c, message: "Target and control qubit cannot be the same")
-    gates.push(bgate(c, start, nq: t - c + 1, t - c, supplements: ((t, end),)))
-  }
-  gates
+    bgate(
+      c, 
+      gate1.with(t - c), 
+      nq: t - c + 1, 
+      supplements: ((t, gate2),)
+    )
+  })
 }
 
-#let generate-multi-controlled-gate(controls, qubit, target) = {
+/// Creates a gate with multiple controls. 
+#let generate-multi-controlled-gate(
+
+  /// Control qubits. 
+  /// -> array
+  controls, 
+
+  /// Target qubit(s). 
+  /// -> int | array
+  qubit, 
+
+  /// Gate to put at the target. 
+  /// -> function
+  gate
+
+) = {
   let sort-ops(cs, q) = {
-    let k = cs.map(c => (c, gates.ctrl.with(0))) + ((q, target),)
+    let k = cs.map(c => (c, gates.ctrl.with(0))) + ((q, gate),)
     k = k.sorted(key: x => x.first())
     let n = k.last().at(0) - k.first().at(0)
     if k.first().at(1) == gates.ctrl.with(0) { k.first().at(1) = gates.ctrl.with(n) }
     else if k.last().at(1) == gates.ctrl.with(0) { k.at(2).at(1) = gates.ctrl.with(-n) }
     return k
   }
-  let gates = ()
-  controls = controls.map(c => if type(c) == int { (c,)} else { c })
+  controls = controls.map(c => if type(c) == int { (c,) } else { c })
   if type(qubit) == int { qubit = (qubit,) }
 
-  for i in range(calc.max(qubit.len(), ..controls.map(array.len))) {
+  range(calc.max(qubit.len(), ..controls.map(array.len))).map(i => {
     let q = qubit.at(i, default: qubit.last())
     let cs = controls.map(c => c.at(i, default: c.last()))
     assert((cs + (q,)).dedup().len() == cs.len() + 1, message: "Target and control qubits need to be all different (were " + str(q) + " and " + repr(cs) + ")")
     let ops = sort-ops(cs, q)
-    gates.push(bgate(
+    bgate(
       ops.first().at(0), ops.first().at(1), 
       nq: ops.last().at(0) - ops.first().at(0) + 1, 
       supplements: ops.slice(1)
-    ))
-  }
-  gates
+    )
+  })
 }
 
 
-#let gate(qubit, ..args) = bgate(qubit, gates.gate, ..args)
+#let gate(qubit, ..args) = bgate(qubit, gates.gate.with(..args))
 
 #let mqgate(qubit, n: 1, ..args) = {
-  bgate(qubit, nq: n, gates.mqgate, ..args.pos(), ..args.named() + (n: n))
+  bgate(qubit, nq: n, gates.mqgate.with(..args, n: n))
 }
 
 #let barrier() = bgate(0, barrier)
@@ -135,18 +187,24 @@
 
 
 /// Constructs a circuit from operation instructions. 
-/// 
-/// - n (auto, int): Number of qubits. Can be inferred automatically. 
-/// - x (int): Determines at which column the subcircuit will be put in the circuit. 
-/// - y (int): Determines at which row the subcircuit will be put in the circuit. 
-/// - append-wire (bool): If set to `true`, the a last column of outgoing wires will be added. 
-/// - ..children (any): Sequence of instructions. 
 #let build(
+
+  /// Number of qubits. Can be inferred automatically. 
+  /// -> auto | int 
   n: auto, 
+  /// Determines at which column the subcircuit will be put in the circuit. 
+  /// -> int 
   x: 1, 
+  /// Determines at which row the subcircuit will be put in the circuit. 
+  /// -> int 
   y: 0,
+  /// If set to `true`, the a last column of outgoing wires will be added. 
+  /// -> bool
   append-wire: true,
+  /// Sequence of instructions. 
+  /// -> any
   ..children
+
 ) = {
   let operations = children.pos().flatten()
   let num-qubits = n
@@ -176,7 +234,7 @@
       tracks.at(q) += (1,) * dif
     }
     if op.constructor != barrier {
-      tracks.at(start).push((op.constructor)(..op.args, x: x + tracks.at(start).len(), y: y + start))
+      tracks.at(start).push((op.constructor)(x: x + tracks.at(start).len(), y: y + start))
       for (qubit, supplement) in op.supplements {
         tracks.at(qubit).push((supplement)(x: x + tracks.at(end).len(), y: y + qubit))
       }
@@ -203,19 +261,24 @@
 
 
 /// Constructs a graph state preparation circuit. 
-/// 
-/// - n (auto, int): Number of qubits. Can be inferred automatically. 
-/// - x (int): Determines at which column the subcircuit will be put in the circuit. 
-/// - y (int): Determines at which row the subcircuit will be put in the circuit. 
-/// - invert (bool): If set to `true`, the circuit will be inverted, i.e., a circuit for
-///     "uncomputing" the corresponding graph state. 
-/// ..edges (array): 
 #let graph-state(
+
+  /// Number of qubits. Can be inferred automatically. 
+  /// -> auto | int
   n: auto,
+  /// Determines at which column the subcircuit will be put in the circuit. 
+  /// -> int 
   x: 1,
+  /// Determines at which row the subcircuit will be put in the circuit. 
+  /// -> int 
   y: 0,
+  /// If set to `true`, the circuit will be inverted, i.e., a circuit for
+  /// "uncomputing" the corresponding graph state. 
+  /// -> bool
   invert: false,
+  /// -> array
   ..edges
+
 ) = {
   edges = edges.pos()
   let max-qubit = 0
@@ -245,13 +308,18 @@
 
 
 /// Template for the quantum fourier transform (QFT). 
-/// - n (auto, int): Number of qubits. 
-/// - x (int): Determines at which column the QFT routine will be placed in the circuit. 
-/// - y (int): Determines at which row the QFT routine will be placed in the circuit. 
 #let qft(
+
+  /// Number of qubits. 
+  /// -> auto | int
   n, 
+  /// - x (int): Determines at which column the QFT routine will be placed in the circuit. 
+  /// -> int 
   x: 1, 
+  /// - y (int): Determines at which row the QFT routine will be placed in the circuit. 
+  /// -> int 
   y: 0
+  
 ) = {
   let gates = ()
   for i in range(n - 1) {
