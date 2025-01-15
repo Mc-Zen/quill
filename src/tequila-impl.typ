@@ -236,25 +236,34 @@
 
 ) = {
   let operations = children.pos().flatten()
+
   let num-qubits = n
   if num-qubits == auto {
     num-qubits = calc.max(..operations.map(x => x.qubit + calc.max(0, x.n - 1))) + 1
   }
+
   let tracks = ((),) * num-qubits
   
+  // now we doin some Tetris
   for op in operations {
     let start = op.qubit
-    // if start < 0 { start = num-qubits + start }
     let end = start + op.n - 1
+
     assert(start >= 0 and start < num-qubits, message: "The qubit `" + str(start) + "` is out of range. Leave `n` at `auto` if you want to automatically resize the circuit. ")
     assert(end >= 0 and end < num-qubits, message: "The qubit `" + str(end) + "` is out of range. Leave `n` at `auto` if you want to automatically resize the circuit. ")
+
+    // Special case: barriers
     let (q1, q2) = (start, end).sorted()
     if op.constructor == barrier {
       (q1, q2) = (0, num-qubits - 1)
     }
+
+
+    // Find how "high" the tracks in interval [q1, q2] are stacked so far. 
     let max-track-len = calc.max(..tracks.slice(q1, q2 + 1).map(array.len))
-    let h = (q1, q2)
-    let h = (start,) + op.supplements.map(x => x.first())
+    let h = (start,) + op.supplements.map(supplement => supplement.first())
+
+    // Even up the "height" of the tracks in interval [q1, q2].
     for q in range(q1, q2 + 1) {
       let dif = max-track-len - tracks.at(q).len()
       if op.constructor != barrier and q not in h {
@@ -262,6 +271,8 @@
       }
       tracks.at(q) += (1,) * dif
     }
+
+    // Place gate and supplementary gates. 
     if op.constructor != barrier {
       tracks.at(start).push((op.constructor)(x: x + tracks.at(start).len(), y: y + start))
       for (qubit, supplement) in op.supplements {
@@ -270,6 +281,7 @@
     }
   }
   
+  /// Fill up all tracks
   let max-track-len = calc.max(..tracks.map(array.len)) + 1
   for q in range(tracks.len()) {
     tracks.at(q) += (1,) * (max-track-len - tracks.at(q).len())
@@ -277,6 +289,10 @@
   
   let num-cols = x + calc.max(..tracks.map(array.len)) - 2
   if append-wire { num-cols += 1 }
+  
+  // A special placeholder guarantees that 
+  // - the last wire is shown even if there are no gates on it
+  // - all wires go to the last column correctly. 
   let placeholder = gates.gate(
     none, 
     x: num-cols, y: y + num-qubits - 1, 
@@ -284,7 +300,7 @@
     size-hint: (it, i) => (width: 0pt, height: 0pt)
   )
 
-  (placeholder,) + tracks.join().filter(x => type(x) != int) 
+  (placeholder,) + tracks.join().filter(x => x != 1) 
 }
 
 
@@ -315,24 +331,29 @@
 ) = {
   edges = edges.pos()
   let max-qubit = 0
+
   for edge in edges {
     assert(type(edge) == array, message: "Edges need to be pairs of vertices")
     assert(edge.len() == 2, message: "Every edge needs to have exactly two vertices")
     max-qubit = calc.max(max-qubit, ..edge)
   }
+
   let num-qubits = max-qubit + 1
   if n != auto {
     num-qubits = n
     assert(n > max-qubit, message: "")
   }
+
   let gates = (
     h(range(num-qubits)),
     barrier(),
     edges.map(edge => cz(..edge))
   )
+
   if invert {
     gates = gates.rev()
   }
+
   build(
     x: x, y: y, 
     ..gates
@@ -357,6 +378,7 @@
 
 ) = {
   let gates = ()
+
   for i in range(n - 1) {
     gates.push(h(i))
     for j in range(2, n - i + 1) {
@@ -365,6 +387,7 @@
     }
     gates.push(barrier())
   }
+
   gates.push(h(n - 1))
   build(n: n, x: x, y: y, ..gates)
 }
