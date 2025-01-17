@@ -17,7 +17,7 @@
   inset: draw-params.padding, 
   width: gate.width,
   radius: gate.radius,
-  stroke: if gate.box { draw-params.wire }, 
+  stroke: if gate.box { utility.if-auto(gate.stroke, draw-params.wire) }, 
   fill: utility.if-auto(gate.fill, if gate.box {draw-params.background}),
   gate.content,
 ))
