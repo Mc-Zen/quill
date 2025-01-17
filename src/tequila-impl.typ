@@ -293,7 +293,7 @@
     }
   }
   
-  /// Fill up all tracks
+  // Fill up all tracks
   let max-track-len = calc.max(..tracks.map(array.len)) + 1
   for q in range(tracks.len()) {
     tracks.at(q) += (1,) * (max-track-len - tracks.at(q).len())
@@ -397,11 +397,11 @@
   /// -> auto | int
   n, 
 
-  /// - x (int): Determines at which column the QFT routine will be placed in the circuit. 
+  /// Determines at which column the QFT routine will be placed in the circuit. 
   /// -> int 
   x: 1, 
 
-  /// - y (int): Determines at which row the QFT routine will be placed in the circuit. 
+  /// Determines at which row the QFT routine will be placed in the circuit. 
   /// -> int 
   y: 0
 
