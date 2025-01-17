@@ -8,65 +8,88 @@
 
 
 /// Create a quantum circuit diagram. Children may be
-/// - gates created by one of the many gate commands (@@gate(), 
-///   @@mqgate(), @@meter(), ...),
+/// - gates created by one of the many gate commands (@gate, @mqgate, @meter, ...),
 /// - `[\ ]` for creating a new wire/row,
-/// - commands like @@setwire(), @@slice() or @@gategroup(),
+/// - commands like @setwire, @slice or @gategroup,
 /// - integers for creating cells filled with the current wire setting,
 /// - lengths for creating space between rows or columns,
 /// - plain content or strings to be placed on the wire, and
-/// - @@lstick(), @@midstick() or @@rstick() for placement next to the wire.
-///
-///
-/// - wire (stroke): Style for drawing the circuit wires. This can take anything 
-///            that is valid for the stroke of the builtin `line()` function. 
-/// - row-spacing (length): Spacing between rows.
-/// - column-spacing (length): Spacing between columns.
-/// - min-row-height (length): Minimum height of a row (e.g., when no 
-///             gates are given).
-/// - min-column-width (length): Minimum width of a column.
-/// - gate-padding (length): General padding setting including the inset for 
-///            gate boxes and the distance of @@lstick() and co. to the wire. 
-/// - equal-row-heights (bool): If true, then all rows will have the same 
-///            height and the wires will have equal distances orienting on the
-///            highest row. 
-/// - color (color): Foreground color, default for strokes, text, controls
-///            etc. If you want to have dark-themed circuits, set this to white  
-///            for instance and update `wire` and `fill` accordingly.           
-/// - fill (color): Default fill color for gates. 
-/// - font-size (length): Default font size for text in the circuit. 
-/// - scale (ratio): Total scale factor applied to the entire 
-///            circuit without changing proportions
-/// - baseline (length, content, str): Set the baseline for the circuit. If a 
-///            content or a string is given, the baseline will be adjusted auto-
-///            matically to align with the center of it. One useful application is 
-///            `"="` so the circuit aligns with the equals symbol. 
-/// - circuit-padding (dictionary): Padding for the circuit (e.g., to accommodate 
-///            for annotations) in form of a dictionary with possible keys 
-///            `left`, `right`, `top` and `bottom`. Not all of those need to be 
-///            specified. 
-///
-///            This setting basically just changes the size of the bounding box 
-///            for the circuit and can be used to increase it when labels or 
-///            annotations extend beyond the actual circuit. 
-/// - fill-wires (bool): Whether to automatically fill up all wires until the end. 
-/// - ..children (any): Items, gates and circuit commands (see description). 
+/// - @lstick, @midstick or @rstick for placement next to the wire.
 #let quantum-circuit(
+
+  /// Style for drawing the circuit wires. This can take anything 
+  /// that is valid for the stroke of the built-in `line()` function. 
+  /// -> stroke
   wire: .7pt + black,     
+
+  /// Spacing between rows.
+  /// -> length
   row-spacing: 12pt,
+
+  /// Spacing between columns.
+  /// -> length
   column-spacing: 12pt,
+
+  /// Minimum height of a row (e.g., when no gates are given).
+  /// -> length
   min-row-height: 10pt, 
+
+  /// Minimum width of a column.
+  /// -> length
   min-column-width: 0pt, 
+
+  /// General padding setting including the inset for gate boxes and 
+  /// the distance of @lstick and co. to the wire. 
+  /// -> length
   gate-padding: .4em, 
+
+  /// If true, then all rows will have the same height and the wires will
+  /// have equal distances orienting on the highest row. 
+  /// -> bool
   equal-row-heights: false, 
+
+  /// Foreground color, default for strokes, text, controls etc. If you want
+  /// to have dark-themed circuits, set this to white for instance and
+  /// update `wire` and `fill` accordingly.           
+  /// -> color
   color: black,
+
+  /// Default fill color for gates. 
+  /// -> color
   fill: white,
+
+  /// Default font size for text in the circuit. 
+  /// -> length
   font-size: 10pt,
+
+  /// Total scale factor applied to the entire circuit without changing proportions.
+  /// -> ratio
   scale: 100%,
+
+  /// Set the baseline for the circuit. If a content or a string is given, the 
+  /// baseline will be adjusted automatically to align with the center of it. 
+  /// One useful application is `"="` so the circuit aligns with the equals symbol. 
+  /// -> length | content | str
   baseline: 0pt,
+
+  /// Padding for the circuit (e.g., to accommodate for annotations) in form of 
+  /// a dictionary with possible keys `left`, `right`, `top` and `bottom`. Not 
+  /// all of those need to be  specified. 
+  ///
+  /// This setting basically just changes the size of the bounding box for the
+  /// circuit and can be used to increase it when labels or annotations extend 
+  /// beyond the actual circuit. 
+  /// -> length | dictionary
   circuit-padding: .4em,
+
+  /// Whether to automatically fill up all wires until the end. 
+  /// -> bool
   fill-wires: true,
+
+  /// Items, gates and circuit commands (see description). 
+  /// -> any
   ..children
+
 ) = { 
   if children.pos().len() == 0 { return }
   if children.named().len() > 0 { 

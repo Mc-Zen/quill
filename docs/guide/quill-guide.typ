@@ -1,5 +1,5 @@
 #import "template.typ": *
-#import "@preview/tidy:0.3.0"
+#import "@preview/tidy:0.4.0"
 
 
 #let version = toml("/typst.toml").package.version
@@ -546,22 +546,37 @@ All built-in gates are drawn with a dedicated `draw-function` and you can also t
   #show heading: set text(size: 1.2em)
   #show heading.where(level: 3): it => { align(center, it) }
   
-  #columns(2,[      
+  #columns(1,[      
     This section contains a complete reference for every function in *quill*. 
     
     // #set raw(lang: none)
     #set heading(numbering: none)
     #{
+            
+      let my-show-example = tidy.show-example.show-example.with(
+        layout: (code, preview) => pad(x: 15em, grid(
+          columns: (2fr, auto), 
+          align: horizon, 
+          code, 
+          preview
+        ))
+      )
+    
       let parse-module = tidy.parse-module.with(
         label-prefix: "quill:",
-        scope: (quill: quill)
+        scope: dictionary(quill),
+        old-syntax: false
       )
       let show-module = tidy.show-module.with(
         show-module-name: false, 
         first-heading-level: 2,
         show-outline: false,
-        style: tidy.styles.default
+        style: dictionary(tidy.styles.default) + (show-example: my-show-example),
+        sort-functions: none
       )
+      
+
+
       let show-outline = tidy.styles.default.show-outline.with(style-args: (enable-cross-references: true))
       
       let docs = parse-module(read("/src/quantum-circuit.typ"))

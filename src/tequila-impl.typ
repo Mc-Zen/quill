@@ -212,6 +212,18 @@
 
 
 /// Constructs a circuit from operation instructions. 
+/// 
+/// ```example
+/// #import tequila as tq
+/// 
+/// #quantum-circuit(
+///   ..tq.build(
+///     tq.h(0),
+///     tq.cx(0, 1),
+///     tq.sdg(1)
+///   )
+/// )
+/// ```
 #let build(
 
   /// Number of qubits. Can be inferred automatically. 
@@ -306,6 +318,16 @@
 
 
 /// Constructs a graph state preparation circuit. 
+/// 
+/// ```example
+/// #import tequila as tq
+/// 
+/// #quantum-circuit(
+///   ..tq.graph-state(
+///     (1, 2), (2,0)
+///   )
+/// )
+/// ```
 #let graph-state(
 
   /// Number of qubits. Can be inferred automatically. 
@@ -362,6 +384,13 @@
 
 
 /// Template for the quantum fourier transform (QFT). 
+/// ```example
+/// #import tequila as tq
+/// 
+/// #quantum-circuit(
+///   ..tq.qft(2)
+/// )
+/// ```
 #let qft(
 
   /// Number of qubits. 
