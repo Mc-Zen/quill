@@ -4,7 +4,7 @@
 
 <div align="center">
 
-[![Typst Package](https://img.shields.io/badge/dynamic/toml?url=https%3A%2F%2Fraw.githubusercontent.com%2FMc-Zen%2Fquill%2Fv0.5.0%2Ftypst.toml&query=%24.package.version&prefix=v&logo=typst&label=package&color=239DAD)](https://typst.app/universe/package/quill)
+[![Typst Package](https://img.shields.io/badge/dynamic/toml?url=https%3A%2F%2Fraw.githubusercontent.com%2FMc-Zen%2Fquill%2Fv0.6.0%2Ftypst.toml&query=%24.package.version&prefix=v&logo=typst&label=package&color=239DAD)](https://typst.app/universe/package/quill)
 [![Test Status](https://github.com/Mc-Zen/quill/actions/workflows/run_tests.yml/badge.svg)](https://github.com/Mc-Zen/quill/actions/workflows/run_tests.yml)
 [![MIT License](https://img.shields.io/badge/license-MIT-blue)](https://github.com/Mc-Zen/quill/blob/main/LICENSE)
 [![User Manual](https://img.shields.io/badge/manual-.pdf-purple)][guide]
@@ -14,10 +14,12 @@
 
 **Quill** is a package for creating quantum circuit diagrams in [Typst](https://typst.app/). 
 
+It features two distinct operation models:
+- The very powerful and more manual [grid model](#basic-usage-the-grid-model).
+- The automatic and operational model [Tequila](#tequila) which is also useful for _composing sub-circuits_. 
 
-_Note, that this package is in beta and may still be undergoing breaking changes. As new features like data types and scoped functions will be added to Typst, this package will be adapted to profit from the new paradigms._
+Outline:
 
-_Meanwhile, we suggest importing everything from the package in a local scope to avoid polluting the global namespace (see example below)._
 
 - [**Usage**](#basic-usage) _quick introduction_
 - [**Cheat sheet**](#cheat-sheet) _gallery for quickly viewing all kinds of gates_
@@ -26,13 +28,13 @@ _Meanwhile, we suggest importing everything from the package in a local scope to
 - [**Changelog**](#changelog)
 
 
-## Basic usage
+## Basic usage (the grid model)
 
-The function `quantum-circuit()` takes any number of positional gates and works somewhat similarly to the built-int Typst functions `table()` or `grid()`. A variety of different gate and instruction commands are available for adding elements and integers can be used to produce any number of empty cells (filled with the current wire style). A new wire is started by adding a `[\ ]` item. 
+The function `quantum-circuit()` takes any number of positional gates and works similar to the built-in Typst functions `table()` and `grid()`. A variety of different gate and instruction commands are available for adding elements. Integers can be used to produce any number of empty cells (filled with the current wire style). A new wire is started by adding a `[\ ]` item. 
 
 ```typ
 #{
-  import "@preview/quill:0.5.0": *
+  import "@preview/quill:0.6.0": *
 
   quantum-circuit(
     lstick($|0〉$), $H$, ctrl(1), rstick($(|00〉+|11〉)/√2$, n: 2), [\ ],
@@ -44,7 +46,7 @@ The function `quantum-circuit()` takes any number of positional gates and works 
   <img alt="Bell Circuit" src="docs/images/bell.svg">
 </div>
 
-Plain quantum gates — such as a Hadamard gate — can be written with the shorthand notation `$H$` instead of the more lengthy `gate($H$)`. The latter offers more options, however. 
+Plain quantum gates — such as a Hadamard gate — can be written with the shorthand notation `$H$` instead of the more lengthy `gate($H$)`. The latter offers additional styling options. 
 
 Refer to the [user guide][guide] for a full documentation of this package. You can also look up the documentation of any function by calling the help module, e.g., `help("gate")` in order to print the signature and description of the `gate` command, just where you are currently typing (powered by [tidy][tidy]). 
 
@@ -62,7 +64,7 @@ Instead of listing every featured gate (as is done in the [user guide][guide]), 
 _Tequila_ is a submodule that adds a completely different way of building circuits. 
 
 ```typ
-#import "@preview/quill:0.5.0" as quill: tequila as tq
+#import "@preview/quill:0.6.0" as quill: tequila as tq
 
 #quill.quantum-circuit(
   ..tq.build(
@@ -80,10 +82,10 @@ The syntax works analog to Qiskit. Available gates are `x`, `y`, `z`, `h`, `s`, 
 
 Also like Qiskit, all qubit arguments support ranges, e.g., `tq.h(range(5))` adds a Hadamard gate on the first five qubits and `tq.cx((0, 1), (1, 2))` adds two CX gates: one from qubit 0 to 1 and one from qubit 1 to 2. 
 
-With Tequila, it is easy to build templates for quantum circuits and to compose circuits of various building blocks. For this purpose, `tq.build()` and the built-in templates all feature optional `x` and `y` arguments to allow placing a subcircuit at an arbitrary position of the circuit. 
+With Tequila, it is easy to build templates for quantum circuits and to compose circuits of various building blocks. For this purpose, `tq.build()` and the built-in templates all feature optional `x` and `y` arguments to allow placing a sub-circuit at an arbitrary position of the circuit. 
 As an example, Tequila provides a `tq.graph-state()` template for quickly drawing graph state preparation circuits. 
 
-The following example demonstrates how to compose multiple subcircuits. 
+The following example demonstrates how to compose multiple sub-circuits. 
 
 
 ```typ
@@ -124,13 +126,20 @@ Some show-off examples, loosely replicating figures from [Quantum Computation an
 
 ## Contribution
 
-If you spot an issue or have a suggestion, you are invited to [post it](https://github.com/Mc-Zen/quill/issues) or to contribute. In [architecture.md](docs/architecture.md), you can also find a description of the algorithm that forms the base of `quantum-circuit()`. 
+If you spot an issue or have a suggestion, you are invited to [post it](https://github.com/Mc-Zen/quill/issues) or to contribute to this package. In [architecture.md](docs/architecture.md), you can also find a description of the algorithm that forms the base of `quantum-circuit()`. 
 
 ## Tests
 This package uses [typst-test](https://github.com/tingerrr/typst-test/) for running [tests](tests/). 
 
 
 ## Changelog
+
+### v0.6.0
+- Improved support for Tequila: controlled-gates can now take additional styling parameters.
+- ⚠️ Removed `targX`: use `swap(0)` instead. 
+- Fixed `stroke` for the plain `gate` command. 
+- Big documentation update. 
+
 ### v0.5.0
 - Added support for multi-controlled gates with Tequila. 
 - Switched to using `context` instead of the now deprecated `style()` for measurement. 
@@ -191,5 +200,5 @@ Note: Starting with this version, Typst 0.11.0 or higher is required.
 Initial Release
 
 
-[guide]: https://github.com/Mc-Zen/quill/releases/download/v0.5.0/quill-guide.pdf
+[guide]: https://github.com/Mc-Zen/quill/releases/download/v0.6.0/quill-guide.pdf
 [tidy]: https://github.com/Mc-Zen/tidy
