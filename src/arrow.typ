@@ -14,7 +14,7 @@
   let w = width/2
   let v1 = (arrow-start.at(0) - w*normal.at(0), arrow-start.at(1) - w*normal.at(1))
   let v2 = (arrow-start.at(0) + w*normal.at(0), arrow-start.at(1) + w*normal.at(1))
-  path(arrow-end, v1, v2, closed: true, fill: arrow-color)
+  polygon(arrow-end, v1, v2, fill: arrow-color)
 }
 
 #let test-arrow() = {

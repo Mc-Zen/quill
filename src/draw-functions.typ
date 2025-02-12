@@ -138,7 +138,12 @@
       width: width, height: height, inset: 0pt, 
       {
         let center-x = width / 2
-        place(path((0%, 110%), ((50%, 40%), (-40%, 0pt)), (100%, 110%), stroke: stroke))
+        place(curve(
+          curve.move((0%, 110%)),
+          curve.quad((15%, 40%), (50%, 40%)),
+          curve.quad(auto, (100%, 110%)),
+          stroke: stroke
+        ))
         set align(left)
         arrow.draw-arrow((center-x, height * 1.2), (width * .9, height*.3), length: 3.8pt, width: 2.8pt, stroke: stroke, arrow-color: draw-params.color)
     })
@@ -187,9 +192,17 @@
         let y-from = draw-params.center-y-coords.at(from + gate.qubit) - y0
         let y-to = draw-params.center-y-coords.at(to + gate.qubit) - y0
         if separation != none {
-          place(path(((0pt,y-from), (-bend, 0pt)), ((width, y-to), (-bend, 0pt)), stroke: separation))
+          place(curve(
+            curve.move((0pt, y-from)),
+            curve.cubic((bend, y-from), (width - bend, y-to), (width, y-to)),
+            stroke: separation
+          ))
         }
-        place(path(((-.1pt,y-from), (-bend, 0pt)), ((width+.1pt, y-to), (-bend, 0pt)), stroke: draw-params.wire)) 
+        place(curve(
+          curve.move((-.1pt, y-from)),
+          curve.cubic((bend, y-from), (width + .1pt - bend, y-to), (width + .1pt, y-to)),
+          stroke: draw-params.wire
+        ))
       }
     }
   )
