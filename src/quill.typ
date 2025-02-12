@@ -6,7 +6,7 @@
 
 
 #let help(..args) = {
-  import "@preview/tidy:0.3.0"
+  import "@preview/tidy:0.4.1"
 
   let namespace = (
     ".": (
