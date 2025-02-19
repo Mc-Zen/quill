@@ -30,8 +30,18 @@
 // and "}" if alignment is left. Other possible values are 
 // "[", "]", "|", "{", and "}".
 #let create-brace(brace, alignment, length) = {
+  let lookup = (
+    "{": ${$,
+    "}": $}$,
+    "|": $|$,
+    "[": $[$,
+    "]": $]$,
+  )
   if brace == auto {
-    brace = if alignment == right {"{"} else {"}"} 
+    brace = if alignment == right {${$} else {$}$} 
+  } else if brace != none {
+    assert(brace in lookup, message: "Unsupported brace " + repr(brace))
+    brace = lookup.at(brace)
   }
   return $ lr(#brace, size: length) $
 }
