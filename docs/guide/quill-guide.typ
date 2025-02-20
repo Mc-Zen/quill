@@ -464,9 +464,8 @@ Another example, here we want to obtain coordinates for the cell centers. We can
     annotate((1.5, 3.5, 2.5), (0.5, 1.5, 2.5), z: "above",
       ((x0, x1, x2), (y0, y1, y2)) => { 
         (
-          content: path(
+          content: polygon(
             (x0, y0), (x1, y1), (x2, y2), 
-            closed: true, 
             fill: rgb("#1020EE50"), stroke: .5pt + black
           ), 
         )
