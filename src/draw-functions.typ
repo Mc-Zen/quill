@@ -138,9 +138,10 @@
       width: width, height: height, inset: 0pt, 
       {
         let center-x = width / 2
+        // place(path((0%, 110%), ((50%, 40%), (-40%, 0pt)), (100%, 110%), stroke: stroke))
         place(curve(
           curve.move((0%, 110%)),
-          curve.quad((15%, 40%), (50%, 40%)),
+          curve.quad((13%, 40%), (50%, 40%)),
           curve.quad(auto, (100%, 110%)),
           stroke: stroke
         ))
