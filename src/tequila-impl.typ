@@ -106,6 +106,8 @@
   })
 }
 
+
+
 /// Creates a gate with multiple controls. 
 #let construct-multi-controlled-gate(
 
@@ -171,7 +173,11 @@
   gate-info(qubit, n: n, gates.mqgate.with(..args, n: n))
 }
 
-#let barrier() = gate-info(0, barrier)
+#let barrier(start: 0, end: auto) = gate-info(
+  start, 
+  n: if end == auto { 1 } else { end - start },
+  barrier
+)
 
 #let x(qubit, ..args) = construct-single-qubit-gate(qubit, gates.gate.with($X$, ..args))
 #let y(qubit, ..args) = construct-single-qubit-gate(qubit, gates.gate.with($Y$, ..args))
@@ -301,7 +307,8 @@
     // Special case: barriers
     let (q1, q2) = (start, end).sorted()
     if op.constructor == barrier {
-      (q1, q2) = (0, num-qubits - 1)
+      if op.n == 1 { end = num-qubits - 1}
+      (q1, q2) = (start, end)
     }
 
 
