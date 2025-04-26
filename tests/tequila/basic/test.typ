@@ -102,8 +102,8 @@
 
 #quill.quantum-circuit(..tq.build(
   tq.measure(0),
-  tq.measure(1, 2),
   tq.measure(2, 1),
+  tq.measure(1, 2),
 ))
 
 
@@ -115,3 +115,4 @@
   tq.barrier(start: 0, end: 2),
   tq.h(range(5))
 ))
+
