@@ -165,25 +165,25 @@
 
 #let barrier() = gate-info(0, barrier)
 
-#let x(qubit) = generate-single-qubit-gate(qubit, gates.gate.with($X$))
-#let y(qubit) = generate-single-qubit-gate(qubit, gates.gate.with($Y$))
-#let z(qubit) = generate-single-qubit-gate(qubit, gates.gate.with($Z$))
+#let x(qubit, ..args) = generate-single-qubit-gate(qubit, gates.gate.with($X$, ..args))
+#let y(qubit, ..args) = generate-single-qubit-gate(qubit, gates.gate.with($Y$, ..args))
+#let z(qubit, ..args) = generate-single-qubit-gate(qubit, gates.gate.with($Z$, ..args))
 
-#let h(qubit) = generate-single-qubit-gate(qubit, gates.gate.with($H$))
-#let s(qubit) = generate-single-qubit-gate(qubit, gates.gate.with($S$))
-#let sdg(qubit) = generate-single-qubit-gate(qubit, gates.gate.with($S^dagger$))
-#let sx(qubit) = generate-single-qubit-gate(qubit, gates.gate.with($sqrt(X)$))
-#let sxdg(qubit) = generate-single-qubit-gate(qubit, gates.gate.with($sqrt(X)^dagger$))
-#let t(qubit) = generate-single-qubit-gate(qubit, gates.gate.with($T$))
-#let tdg(qubit) = generate-single-qubit-gate(qubit, gates.gate.with($T^dagger$))
-#let p(theta, qubit) = generate-single-qubit-gate(qubit, gates.gate.with($P (#theta)$))
+#let h(qubit, ..args) = generate-single-qubit-gate(qubit, gates.gate.with($H$, ..args))
+#let s(qubit, ..args) = generate-single-qubit-gate(qubit, gates.gate.with($S$, ..args))
+#let sdg(qubit, ..args) = generate-single-qubit-gate(qubit, gates.gate.with($S^dagger$, ..args))
+#let sx(qubit, ..args) = generate-single-qubit-gate(qubit, gates.gate.with($sqrt(X)$, ..args))
+#let sxdg(qubit, ..args) = generate-single-qubit-gate(qubit, gates.gate.with($sqrt(X)^dagger$, ..args))
+#let t(qubit, ..args) = generate-single-qubit-gate(qubit, gates.gate.with($T$, ..args))
+#let tdg(qubit, ..args) = generate-single-qubit-gate(qubit, gates.gate.with($T^dagger$, ..args))
+#let p(theta, qubit, ..args) = generate-single-qubit-gate(qubit, gates.gate.with($P (#theta)$, ..args))
 
-#let rx(theta, qubit) = generate-single-qubit-gate(qubit, gates.gate.with($R_x (#theta)$))
-#let ry(theta, qubit) = generate-single-qubit-gate(qubit, gates.gate.with($R_y (#theta)$))
-#let rz(theta, qubit) = generate-single-qubit-gate(qubit, gates.gate.with($R_z (#theta)$))
+#let rx(theta, qubit, ..args) = generate-single-qubit-gate(qubit, gates.gate.with($R_x (#theta)$, ..args))
+#let ry(theta, qubit, ..args) = generate-single-qubit-gate(qubit, gates.gate.with($R_y (#theta)$, ..args))
+#let rz(theta, qubit, ..args) = generate-single-qubit-gate(qubit, gates.gate.with($R_z (#theta)$, ..args))
 
-#let u(theta, phi, lambda, qubit) = generate-single-qubit-gate(
-  qubit, gates.gate.with($U (#theta, #phi, #lambda)$)
+#let u(theta, phi, lambda, qubit, ..args) = generate-single-qubit-gate(
+  qubit, gates.gate.with($U (#theta, #phi, #lambda)$, ..args)
 )
 
 #let meter(qubit, ..args) = generate-single-qubit-gate(qubit, gates.meter.with(..args))
