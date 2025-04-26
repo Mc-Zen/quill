@@ -1,6 +1,6 @@
 #import "gates.typ"
 
-/// Info about one quantum gate. 
+/// Info about one single quantum gate. 
 #let gate-info(
 
   /// Qubit or first qubit in the case of a multi-qubit gate. 
@@ -32,7 +32,7 @@
 
 
 
-#let generate-single-qubit-gate(
+#let construct-single-qubit-gate(
 
   /// One or more qubits. Named arguments are disallowed. 
   /// -> int | array
@@ -61,7 +61,7 @@
 
 
 /// Generates a two-qubit gate with two qubits connected by a wire. 
-#let generate-two-qubit-gate(
+#let construct-two-qubit-gate(
 
   /// Control qubit(s). 
   /// -> int | array
@@ -107,7 +107,7 @@
 }
 
 /// Creates a gate with multiple controls. 
-#let generate-multi-controlled-gate(
+#let construct-multi-controlled-gate(
 
   /// Control qubits. 
   /// -> array
@@ -165,58 +165,58 @@
 
 #let barrier() = gate-info(0, barrier)
 
-#let x(qubit, ..args) = generate-single-qubit-gate(qubit, gates.gate.with($X$, ..args))
-#let y(qubit, ..args) = generate-single-qubit-gate(qubit, gates.gate.with($Y$, ..args))
-#let z(qubit, ..args) = generate-single-qubit-gate(qubit, gates.gate.with($Z$, ..args))
+#let x(qubit, ..args) = construct-single-qubit-gate(qubit, gates.gate.with($X$, ..args))
+#let y(qubit, ..args) = construct-single-qubit-gate(qubit, gates.gate.with($Y$, ..args))
+#let z(qubit, ..args) = construct-single-qubit-gate(qubit, gates.gate.with($Z$, ..args))
 
-#let h(qubit, ..args) = generate-single-qubit-gate(qubit, gates.gate.with($H$, ..args))
-#let s(qubit, ..args) = generate-single-qubit-gate(qubit, gates.gate.with($S$, ..args))
-#let sdg(qubit, ..args) = generate-single-qubit-gate(qubit, gates.gate.with($S^dagger$, ..args))
-#let sx(qubit, ..args) = generate-single-qubit-gate(qubit, gates.gate.with($sqrt(X)$, ..args))
-#let sxdg(qubit, ..args) = generate-single-qubit-gate(qubit, gates.gate.with($sqrt(X)^dagger$, ..args))
-#let t(qubit, ..args) = generate-single-qubit-gate(qubit, gates.gate.with($T$, ..args))
-#let tdg(qubit, ..args) = generate-single-qubit-gate(qubit, gates.gate.with($T^dagger$, ..args))
-#let p(theta, qubit, ..args) = generate-single-qubit-gate(qubit, gates.gate.with($P (#theta)$, ..args))
+#let h(qubit, ..args) = construct-single-qubit-gate(qubit, gates.gate.with($H$, ..args))
+#let s(qubit, ..args) = construct-single-qubit-gate(qubit, gates.gate.with($S$, ..args))
+#let sdg(qubit, ..args) = construct-single-qubit-gate(qubit, gates.gate.with($S^dagger$, ..args))
+#let sx(qubit, ..args) = construct-single-qubit-gate(qubit, gates.gate.with($sqrt(X)$, ..args))
+#let sxdg(qubit, ..args) = construct-single-qubit-gate(qubit, gates.gate.with($sqrt(X)^dagger$, ..args))
+#let t(qubit, ..args) = construct-single-qubit-gate(qubit, gates.gate.with($T$, ..args))
+#let tdg(qubit, ..args) = construct-single-qubit-gate(qubit, gates.gate.with($T^dagger$, ..args))
+#let p(theta, qubit, ..args) = construct-single-qubit-gate(qubit, gates.gate.with($P (#theta)$, ..args))
 
-#let rx(theta, qubit, ..args) = generate-single-qubit-gate(qubit, gates.gate.with($R_x (#theta)$, ..args))
-#let ry(theta, qubit, ..args) = generate-single-qubit-gate(qubit, gates.gate.with($R_y (#theta)$, ..args))
-#let rz(theta, qubit, ..args) = generate-single-qubit-gate(qubit, gates.gate.with($R_z (#theta)$, ..args))
+#let rx(theta, qubit, ..args) = construct-single-qubit-gate(qubit, gates.gate.with($R_x (#theta)$, ..args))
+#let ry(theta, qubit, ..args) = construct-single-qubit-gate(qubit, gates.gate.with($R_y (#theta)$, ..args))
+#let rz(theta, qubit, ..args) = construct-single-qubit-gate(qubit, gates.gate.with($R_z (#theta)$, ..args))
 
-#let u(theta, phi, lambda, qubit, ..args) = generate-single-qubit-gate(
+#let u(theta, phi, lambda, qubit, ..args) = construct-single-qubit-gate(
   qubit, gates.gate.with($U (#theta, #phi, #lambda)$, ..args)
 )
 
-#let meter(qubit, ..args) = generate-single-qubit-gate(qubit, gates.meter.with(..args))
+#let meter(qubit, ..args) = construct-single-qubit-gate(qubit, gates.meter.with(..args))
 
 
-#let cx(control, target, ..args) = generate-two-qubit-gate(
+#let cx(control, target, ..args) = construct-two-qubit-gate(
   control, target, gates.ctrl.with(..args), gates.targ
 )
-#let cz(control, target, ..args) = generate-two-qubit-gate(
+#let cz(control, target, ..args) = construct-two-qubit-gate(
   control, target, gates.ctrl.with(..args), gates.ctrl.with(0)
 )
-#let swap(control, target, ..args) = generate-two-qubit-gate(
+#let swap(control, target, ..args) = construct-two-qubit-gate(
   control, target, gates.swap.with(..args), gates.swap.with(0)
 )
-#let ccx(control1, control2, target, ..args) = generate-multi-controlled-gate(
+#let ccx(control1, control2, target, ..args) = construct-multi-controlled-gate(
   (control1, control2), target, gates.targ, ..args
 )
-#let cccx(control1, control2, control3, target, ..args) = generate-multi-controlled-gate(
+#let cccx(control1, control2, control3, target, ..args) = construct-multi-controlled-gate(
   (control1, control2, control3), target, gates.targ, ..args
 )
-#let ccz(control1, control2, target, ..args) = generate-multi-controlled-gate(
+#let ccz(control1, control2, target, ..args) = construct-multi-controlled-gate(
   (control1, control2), target, gates.ctrl.with(0), ..args
 )
-#let cca(control1, control2, target, content, ..args) = generate-multi-controlled-gate(
+#let cca(control1, control2, target, content, ..args) = construct-multi-controlled-gate(
   (control1, control2), target, gates.gate.with(content), ..args
 )
 
 
-#let ca(control, target, content) = generate-two-qubit-gate(
+#let ca(control, target, content) = construct-two-qubit-gate(
   control, target, gates.ctrl, gates.gate.with(content)
 )
 
-#let multi-controlled-gate(controls, qubit, target, ..args) = generate-multi-controlled-gate(
+#let multi-controlled-gate(controls, qubit, target, ..args) = construct-multi-controlled-gate(
   controls, qubit, target, ..args
 )
 
