@@ -127,7 +127,7 @@
 
 ) = {
   let ctrl = gates.ctrl.with(..args)
-  
+
   controls = controls.map(c => if type(c) == int { (c,) } else { c })
   if type(qubit) == int { qubit = (qubit,) }
 
@@ -196,6 +196,22 @@
 
 #let meter(qubit, ..args) = construct-single-qubit-gate(qubit, gates.meter.with(..args))
 
+#let measure(..args) = {
+  let qubits = args.pos()
+  assert(qubits.len() > 0, message: "Missing argument `qubit`")
+  if qubits.len() == 1 {
+    construct-single-qubit-gate(qubits.first(), gates.meter.with(..args.named()))
+  } else {
+    assert(qubits.len() == 2, message: "Expected a qubit and a classical, got more than three positional arguments")
+    construct-two-qubit-gate(
+      qubits.first(), 
+      qubits.last(), 
+      gates.ctrl.with(open: true, wire-count: 2), 
+      gates.meter.with(..args.named())
+    )
+  }
+}
+
 
 #let cx(control, target, ..args) = construct-two-qubit-gate(
   control, target, gates.ctrl.with(..args), gates.targ
@@ -209,23 +225,23 @@
 #let ccx(control1, control2, target, ..args) = construct-multi-controlled-gate(
   (control1, control2), target, gates.targ, ..args
 )
-#let cccx(control1, control2, control3, target, ..args) = construct-multi-controlled-gate(
-  (control1, control2, control3), target, gates.targ, ..args
-)
 #let ccz(control1, control2, target, ..args) = construct-multi-controlled-gate(
   (control1, control2), target, gates.ctrl.with(0), ..args
 )
 #let cca(control1, control2, target, content, ..args) = construct-multi-controlled-gate(
   (control1, control2), target, gates.gate.with(content), ..args
 )
-
-
-#let ca(control, target, content) = construct-two-qubit-gate(
-  control, target, gates.ctrl, gates.gate.with(content)
+#let cccx(control1, control2, control3, target, ..args) = construct-multi-controlled-gate(
+  (control1, control2, control3), target, gates.targ, ..args
 )
 
-#let multi-controlled-gate(controls, qubit, target, ..args) = construct-multi-controlled-gate(
-  controls, qubit, target, ..args
+
+#let ca(control, target, ..args) = construct-two-qubit-gate(
+  control, target, gates.ctrl, gates.gate.with(..args)
+)
+
+#let multi-controlled-gate(controls, target, gate, ..args) = construct-multi-controlled-gate(
+  controls, target, gate, ..args
 )
 
 
