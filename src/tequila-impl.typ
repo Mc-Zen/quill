@@ -113,8 +113,8 @@
   /// -> array
   controls, 
 
-  /// Target qubit(s). 
-  /// -> int | array
+  /// Target qubit. 
+  /// -> int
   qubit, 
 
   /// Gate to put at the target. 
@@ -127,32 +127,40 @@
 
 ) = {
   let ctrl = gates.ctrl.with(..args)
-  let sort-ops(cs, q) = {
-    let k = cs.map(c => (c, ctrl.with(0))) + ((q, gate),)
-    k = k.sorted(key: x => x.first())
-    let n = k.last().at(0) - k.first().at(0)
-    // for i in range(1, k.len()) {
-    //   if k.at(i)
-    // }
-    if k.first().at(1) == ctrl.with(0) { k.first().at(1) = ctrl.with(n) }
-    else if k.last().at(1) == ctrl.with(0) { k.at(2).at(1) = ctrl.with(-n) }
-    return k
-  }
+  
   controls = controls.map(c => if type(c) == int { (c,) } else { c })
   if type(qubit) == int { qubit = (qubit,) }
 
   range(calc.max(qubit.len(), ..controls.map(array.len))).map(i => {
-    let q = qubit.at(i, default: qubit.last())
+    let target = qubit.at(i, default: qubit.last())
     let cs = controls.map(c => c.at(i, default: c.last()))
 
-    assert((cs + (q,)).dedup().len() == cs.len() + 1, message: "Target and control qubits need to be all different (were " + str(q) + " and " + repr(cs) + ")")
+    assert((cs + (target,)).dedup().len() == cs.len() + 1, message: "Target and control qubits need to be all different (were " + str(target) + " and " + repr(cs) + ")")
 
-    let ops = sort-ops(cs, q)
-    gate-info(
-      ops.first().at(0), ops.first().at(1), 
-      n: ops.last().at(0) - ops.first().at(0) + 1, 
-      supplements: ops.slice(1)
-    )
+
+
+
+    let (first, ..rest) = (cs + (target,)).sorted()
+    let n = rest.last() - first
+
+    if first == target {
+      let (..rest, last) = rest
+      gate-info(
+        target, gate,
+        n: n + 1, 
+        supplements: rest.map(q => (q, ctrl.with(0))) +  ((last, ctrl.with(-n)),)
+      )
+    } else {
+      
+      gate-info(
+        first, ctrl.with(n), 
+        n: n + 1, 
+        supplements: rest.map(q => 
+          (q, if q == target { gate } else { ctrl.with(0) })
+        )
+      )
+    }
+
   })
 }
 
