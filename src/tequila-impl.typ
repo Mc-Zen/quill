@@ -1,4 +1,5 @@
 #import "gates.typ"
+#import "utility.typ": if-auto
 
 /// Info about one single quantum gate. 
 #let gate-info(
@@ -175,7 +176,7 @@
 
 #let barrier(start: 0, end: auto) = gate-info(
   start, 
-  n: if end == auto { 1 } else { end - start },
+  n: if end == auto { auto } else { end - start },
   barrier
 )
 
@@ -291,7 +292,7 @@
 
   let num-qubits = n
   if num-qubits == auto {
-    num-qubits = calc.max(..operations.map(x => x.qubit + calc.max(0, x.n - 1))) + 1
+    num-qubits = calc.max(..operations.map(x => x.qubit + calc.max(0, if-auto(x.n, 1) - 1))) + 1
   }
 
   let tracks = ((),) * num-qubits
@@ -299,15 +300,15 @@
   // now we doin some Tetris
   for op in operations {
     let start = op.qubit
-    let end = start + op.n - 1
+    let end = start + if-auto(op.n, 2) - 1
 
     assert(start >= 0 and start < num-qubits, message: "The qubit `" + str(start) + "` is out of range. Leave `n` at `auto` if you want to automatically resize the circuit. ")
-    assert(end >= 0 and end < num-qubits, message: "The qubit `" + str(end) + "` is out of range. Leave `n` at `auto` if you want to automatically resize the circuit. ")
+    assert(end >= 0 and end < num-qubits, message: "The qubit `" + str(end) + "` is out of range. Leave `n` at `auto` if you want to automatically resize the circuit. " + repr((start, end, num-qubits, op)))
 
     // Special case: barriers
     let (q1, q2) = (start, end).sorted()
     if op.constructor == barrier {
-      if op.n == 1 { end = num-qubits - 1}
+      if op.n == auto { end = num-qubits - 1}
       (q1, q2) = (start, end)
     }
 
