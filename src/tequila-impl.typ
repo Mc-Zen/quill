@@ -35,7 +35,7 @@
 #let generate-single-qubit-gate(
 
   /// One or more qubits. Named arguments are disallowed. 
-  /// -> arguments
+  /// -> int | array
   qubit, 
 
   /// Gate function.
@@ -43,10 +43,17 @@
   gate
   
 ) = {
-  if qubit.named().len() != 0 {
-    assert(false, message: "Unexpected argument `" + qubit.named().keys().first() + "`")
+
+  if type(qubit) == arguments {
+    if qubit.named().len() != 0 {
+      assert(false, message: "Unexpected argument `" + qubit.named().keys().first() + "`")
+    }
+    qubit = qubit.pos()
+  } 
+  if type(qubit) == int {
+    qubit = (qubit,)
   }
-  qubit = qubit.pos()
+
   if qubit.len() == 1 { qubit = qubit.first() }
   if type(qubit) == int { return gate-info(qubit, gate) }
   qubit.map(qubit => gate-info(qubit, gate))
@@ -124,6 +131,9 @@
     let k = cs.map(c => (c, ctrl.with(0))) + ((q, gate),)
     k = k.sorted(key: x => x.first())
     let n = k.last().at(0) - k.first().at(0)
+    // for i in range(1, k.len()) {
+    //   if k.at(i)
+    // }
     if k.first().at(1) == ctrl.with(0) { k.first().at(1) = ctrl.with(n) }
     else if k.last().at(1) == ctrl.with(0) { k.at(2).at(1) = ctrl.with(-n) }
     return k
@@ -155,28 +165,28 @@
 
 #let barrier() = gate-info(0, barrier)
 
-#let x(..qubit) = generate-single-qubit-gate(qubit, gates.gate.with($X$))
-#let y(..qubit) = generate-single-qubit-gate(qubit, gates.gate.with($Y$))
-#let z(..qubit) = generate-single-qubit-gate(qubit, gates.gate.with($Z$))
+#let x(qubit) = generate-single-qubit-gate(qubit, gates.gate.with($X$))
+#let y(qubit) = generate-single-qubit-gate(qubit, gates.gate.with($Y$))
+#let z(qubit) = generate-single-qubit-gate(qubit, gates.gate.with($Z$))
 
-#let h(..qubit) = generate-single-qubit-gate(qubit, gates.gate.with($H$))
-#let s(..qubit) = generate-single-qubit-gate(qubit, gates.gate.with($S$))
-#let sdg(..qubit) = generate-single-qubit-gate(qubit, gates.gate.with($S^dagger$))
-#let sx(..qubit) = generate-single-qubit-gate(qubit, gates.gate.with($sqrt(X)$))
-#let sxdg(..qubit) = generate-single-qubit-gate(qubit, gates.gate.with($sqrt(X)^dagger$))
-#let t(..qubit) = generate-single-qubit-gate(qubit, gates.gate.with($T$))
-#let tdg(..qubit) = generate-single-qubit-gate(qubit, gates.gate.with($T^dagger$))
-#let p(theta, ..qubit) = generate-single-qubit-gate(qubit, gates.gate.with($P (#theta)$))
+#let h(qubit) = generate-single-qubit-gate(qubit, gates.gate.with($H$))
+#let s(qubit) = generate-single-qubit-gate(qubit, gates.gate.with($S$))
+#let sdg(qubit) = generate-single-qubit-gate(qubit, gates.gate.with($S^dagger$))
+#let sx(qubit) = generate-single-qubit-gate(qubit, gates.gate.with($sqrt(X)$))
+#let sxdg(qubit) = generate-single-qubit-gate(qubit, gates.gate.with($sqrt(X)^dagger$))
+#let t(qubit) = generate-single-qubit-gate(qubit, gates.gate.with($T$))
+#let tdg(qubit) = generate-single-qubit-gate(qubit, gates.gate.with($T^dagger$))
+#let p(theta, qubit) = generate-single-qubit-gate(qubit, gates.gate.with($P (#theta)$))
 
-#let rx(theta, ..qubit) = generate-single-qubit-gate(qubit, gates.gate.with($R_x (#theta)$))
-#let ry(theta, ..qubit) = generate-single-qubit-gate(qubit, gates.gate.with($R_y (#theta)$))
-#let rz(theta, ..qubit) = generate-single-qubit-gate(qubit, gates.gate.with($R_z (#theta)$))
+#let rx(theta, qubit) = generate-single-qubit-gate(qubit, gates.gate.with($R_x (#theta)$))
+#let ry(theta, qubit) = generate-single-qubit-gate(qubit, gates.gate.with($R_y (#theta)$))
+#let rz(theta, qubit) = generate-single-qubit-gate(qubit, gates.gate.with($R_z (#theta)$))
 
-#let u(theta, phi, lambda, ..qubit) = generate-single-qubit-gate(
+#let u(theta, phi, lambda, qubit) = generate-single-qubit-gate(
   qubit, gates.gate.with($U (#theta, #phi, #lambda)$)
 )
 
-#let meter(..qubit) = generate-single-qubit-gate(qubit, gates.meter)
+#let meter(qubit, ..args) = generate-single-qubit-gate(qubit, gates.meter.with(..args))
 
 
 #let cx(control, target, ..args) = generate-two-qubit-gate(
@@ -247,7 +257,7 @@
   ..children
 
 ) = {
-  let operations = children.pos().flatten()
+  let operations = children.pos().flatten().filter(x => x != none)
 
   let num-qubits = n
   if num-qubits == auto {
