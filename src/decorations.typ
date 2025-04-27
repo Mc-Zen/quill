@@ -259,7 +259,7 @@
   radius: 0pt, 
 
   /// One or more labels to add to the group. See @gate. 
-  /// -> none | array | str | content | dictionary
+  /// -> none | array | str | content | dictionary
   label: none
 
 ) = (
@@ -300,7 +300,7 @@
   stroke: (paint: red, thickness: .7pt, dash: "dashed"),
 
   /// One or more labels to add to the slice. See @gate. 
-  /// -> none | array | str | content | dictionary
+  /// -> none | array | str | content | dictionary
   label: none
 
 ) = (

@@ -432,7 +432,7 @@
   open: false,
 
   /// How to fill or stroke the circle if `open: true`. 
-  /// -> none | color | stroke
+  /// -> none | color | stroke
   fill: auto,
 
   /// The radius of the circle. 

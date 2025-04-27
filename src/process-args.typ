@@ -36,11 +36,11 @@
   default-dx: .4em, 
   default-dy: .4em
 ) = {
-  if labels == none {  return () }
+  if labels == none { return () }
   let type = type(labels)
-  if type == dictionary { labels = (labels,) } 
-  else if type in (symbol, content, str) { labels = ((content: labels),) } 
-  else if type == dictionary { labels = ((content: labels),) } 
+  if type == dictionary { labels = (labels,) }
+  else if type in (symbol, content, str) { labels = ((content: labels),) }
+  else if type == dictionary { labels = ((content: labels),) }
   let processed-labels = ()
   for label in labels {
     let alignment = layout.make-2d-alignment(label.at("pos", default: default-pos))
