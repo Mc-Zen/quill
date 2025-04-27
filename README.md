@@ -123,7 +123,7 @@ The following example demonstrates how to compose multiple sub-circuits.
 
 ## Examples
 
-Some show-off examples, loosely replicating figures from [Quantum Computation and Quantum Information by M. Nielsen and I. Chuang](https://www.cambridge.org/highereducation/books/quantum-computation-and-quantum-information/01E10196D0A682A6AEFFEA52D53BE9AE#overview). The code for these examples can be found in the [example folder](./examples/) or in the [user guide][guide]. 
+Some show-off examples, loosely replicating figures from [Quantum Computation and Quantum Information by M. Nielsen and I. Chuang](https://www.cambridge.org/highereducation/books/quantum-computation-and-quantum-information/01E10196D0A682A6AEFFEA52D53BE9AE#overview). The code for these examples can be found in the [example folder][examples] or in the [user guide][guide]. 
 
 <div align="center">
   <img alt="Quantum teleportation circuit" src="https://github.com/user-attachments/assets/f371d9b9-e9ab-49a7-a728-7fa94d958a8a">
@@ -138,7 +138,7 @@ Some show-off examples, loosely replicating figures from [Quantum Computation an
 
 ## Contribution
 
-If you spot an issue or have a suggestion, you are invited to [post it](https://github.com/Mc-Zen/quill/issues) or to contribute to this package. In [architecture.md](docs/architecture.md), you can also find a description of the algorithm that forms the base of `quantum-circuit()`. 
+If you spot an issue or have a suggestion, you are invited to [post it](https://github.com/Mc-Zen/quill/issues) or to contribute to this package. In [architecture.md][architecture], you can also find a description of the algorithm that forms the base of `quantum-circuit()`. 
 
 ## Tests
 This package uses [tytanic](https://github.com/tingerrr/tytanic) for running [tests](tests/). 
@@ -219,7 +219,9 @@ Initial Release
 
 
 [guide]: https://github.com/Mc-Zen/quill/releases/download/v0.6.1/quill-guide.pdf
+[examples]: https://github.com/Mc-Zen/quill/tree/main/examples
 [tidy]: https://github.com/Mc-Zen/tidy
+[architecture]: https://github.com/Mc-Zen/quill/blob/main/docs/architecture.md
 
 
 
