@@ -12,7 +12,6 @@
   stroke: none,
   radius: 3pt,
   inset: (x: 15pt, y: 4pt),
-  fill: white,
   quantum-circuit(
     row-spacing: 7pt,
     column-spacing: 18pt,

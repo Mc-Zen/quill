@@ -204,9 +204,19 @@
 
   /// Distance between wires. 
   /// -> length
-  wire-distance: auto
+  wire-distance: auto,
+
+  /// The starting column of the wire change command. 
+  /// -> auto | int
+  x: auto, 
+
+  /// The starting wire of the wire change command. 
+  /// -> auto | int
+  y: auto
 
 ) = (
+  x: x, 
+  y: y,
   qc-instr: "setwire",
   wire-count: wire-count,
   stroke: stroke,
