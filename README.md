@@ -1,5 +1,5 @@
 <h1 align="center">
-  <img alt="Quill" src="docs/images/logo.svg" style="max-width: 100%; width: 300pt">
+  <img alt="Quill" src="https://github.com/user-attachments/assets/3cb87ef5-03e0-48a7-b00b-1b8277a03fe1" style="max-width: 100%; width: 300pt">
 </h1>
 
 <div align="center">
@@ -46,23 +46,31 @@ The function `quantum-circuit()` takes any number of positional gates and works 
 }
 ```
 <div align="center">
-  <img alt="Bell Circuit" src="docs/images/bell.svg">
+  
+  ![Bell state preparation circuit](https://github.com/user-attachments/assets/f80f6041-379e-440c-bcda-95348f066f17)
+  
 </div>
 
 Plain quantum gates — such as a Hadamard gate — can be written with the shorthand notation `$H$` instead of the more lengthy `gate($H$)`. The latter offers additional styling options. 
 
 Refer to the [user guide][guide] for a full documentation of this package. You can also look up the documentation of any function by calling the help module, e.g., `#help("gate")` just where you are currently typing (powered by [tidy][tidy]). 
 
+
 ## Cheat Sheet
 
 This gallery quickly showcases a large selection of possible gates and decorations that can be added to any quantum circuit. 
 
 <div align="center">
-  <img alt="Gallery" src="docs/images/gallery.svg" />
+  
+  ![Gallery](https://github.com/user-attachments/assets/e6b56bfb-d5fb-462a-8f1a-591f3cfc4593)
+  
 </div>
 
 
+
+
 ## Tequila
+
 
 _Tequila_ is a submodule that adds a completely different way of building circuits. 
 
@@ -109,7 +117,7 @@ The following example demonstrates how to compose multiple sub-circuits.
 )
 ```
 <div align="center">
-  <img alt="Gallery" src="docs/images/composition.svg" />
+  <img alt="Gallery" src="https://github.com/user-attachments/assets/3a660b40-923f-4410-838e-322a673604e6" />
 </div>
 
 
@@ -118,13 +126,13 @@ The following example demonstrates how to compose multiple sub-circuits.
 Some show-off examples, loosely replicating figures from [Quantum Computation and Quantum Information by M. Nielsen and I. Chuang](https://www.cambridge.org/highereducation/books/quantum-computation-and-quantum-information/01E10196D0A682A6AEFFEA52D53BE9AE#overview). The code for these examples can be found in the [example folder](./examples/) or in the [user guide][guide]. 
 
 <div align="center">
-  <img alt="Quantum teleportation circuit" src="docs/images/teleportation.svg">
+  <img alt="Quantum teleportation circuit" src="https://github.com/user-attachments/assets/f371d9b9-e9ab-49a7-a728-7fa94d958a8a">
 </div>
 <div align="center">
-  <img alt="Quantum circuit for phase estimation" src="docs/images/phase-estimation.svg">
+  <img alt="Quantum circuit for phase estimation" src="https://github.com/user-attachments/assets/1864a436-b09b-46ac-961d-f13f3a4616ec">
 </div>
 <div align="center">
-  <img alt="Quantum fourier transformation circuit" src="docs/images/qft.svg">
+  <img alt="Quantum fourier transformation circuit" src="https://github.com/user-attachments/assets/6dabcd87-3dfe-4d4b-9758-798855c6fee7">
 </div>
 
 
@@ -212,3 +220,7 @@ Initial Release
 
 [guide]: https://github.com/Mc-Zen/quill/releases/download/v0.6.1/quill-guide.pdf
 [tidy]: https://github.com/Mc-Zen/tidy
+
+
+
+
