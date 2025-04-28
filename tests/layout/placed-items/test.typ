@@ -7,7 +7,7 @@
   1, $H$, [\ ],
   ..range(3).map(i => mqgate($+$, x: i + 2, y: i, n: 2)),
   ..range(3).map(i => meter(x: 6, y: i)),
-  ..range(3).map(i => ctrl(0, x: 7, y: i)),
+  ..range(3).map(i => ctrl(x: 7, y: i)),
   ..range(3).map(i => lstick($|0〉$, x: 0, y: i)),
   gategroup(4, 3, x: 2, y: 0),
   slice(y: 1, x: 6, n: 2),

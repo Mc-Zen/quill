@@ -33,7 +33,7 @@
 #pagebreak()
 
 #quantum-circuit(
-  1, ctrl(0, label: (content: "al", pos: right + top)), 1
+  1, ctrl(label: (content: "al", pos: right + top)), 1
 )
 
 #pagebreak()

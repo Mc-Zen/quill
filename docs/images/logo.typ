@@ -19,9 +19,9 @@
     scale: 130%,
     lstick($|psi〉$), gategroup(2,4, fill:blue.lighten(80%), stroke: (thickness: .7pt, dash: "dashed")),
     gate([Quill], radius: 2pt), ctrl(1), 1, 1, meter(target: 1), [\ ],
-    setwire(2), 1, phantom(content: "X"), ctrl(0), 
+    setwire(2), 1, phantom(content: "X"), ctrl(), 
     1, setwire(1, stroke: (thickness: .9pt, dash: "loosely-dotted")), 15pt, 1, 
-    setwire(2, stroke: (dash: "solid", thickness: .6pt)), ctrl(0), 1, 
+    setwire(2, stroke: (dash: "solid", thickness: .6pt)), ctrl(), 1, 
 
     annotate((3.9, 4), (0.1, 1.4), ((x0, x1), (y0, y1)) => {
       let x1 = x0 + 21.5pt

@@ -116,3 +116,24 @@
   tq.h(range(5))
 ))
 
+
+#pagebreak()
+
+#quill.quantum-circuit(
+  import tq: *,
+  ..tq.build(
+    n: 6,
+    import tq: *,
+    h(0),
+    h(1),
+    cx(1, 0),
+    cx(1, 3),
+    measure(1, 4),
+    barrier(start: 0, end: 1),
+  ),
+  [\ ],
+  [\ ],
+  [\ ],
+  [\ ],
+  quill.setwire(2)
+)

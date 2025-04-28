@@ -15,5 +15,5 @@
 #quantum-circuit(
   baseline: .6fr,
     1, ctrl(1), targ(), ctrl(1), midstick("=", n: 2), swap(1), 1, [\ ],
-    1, targ(), ctrl(-1), targ(), 1, swap(0), 1, 
+    1, targ(), ctrl(-1), targ(), 1, swap(), 1, 
 ) 

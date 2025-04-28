@@ -83,7 +83,7 @@ A new wire can be created by breaking the current wire with `[\ ]`:
   ```
 )
 
-We can create a #smallcaps("cx")-gate by calling #ref-fn("ctrl()") and passing the relative distance to the desired wire, e.g., `1` to the next wire, `2` to the second-next one or `-1` to the previous wire. Per default, the end of the vertical wire is  just joined with the target wire without any decoration at all. Here, we make the gate a #smallcaps("cx")-gate by adding a #ref-fn("targ()") symbol on the second wire. In order to make a #smallcaps("cz")-gate with another control circle on the target wire, just use `ctrl(0)` as target. 
+We can create a #smallcaps("cx")-gate by calling #ref-fn("ctrl()") and passing the relative distance to the desired wire, e.g., `1` to the next wire, `2` to the second-next one or `-1` to the previous wire. Per default, the end of the vertical wire is  just joined with the target wire without any decoration at all. Here, we make the gate a #smallcaps("cx")-gate by adding a #ref-fn("targ()") symbol on the second wire. In order to make a #smallcaps("cz")-gate with another control circle on the target wire, just use `ctrl()` as target. 
 
 
 == Multi-Qubit Gates and Wire Labels
@@ -111,8 +111,8 @@ Just as multi-qubit gates, #ref-fn("lstick()") and #ref-fn("rstick()") can span 
   #quantum-circuit(
     lstick($|000〉$, n: 3), $H$, ctrl(1), ctrl(2), 1,
       rstick($|psi〉$, n: 3, brace: "]"), [\ ],
-    1, $H$, ctrl(0), 3, [\ ],
-    1, $H$, 1, ctrl(0), 2
+    1, $H$, ctrl(), 3, [\ ],
+    1, $H$, 1, ctrl(), 2
   )
   ```
 )
@@ -125,7 +125,7 @@ In many circuits, we need classical wires. This library generalizes the concept 
   ```typ
   #quantum-circuit(
     1, $A$, meter(n: 1), [\ ],
-    setwire(2, stroke: blue), 2, ctrl(0), 2, [\ ],
+    setwire(2, stroke: blue), 2, ctrl(), 2, [\ ],
     1, $X$, setwire(0), 1, lstick($|0〉$), setwire(1), $Y$,
   )
   ```
@@ -156,11 +156,11 @@ In order to structure quantum circuits, you often want to mark sections to denot
       slice(label: "1"), 1,
       gategroup(3, 3, label: (content:
       "Syndrome measurement", pos: bottom)),
-      1, ctrl(2), ctrl(0), 1,
+      1, ctrl(2), ctrl(), 1,
       slice(label: "3", n: 2,
         stroke: blue), 
       2, [\ ],
-    2, targ(), 1, ctrl(1), 1, ctrl(0), 3, [\ ], 
+    2, targ(), 1, ctrl(1), 1, ctrl(), 3, [\ ], 
     4, targ(), targ(), meter(target: -2)
   )
   ```
@@ -219,7 +219,7 @@ Labels for slices and gate groups work just the same. In order to place a label 
         content: rotate(-90deg, smallcaps("swap")), 
         pos: left, dx: 0pt)
       ), 1, [\ ], 10pt,
-    1, ctrl(0), 2, swap(0), 1,
+    1, ctrl(), 2, swap(), 1,
   )
   ```
 )
@@ -239,9 +239,9 @@ Let's look at an example of preparing a certain graph state:
     ..range(4).map(i => gate($H$, y: i, x: 1)),
     2,
     ctrl(2), 1, ctrl(1), 1, [\ ],
-    3, ctrl(2), ctrl(0), [\ ],
-    2, ctrl(0), [\ ],
-    3, ctrl(0)
+    3, ctrl(2), ctrl(), [\ ],
+    2, ctrl(), [\ ],
+    3, ctrl()
   )
   ```
 )
@@ -252,7 +252,7 @@ Manual placement can also be helpful to keep the source code a bit more cleaner.
 #example(text-size: .9em,
   ```typ
   #quantum-circuit(
-    1, $S^dagger$, $H$, ctrl(0), $H$, $S$, 1, [\ ],
+    1, $S^dagger$, $H$, ctrl(), $H$, $S$, 1, [\ ],
     3, ctrl(-1),
     gategroup(2, 5, x: 1, y: 0, stroke: purple, 
       label: (pos: bottom, content: text(purple)[CY gate])),
@@ -354,7 +354,7 @@ Setting the option `equal-row-heights` to `true` solves this problem (manually s
 //   #quantum-circuit(
 //     baseline: "=",
 //     phantom(), ctrl(1),  1, [\ ],
-//      phantom(content: $H$), ctrl(0), phantom(content: $H$),
+//      phantom(content: $H$), ctrl(), phantom(content: $H$),
 //   )
 // ])
 
@@ -368,8 +368,8 @@ There is another option for #ref-fn("quantum-circuit()") that has a lot of impac
       row-spacing: 5pt, column-spacing: 7pt,
       lstick($|0〉$, n: 3), $H$, ctrl(1), 
         ctrl(2), 1, rstick("GHZ", n: 3), [\ ],
-      1, $H$, ctrl(0), 1, $H$, 1, [\ ],
-      1, $H$, 1, ctrl(0), $H$, 1
+      1, $H$, ctrl(), 1, $H$, 1, [\ ],
+      1, $H$, 1, ctrl(), $H$, 1
   )
   ```
 )

@@ -487,7 +487,7 @@
 /// ```example
 /// #quantum-circuit(
 ///   1, swap(1), 1, [\ ],
-///   1, swap(0), 1
+///   1, swap(), 1
 /// )
 /// ```
 #let swap(
@@ -538,7 +538,7 @@
 /// ```example
 /// #quantum-circuit(
 ///   1, ctrl(1), 1, [\ ],
-///   1, ctrl(0), 1
+///   1, ctrl(), 1
 /// )
 /// ```
 #let ctrl(
