@@ -62,9 +62,10 @@ This gallery quickly showcases a large selection of possible gates and decoratio
 
 <div align="center">
   
-  ![Gallery](https://github.com/user-attachments/assets/e6b56bfb-d5fb-462a-8f1a-591f3cfc4593)
+  ![Gallery](https://github.com/user-attachments/assets/c7852e83-6652-4503-a52e-3a658c123a37)
   
 </div>
+
 
 
 
