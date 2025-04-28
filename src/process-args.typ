@@ -54,3 +54,20 @@
   }
   processed-labels
 }
+
+
+/// Assert that there are no additional named arguments in an argument sink. 
+#let assert-no-named(
+  /// Argument sink.
+  args, 
+  /// Function name. This can be used to improve the error message. 
+  fn: ""
+) = {
+  if args.named().len() == 0 { return }
+  
+  assert(false,
+    message: "Unexpected named argument \"" + args.named().keys().first() + "\"" + if fn == "" {""} else {
+      " in function " + fn + "()"
+    }
+  )
+}

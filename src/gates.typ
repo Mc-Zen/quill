@@ -3,6 +3,8 @@
 #import "draw-functions.typ"
 
 
+
+
 /// Creates a quantum (or classical) gate. For special gates, many dedicated 
 /// gate commands like @ctrl, @swap, and more exist. 
 /// 
@@ -387,6 +389,8 @@
 /// ```
 #let targ(
 
+  ..n,
+
   /// How to fill the target circle. If set to `auto`, the target is 
   /// filled with the circuits background color.
   /// -> none | auto | color | gradient | tiling
@@ -402,16 +406,34 @@
 
   y: auto,
 
-) = gate(
-  none, 
-  x: x, 
-  y: y, 
-  box: false, 
-  draw-function: draw-functions.draw-targ, 
-  fill: if fill == true {auto} else if fill == false {none} else {fill}, 
-  data: (size: size), 
-  label: label
-)
+  /// Wire count for the control wire.  
+  /// -> int
+  wire-count: 1,
+
+  /// One or more labels to add to the control wire. See @mqgate.wire-label. 
+  /// -> none | array | str | content | dictionary
+  wire-label: none,
+
+) = {
+  process-args.assert-no-named(n, fn: "targ")
+  n = n.pos()
+  assert(n.len() <= 1, message: "Unexpected second positional argument for `targ`")
+
+  mqgate(
+    none,
+    x: x, 
+    y: y,
+    target: n.at(0, default: 0),
+    box: false,
+    draw-function: draw-functions.draw-targ,
+    wire-count: wire-count,
+    fill: if fill == true {auto} else if fill == false {none} else {fill}, 
+    data: (size: size), 
+    label: label,
+    wire-label: wire-label
+  )
+}
+
 
 
 /// Creates a phase gate shown as a point on the wire together with a label. 
@@ -472,7 +494,7 @@
 
   /// How many wires up or down the target wire lives. 
   /// -> int
-  n, 
+  ..n, 
 
   wire-count: 1, 
 
@@ -490,18 +512,24 @@
 
   y: auto
 
-) = mqgate(
-  none,
-  x: x, 
-  y: y,
-  target: n,
-  box: false,
-  draw-function: draw-functions.draw-swap,
-  wire-count: wire-count,
-  data: (size: size),
-  label: label,
-  wire-label: wire-label
-)
+) = {
+  process-args.assert-no-named(n, fn: "swap")
+  n = n.pos()
+  assert(n.len() <= 1, message: "Unexpected second positional argument for `swap`")
+
+  mqgate(
+    none,
+    x: x, 
+    y: y,
+    target: n.at(0, default: 0),
+    box: false,
+    draw-function: draw-functions.draw-swap,
+    wire-count: wire-count,
+    data: (size: size),
+    label: label,
+    wire-label: wire-label
+  )
+}
 
 
 
@@ -517,7 +545,7 @@
 
   /// How many wires up or down the target wire lives. 
   /// -> int
-  n,
+  ..n,
 
   /// Wire count for the control wire.  
   /// -> int
@@ -550,16 +578,22 @@
 
   y: auto
 
-) = mqgate(
-  none,
-  x: x, 
-  y: y,
-  target: n,
-  box: false,
-  draw-function: draw-functions.draw-ctrl,
-  wire-count: wire-count,
-  fill: fill,
-  data: (open: open, size: size, show-dot: show-dot),
-  label: label,
-  wire-label: wire-label
-)
+) = {
+  process-args.assert-no-named(n, fn: "ctrl")
+  n = n.pos()
+  assert(n.len() <= 1, message: "Unexpected second positional argument for `ctrl`")
+
+  mqgate(
+    none,
+    x: x, 
+    y: y,
+    target: n.at(0, default: 0),
+    box: false,
+    draw-function: draw-functions.draw-ctrl,
+    wire-count: wire-count,
+    fill: fill,
+    data: (open: open, size: size, show-dot: show-dot),
+    label: label,
+    wire-label: wire-label
+  )
+}
