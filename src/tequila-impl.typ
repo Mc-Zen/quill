@@ -454,7 +454,6 @@
     gates.push(h(i))
     for j in range(2, n - i + 1) {
       gates.push(ca(i + j - 1, i, $R_#j$))
-      gates.push(p(i + j - 1))
     }
     gates.push(barrier())
   }
