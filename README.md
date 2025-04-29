@@ -37,7 +37,7 @@ The function `quantum-circuit()` takes any number of positional gates and works 
 
 ```typ
 #{
-  import "@preview/quill:0.6.1": *
+  import "@preview/quill:0.7.0": *
 
   quantum-circuit(
     lstick($|0〉$), $H$, ctrl(1), rstick($(|00〉+|11〉)/√2$, n: 2), [\ ],
@@ -76,7 +76,7 @@ This gallery quickly showcases a large selection of possible gates and decoratio
 _Tequila_ is a submodule that adds a completely different way of building circuits. 
 
 ```typ
-#import "@preview/quill:0.6.1" as quill: tequila as tq
+#import "@preview/quill:0.7.0" as quill: tequila as tq
 
 #quill.quantum-circuit(
   ..tq.build(
@@ -146,6 +146,16 @@ This package uses [tytanic](https://github.com/tingerrr/tytanic) for running [te
 
 
 ## Changelog
+
+### v0.7.0
+- Improvements to Tequila: 
+  - Exposed a `tequila.ca` gate for arbitrary single-qubit controlled gates. 
+  - Added `tequila.measure` to replace `tequila.meter`. The new gate can also receive an index of a wire to send the result to via a classical wire. 
+  - Addd optional `start` and `end` parameters to `tequila.barrier` that allow local barriers. 
+  - Fixed problems with `multi-controlled-gate`. 
+- `targ` can now take a "target" qubit as in `targ(2)` to produce a vertical wire, just like `ctrl` and `swap`. 
+- Both `ctrl` and `swap` can now be used without target argument like `ctrl()`. This can replace usage like `ctrl(0)` for gates without a control wire. 
+- Added position parameters `x` and `y` to the `phantom` gate. 
 
 ### v0.6.1
 - Fixes braces in circuits which were broken in new Typst version 0.13. 
@@ -219,7 +229,7 @@ Note: Starting with this version, Typst 0.11.0 or higher is required.
 Initial Release
 
 
-[guide]: https://github.com/Mc-Zen/quill/releases/download/v0.6.1/quill-guide.pdf
+[guide]: https://github.com/Mc-Zen/quill/releases/download/v0.7.0/quill-guide.pdf
 [examples]: https://github.com/Mc-Zen/quill/tree/main/examples
 [tidy]: https://github.com/Mc-Zen/tidy
 [architecture]: https://github.com/Mc-Zen/quill/blob/main/docs/architecture.md
