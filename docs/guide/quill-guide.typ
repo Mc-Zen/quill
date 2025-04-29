@@ -1,5 +1,5 @@
 #import "template.typ": *
-#import "@preview/tidy:0.4.1"
+#import "@preview/tidy:0.4.3"
 
 
 #let version = toml("/typst.toml").package.version
