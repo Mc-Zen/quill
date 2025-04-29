@@ -681,7 +681,9 @@ _Tequila_ is a submodule of *Quill* that adds a completely different way of buil
     tq.h(0),
     tq.cx(0, 1),
     tq.cx(0, 2),
+    tq.measure(0, 3)
   ),
+  [\ ], [\ ], [\ ], setwire(2)
 )
 ```
 )
