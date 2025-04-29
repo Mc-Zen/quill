@@ -1,4 +1,4 @@
-#import "utility.typ"
+#import "utility.typ" as utility: if-auto
 #import "verifications.typ"
 #import "length-helpers.typ"
 #import "decorations.typ": *
@@ -164,6 +164,7 @@
       wire-ended = true
     } else if utility.is-circuit-meta-instruction(item) { 
       if item.qc-instr == "setwire" {
+        // let (x, y) = (if-auto(item.x, col), if-auto(item.y, row))
         wire-style.count = item.wire-count
 
         wire-style.distance = utility.if-auto(item.wire-distance, wire-style.distance)
@@ -171,9 +172,7 @@
         wire-instructions.push(wire-style)
       } else {
         // Visual meta instructions are handled later
-        let (x, y) = (item.x, item.y)
-        if x == auto { x = col }
-        if y == auto { y = row }
+        let (x, y) = (if-auto(item.x, col), if-auto(item.y, row))
         meta-instructions.push((x: x, y: y, item: item))
       }
     } else if utility.is-circuit-drawable(item) {
