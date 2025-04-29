@@ -389,6 +389,8 @@
 /// ```
 #let targ(
 
+  /// How many wires up or down the target wire lives. 
+  /// -> int
   ..n,
 
   /// How to fill the target circle. If set to `auto`, the target is 
