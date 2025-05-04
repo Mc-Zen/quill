@@ -1,6 +1,6 @@
-<h1 align="center">
+<div align="center">
   <img alt="Quill" src="https://github.com/user-attachments/assets/3cb87ef5-03e0-48a7-b00b-1b8277a03fe1" style="max-width: 100%; width: 300pt">
-</h1>
+</div>
 
 <div align="center">
 
