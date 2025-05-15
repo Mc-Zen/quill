@@ -326,6 +326,7 @@
   let circuit = block(
     width: circuit-width, height: circuit-height, {
     set align(top + left) // quantum-circuit could be called in a scope where these have been changed which would mess up everything
+    set place(left)
 
     let layer-below-circuit
     let layer-above-circuit
