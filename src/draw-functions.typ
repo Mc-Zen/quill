@@ -178,16 +178,19 @@
   if separation == auto { separation = draw-params.background }
   if type(separation) == color { separation += 3pt }
   if type(separation) == length { separation += draw-params.background }
+
+  let qubits = gate.data.qubits
+  let wire-counts = gate.data.wire-count
+  let stroke = gate.data.stroke
   
   box(
     height: dy + 4pt,
     inset: (y: 2pt),
     fill: draw-params.background,
     width: width, {
-      let qubits = gate.data.qubits
       let y0 = draw-params.center-y-coords.at(gate.qubit)
       let bend = gate.data.bend * width / 2
-      for from in range(qubits.len()) {
+      for (from, wire-count) in wire-counts.enumerate() {
         let to = qubits.at(from)
         let y-from = draw-params.center-y-coords.at(from + gate.qubit) - y0
         let y-to = draw-params.center-y-coords.at(to + gate.qubit) - y0
@@ -198,11 +201,16 @@
             stroke: separation
           ))
         }
-        place(curve(
+        let correction = calc.atan((y-to - y-from) / width) / 1.2rad * calc.sqrt(gate.data.bend / 100%)
+        let pcurve(dy) = place(dy: dy, curve(
           curve.move((-.1pt, y-from)),
-          curve.cubic((bend, y-from), (width + .1pt - bend, y-to), (width + .1pt, y-to)),
-          stroke: draw-params.wire
+          curve.cubic((bend - dy*correction, y-from), (width + .1pt - bend - dy*correction, y-to), (width + .1pt, y-to)),
+          stroke: utility.update-stroke(draw-params.wire, stroke.at(from))
         ))
+        range(wire-count)
+          .map(i => (2*i - (wire-count - 1)) * 1pt)
+          .map(pcurve).join()
+        
       }
     }
   )

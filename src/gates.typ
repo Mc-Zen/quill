@@ -334,6 +334,15 @@
   /// -> auto | none | length | color | stroke
   separation: auto,
 
+  /// The number of wires to display on each permuted wire. This can be used to
+  /// create a permutation of classical or even mixed wires. 
+  /// -> int | array
+  wire-count: 1,
+
+  /// How to stroke each permuted wire. Wires left at `auto` will inherit the general wire style. 
+  /// -> auto | stroke | array
+  stroke: auto,
+
   x: auto,
 
   y: auto,
@@ -342,7 +351,24 @@
   if qubits.named().len() != 0 {
     assert(false, message: "Unexpected named argument `" + qubits.named().keys().first() + "` in function `permute()`")
   }
-  mqgate(none, n: qubits.pos().len(), width: width, draw-function: draw-functions.draw-permutation-gate, data: (qubits: qubits.pos(), extent: 2pt, separation: separation, bend: bend))
+  qubits = qubits.pos()
+  if type(wire-count) == array {
+    assert(
+      wire-count.len() == qubits.len(),
+      message: "The number of wire-counts and permuted qubits must match"
+    )
+  } else {
+    wire-count = (wire-count,) * qubits.len()
+  }
+  if type(stroke) == array {
+    assert(
+      stroke.len() == qubits.len(),
+      message: "The number of strokes and permuted qubits must match"
+    )
+  }else {
+    stroke = (stroke,) * qubits.len()
+  }
+  mqgate(none, n: qubits.len(), width: width, draw-function: draw-functions.draw-permutation-gate, data: (qubits: qubits, extent: 2pt, separation: separation, bend: bend, wire-count: wire-count, stroke: stroke))
 }
 
 
