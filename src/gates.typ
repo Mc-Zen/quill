@@ -258,6 +258,11 @@
 /// ```
 #let meter(
 
+  /// Optional body to use for the meter. Here you may use `meter-symbol` and 
+  /// combine it with additional measurement information. 
+  /// -> any
+  ..body,
+
   /// If given, draw a control wire to the given target qubit the specified
   /// number of wires up or down.
   /// -> none | int
@@ -284,11 +289,20 @@
   radius: 0pt
 
 ) = {
+  process-args.assert-no-named(body, fn: "meter")
+  body = body.pos()
+  if body.len() == 1 {
+    body = body.first()
+  } else if body.len() == 0 {
+    body = auto
+  } else {
+    assert(false, message: "Unexpected positional argument `" + repr(body.at(1)) + "` encountered at meter")
+  }
   label = if label != none {(content: label, pos: top, dy: -0.5em)} else { () }
   if target == none and n == 1 {
-    gate(none, x: x, y: y, fill: fill, radius: radius, draw-function: draw-functions.draw-meter, data: (meter-label: label), label: label)
+    gate(body, x: x, y: y, fill: fill, radius: radius, draw-function: draw-functions.draw-meter, data: (meter-label: label), label: label)
   } else {
-     mqgate(none, x: x, y: y, n: n, target: target, fill: fill, radius: radius, box: true, wire-count: wire-count, draw-function: draw-functions.draw-meter, data: (meter-label: label), label: label)
+     mqgate(body, x: x, y: y, n: n, target: target, fill: fill, radius: radius, box: true, wire-count: wire-count, draw-function: draw-functions.draw-meter, data: (meter-label: label), label: label)
   }
 }
 
@@ -365,7 +379,7 @@
       stroke.len() == qubits.len(),
       message: "The number of strokes and permuted qubits must match"
     )
-  }else {
+  } else {
     stroke = (stroke,) * qubits.len()
   }
   mqgate(none, n: qubits.len(), width: width, draw-function: draw-functions.draw-permutation-gate, data: (qubits: qubits, extent: 2pt, separation: separation, bend: bend, wire-count: wire-count, stroke: stroke))
