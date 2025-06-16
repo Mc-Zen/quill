@@ -258,8 +258,26 @@
 /// ```
 #let meter(
 
-  /// Optional body to use for the meter. Here you may use `meter-symbol` and 
+  /// Optional body to use for the meter. Here you may use the `meter-symbol` and 
   /// combine it with additional measurement information. 
+  /// ```example
+  /// #quantum-circuit(
+  ///  1, meter[$P_1$ #meter-symbol], 1
+  /// )
+  /// ```
+  /// Superscripts can be used to embed a small basis inset. 
+  /// 
+  /// ```example
+  /// #let basis-meter(basis) = meter[
+  ///   #place(super(baseline: -0.4em, basis)) 
+  ///   #meter-symbol
+  /// ]
+  /// 
+  /// #quantum-circuit(
+  ///  1, basis-meter[X], 1
+  /// )
+  /// ```
+  /// 
   /// -> any
   ..body,
 
