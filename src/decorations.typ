@@ -17,7 +17,8 @@
     num-qubits: n, 
     wire-count: 0, 
     label: label,
-    size-all-wires: if n > 1 { none } else { false }
+    size-all-wires: if n > 1 { none } else { false },
+    pass-through: ()
   )},
   data: (
     brace: brace,

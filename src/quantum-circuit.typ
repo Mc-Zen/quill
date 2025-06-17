@@ -307,6 +307,7 @@
     verifications.verify-mqgate(gate.gate, x, y, num-rows, num-cols)
 
     for qubit in range(y, y + nq) {
+      if qubit - y in multi.pass-through { continue }
       matrix.at(qubit).at(x).size.width = size.width
     }
     let start = y

@@ -128,6 +128,24 @@
   /// -> none | int
   target: none,
 
+  /// Which wires to allow to pass through the gate. 
+  /// ```example
+  /// #quantum-circuit(
+  ///   wires: 4,
+  ///   1, mqgate(
+  ///     n: 4, 
+  ///     fill: none, 
+  ///     pass-through: (2,),
+  ///     $E$
+  ///   ), 1
+  /// )
+  /// ```
+  /// Note that it is necessary to set `fill` to none to prevent the gate from 
+  /// drawing over the wires. 
+  /// 
+  /// The first and last wire cannot pass through the gate. 
+  pass-through: (),
+
 
   /// The column to put the gate in. 
   /// -> auto | int
@@ -229,6 +247,7 @@
     inputs: inputs,
     outputs: outputs,
     wire-label: process-args.process-label-arg(wire-label, default-pos: right),
+    pass-through: pass-through
   ),
   label: label,
   data: data,
