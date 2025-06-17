@@ -143,7 +143,7 @@
   /// Note that it is necessary to set `fill` to none to prevent the gate from 
   /// drawing over the wires. 
   /// 
-  /// The first and last wire cannot pass through the gate. 
+  /// The indices are given relative to the first wire of the gate. The (relative) first and last wires cannot pass through the gate. 
   pass-through: (),
 
 
