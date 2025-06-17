@@ -1,6 +1,6 @@
 [package]
 name = "quill"
-version = "0.7.0"
+version = "0.7.1"
 entrypoint = "src/quill.typ"
 authors = ["Mc-Zen <https://github.com/Mc-Zen>"]
 license = "MIT"
@@ -11,4 +11,3 @@ repository = "https://github.com/Mc-Zen/quill"
 keywords = ["quantum circuit diagram", "quantikz", "qcircuit"]
 categories = ["visualization"]
 disciplines = ["physics", "computer-science"]
-exclude = ["/docs/*"]
