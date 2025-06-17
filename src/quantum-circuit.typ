@@ -82,6 +82,11 @@
   /// -> length | dictionary
   circuit-padding: .4em,
 
+  /// How many wires the circuit has or an array of wire counts, e.g., 
+  /// `(1, 1, 2)` for two quantum wires and one classical wire. 
+  /// -> auto | int | array
+  wires: auto,
+
   /// Whether to automatically fill up all wires until the end. 
   /// -> bool
   fill-wires: true,
@@ -141,35 +146,41 @@
     distance: 1pt, 
     stroke: wire
   )
-  let wire-style = default-wire-style
-  let wire-instructions = ()
-
   let (row, col) = (0, 0)
   let prev-col = 0
   let wire-ended = false
 
+  // Wire styles and wire pieces per row. 
+  let wire-instructions = (
+    (default-wire-style, ),
+  )
+  
+ if type(wires) == array {
+    wire-instructions = wires.map(count => (default-wire-style + (count: count),))
+  }
+
   for item in items {
     if item == [\ ] {
       if fill-wires {
-        wire-instructions.push((row, prev-col, -1))
+        wire-instructions.at(row).push((prev-col, -1))
       }
       row += 1; col = 0; prev-col = 0
+      if row >= wire-instructions.len() {
+        wire-instructions.push((default-wire-style,))
+      }
 
       if row >= matrix.len() {
         matrix.push(())
         row-gutter.push(0pt)
       }
-      wire-style = default-wire-style
-      wire-instructions.push(wire-style)
       wire-ended = true
     } else if utility.is-circuit-meta-instruction(item) { 
       if item.qc-instr == "setwire" {
-        // let (x, y) = (if-auto(item.x, col), if-auto(item.y, row))
-        wire-style.count = item.wire-count
-
-        wire-style.distance = utility.if-auto(item.wire-distance, wire-style.distance)
-        wire-style.stroke = utility.if-auto(utility.update-stroke(wire-style.stroke, item.stroke), wire-style.stroke)
-        wire-instructions.push(wire-style)
+        let new-style = (:)
+        if "distance" in item { new-style.distance = item.distance }
+        if "count" in item { new-style.count = item.count }
+        if "stroke" in item { new-style.stroke = item.stroke }
+        wire-instructions.at(row).push(new-style)
       } else {
         // Visual meta instructions are handled later
         let (x, y) = (if-auto(item.x, col), if-auto(item.y, row))
@@ -182,7 +193,7 @@
         x = col 
         if y == auto {
           if col != prev-col {
-            wire-instructions.push((row, prev-col, col))
+            wire-instructions.at(row).push((prev-col, col))
           }
           prev-col = col 
           col += 1
@@ -217,7 +228,7 @@
       else { single-qubit-gates.push(gate-info) }
       wire-ended = false
     } else if type(item) == int {
-      wire-instructions.push((row, prev-col, col + item - 1))
+      wire-instructions.at(row).push((prev-col, col + item - 1))
       col += item
       prev-col = col - 1
       if col >= matrix.at(row).len() {
@@ -233,6 +244,19 @@
     }
   }
 
+  
+  if wires != auto {
+    let num-wires = if type(wires) == array { wires.len() } else { wires }
+    if matrix.len() < num-wires {
+      let diff = num-wires - matrix.len()
+
+      matrix += ((),) * diff
+      row-gutter +=  (0pt,) * diff
+    } else if type(wires) == int and matrix.len() > num-wires {
+      assert(false, message: "You explicitly specified " + str(wires) + " wires but there are " + str(matrix.len()))
+    }
+  }
+
   // finish up matrix
   let num-rows = matrix.len()
   let num-cols = calc.max(0, ..matrix.map(array.len))
@@ -244,9 +268,16 @@
   }
   row-gutter += (0pt,) * (matrix.len() - row-gutter.len())
 
+  if wire-instructions.len() != num-rows {
+    let diff = num-rows - wire-instructions.len()
+    wire-instructions += ((default-wire-style,),) * diff 
+  }
+
   if fill-wires {
-    wire-instructions.push((row, prev-col, -1)) // fill current wire
-    wire-instructions += range(row + 1, num-rows).map(row => (row, 0, -1)) // we may not have visited all wires due to manual placement. Fill all remaining wires. 
+    wire-instructions.at(row).push((prev-col, -1)) // fill current wire
+    for row in range(row + 1, num-rows) {
+      wire-instructions.at(row).push((0, -1))
+    }
   }
 
   let vertical-wires = ()
@@ -403,36 +434,43 @@
     }
 
 
-    let wire-style = default-wire-style
-    for wire-piece in wire-instructions {
-      if type(wire-piece) == dictionary {
-        wire-style = wire-piece
-      } else {
-        if wire-style.count == 0 { continue }
-        let (row, start-x, end-x) = wire-piece
-        if end-x == -1 {
-          end-x = num-cols - 1
-        }
-        if start-x == end-x { continue }
+    
+    for (row, wire-in) in wire-instructions.enumerate() {
+      let wire-style = wire-in.at(0)
+      for wire-piece in wire-in {
+        if type(wire-piece) == dictionary {
+          if "stroke" in wire-piece {
+            wire-piece.stroke = utility.update-stroke(wire-style.stroke, wire-piece.stroke)
+          }
+          wire-style += wire-piece
+        } else {
+          if wire-style.count == 0 { continue }
+          let (start-x, end-x) = wire-piece
+          if end-x == -1 {
+            end-x = num-cols - 1
+          }
+          if start-x == end-x { continue }
 
-        let draw-subwire(x1, x2) = {
-          let dx1 = center-x-coords.at(x1)
-          let dx2 = center-x-coords.at(x2, default: circuit-width)
-          let dy = center-y-coords.at(row)
-          dx1 += get-anchor-width(x1, row) / 2
-          dx2 -= get-anchor-width(x2, row) / 2
-          draw-functions.draw-horizontal-wire(dx1, dx2, dy, wire-style.stroke, wire-style.count, wire-distance: wire-style.distance)
+          let draw-subwire(x1, x2) = {
+            let dx1 = center-x-coords.at(x1)
+            let dx2 = center-x-coords.at(x2, default: circuit-width)
+            let dy = center-y-coords.at(row)
+            dx1 += get-anchor-width(x1, row) / 2
+            dx2 -= get-anchor-width(x2, row) / 2
+            draw-functions.draw-horizontal-wire(dx1, dx2, dy, wire-style.stroke, wire-style.count, wire-distance: wire-style.distance)
+          }
+          // Draw wire pieces and take care not to draw through gates. 
+          for x in range(start-x + 1, end-x) {
+            let anchor-width = get-anchor-width(x, row)
+            if anchor-width == 0pt { continue } // no gate or `box: false` gate. 
+            draw-subwire(start-x, x)
+            start-x = x
+          }
+          draw-subwire(start-x, end-x)
         }
-        // Draw wire pieces and take care not to draw through gates. 
-        for x in range(start-x + 1, end-x) {
-          let anchor-width = get-anchor-width(x, row)
-          if anchor-width == 0pt { continue } // no gate or `box: false` gate. 
-          draw-subwire(start-x, x)
-          start-x = x
-        }
-        draw-subwire(start-x, end-x)
       }
     }
+    
     
     for (x, y, target, wire-style, labels) in vertical-wires {
       let dx = center-x-coords.at(x)

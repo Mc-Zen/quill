@@ -196,7 +196,7 @@
 
   /// Number of wires to display. 
   /// -> int
-  wire-count, 
+  count, 
 
   /// When given, the stroke is applied to the wire. Otherwise the current stroke is kept. 
   /// -> auto | none | stroke
@@ -214,15 +214,17 @@
   /// -> auto | int
   y: auto
 
-) = (
-  x: x, 
-  y: y,
-  qc-instr: "setwire",
-  wire-count: wire-count,
-  stroke: stroke,
-  wire-distance: wire-distance
-)
-
+) = {
+  let result = (
+    x: x, 
+    y: y,
+    qc-instr: "setwire",
+  )
+  if count != auto { result.count = count }
+  if stroke != auto { result.stroke = stroke }
+  if wire-distance != auto { result.distance = wire-distance }
+  result
+}
 
 
 /// Highlight a group of circuit elements by drawing a rectangular box around
