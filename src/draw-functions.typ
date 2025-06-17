@@ -123,32 +123,37 @@
 }
 
 
+#let meter-symbol = box(rect(
+  stroke: none, fill: none, 
+  inset: 0pt, outset: 0pt, 
+  {
+    place(curve(
+      curve.move((0%, 110%)),
+      curve.quad((13%, 40%), (50%, 40%)),
+      curve.quad(auto, (100%, 110%)),
+    ))
+    set align(left)
+    arrow.draw-arrow((50%, 120%), (90%, 30%), length: 3.8pt, width: 2.8pt)
+  }
+))
+
+
 
 #let draw-meter(gate, draw-params) = {
-  let content = {
+  let height = draw-params.x-gate-size.height 
+  let width = 1.5 * height
+  height -= 2 * draw-params.padding
+  width -= 2 * draw-params.padding
+  
+  gate.content = block({
     set align(top)
-    let stroke = draw-params.wire
-    let padding = draw-params.padding
-    let fill = utility.if-none(gate.fill, draw-params.background)
-    let height = draw-params.x-gate-size.height 
-    let width = 1.5 * height
-    height -= 2 * padding
-    width -= 2 * padding
-    box(
-      width: width, height: height, inset: 0pt, 
-      {
-        let center-x = width / 2
-        place(curve(
-          curve.move((0%, 110%)),
-          curve.quad((13%, 40%), (50%, 40%)),
-          curve.quad(auto, (100%, 110%)),
-          stroke: stroke
-        ))
-        set align(left)
-        arrow.draw-arrow((center-x, height * 1.2), (width * .9, height*.3), length: 3.8pt, width: 2.8pt, stroke: stroke, arrow-color: draw-params.color)
-    })
-  }
-  gate.content = rect(content, inset: 0pt, stroke: none)
+    set curve(stroke: draw-params.wire)
+    set line(stroke: draw-params.wire)
+    set rect(width: width, height: height)
+
+    utility.if-auto(gate.content, meter-symbol)
+  })
+
   if gate.multi != none and gate.multi.num-qubits > 1 {
     draw-boxed-multigate(gate, draw-params)
   } else {
