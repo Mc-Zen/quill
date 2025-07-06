@@ -676,3 +676,54 @@
     wire-label: wire-label
   )
 }
+
+
+
+#let targy(
+
+  /// How many wires up or down the target wire lives. 
+  /// -> int
+  ..n,
+
+  /// How to fill the target circle. If set to `auto`, the target is 
+  /// filled with the circuits background color.
+  /// -> none | auto | color | gradient | tiling
+  fill: none,
+
+  /// Radius of the target symbol. 
+  /// -> length
+  size: 4.3pt,
+
+  label: none, 
+
+  x: auto,
+
+  y: auto,
+
+  /// Wire count for the control wire.  
+  /// -> int
+  wire-count: 1,
+
+  /// One or more labels to add to the control wire. See @mqgate.wire-label. 
+  /// -> none | array | str | content | dictionary
+  wire-label: none,
+
+) = {
+  process-args.assert-no-named(n, fn: "targy")
+  n = n.pos()
+  assert(n.len() <= 1, message: "Unexpected second positional argument for `targ`")
+
+  mqgate(
+    none,
+    x: x, 
+    y: y,
+    target: n.at(0, default: 0),
+    box: false,
+    draw-function: draw-functions.draw-targy,
+    wire-count: wire-count,
+    fill: if fill == true {auto} else if fill == false {none} else {fill}, 
+    data: (size: size), 
+    label: label,
+    wire-label: wire-label
+  )
+}
