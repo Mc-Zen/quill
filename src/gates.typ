@@ -335,11 +335,11 @@
   } else {
     assert(false, message: "Unexpected positional argument `" + repr(body.at(1)) + "` encountered at meter")
   }
-  label = if label != none {(content: label, pos: top, dy: -0.5em)} else { () }
+  label = process-args.process-label-arg(label, default-dy: 0.5em, default-pos: top)
   if target == none and n == 1 {
-    gate(body, x: x, y: y, fill: fill, radius: radius, draw-function: draw-functions.draw-meter, data: (meter-label: label), label: label)
+    gate(body, x: x, y: y, fill: fill, radius: radius, draw-function: draw-functions.draw-meter, label: label)
   } else {
-     mqgate(body, x: x, y: y, n: n, target: target, fill: fill, radius: radius, box: true, wire-count: wire-count, draw-function: draw-functions.draw-meter, data: (meter-label: label), label: label)
+     mqgate(body, x: x, y: y, n: n, target: target, fill: fill, radius: radius, box: true, wire-count: wire-count, draw-function: draw-functions.draw-meter, label: label)
   }
 }
 

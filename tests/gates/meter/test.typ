@@ -31,3 +31,16 @@
   1, meter[#place(super(baseline: -0.4em)[X]) #meter-symbol]
 )
 
+#pagebreak()
+
+// meter with multiple labels
+
+#quantum-circuit(
+  meter(label: (content: [A], pos: bottom)),
+  meter(
+    label: (
+      (content: [A], pos: bottom),
+      (content: [B]),
+    )
+  ),
+)
