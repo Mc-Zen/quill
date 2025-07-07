@@ -692,7 +692,7 @@
 
   /// Radius of the target symbol. 
   /// -> length
-  size: 4.3pt,
+  size: 10pt,
 
   label: none, 
 

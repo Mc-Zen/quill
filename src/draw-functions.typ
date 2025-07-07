@@ -124,11 +124,14 @@
 #let draw-targy(item, draw-params) = {
   let size = item.data.size
   box({
-    polygon.regular(
-      fill: draw-params.wire.paint.lighten(60%),
-      stroke: draw-params.wire,
-      size: 1.7*size,
-      vertices: 3,
+    rotate(
+      180deg,
+      polygon.regular(
+        fill: draw-params.wire.paint.lighten(60%),
+        stroke: draw-params.wire,
+        size: size,
+        vertices: 3,
+      ),
     )
   })
 }
