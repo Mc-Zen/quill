@@ -297,7 +297,7 @@
         x: x, 
         y: y + diff, 
         target: multi.target - diff, 
-        wire-style: (count: multi.wire-count),
+        wire-style: (count: multi.wire-count, stroke: multi.wire-stroke),
         labels: multi.wire-label
       ))
     }
@@ -482,7 +482,8 @@
       if labels.len() == 0 {
         draw-functions.draw-vertical-wire(
           dy1, dy2, dx, 
-          wire, wire-count: wire-style.count,
+          utility.update-stroke(wire, wire-style.stroke),
+          wire-count: wire-style.count,
         )
       } else {
         let (result, gate-bounds) = draw-functions.draw-vertical-wire-with-labels(

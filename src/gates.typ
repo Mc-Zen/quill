@@ -182,6 +182,10 @@
   /// -> int
   wire-count: 1,
 
+  /// How to stroke the control wire. 
+  /// -> auto | stroke
+  wire-stroke: auto,
+
   /// You can put labels inside the gate to label the input wires with this
   /// argument. It accepts a list of labels, each of which has to be a 
   /// dictionary with the keys `qubit` (denoting the qubit to label, starting 
@@ -241,6 +245,7 @@
     target: target,
     num-qubits: n, 
     wire-count: wire-count, 
+    wire-stroke: wire-stroke,
     label: label,
     extent: extent,
     size-all-wires: size-all-wires,
@@ -313,9 +318,13 @@
 
   y: auto,
 
-  /// Wire count for the (optional) control wire, see @meter.target. 
+  /// Wire count for the optional control wire, see @meter.target. 
   /// -> int
   wire-count: 2, 
+
+  /// How to stroke the optional control wire. 
+  /// -> auto | stroke
+  wire-stroke: auto,
 
   /// One or more labels to add to the gate. See @gate.label. 
   /// -> none | array | str | content | dictionary
@@ -339,7 +348,7 @@
   if target == none and n == 1 {
     gate(body, x: x, y: y, fill: fill, radius: radius, draw-function: draw-functions.draw-meter, label: label)
   } else {
-     mqgate(body, x: x, y: y, n: n, target: target, fill: fill, radius: radius, box: true, wire-count: wire-count, draw-function: draw-functions.draw-meter, label: label)
+     mqgate(body, x: x, y: y, n: n, target: target, fill: fill, radius: radius, box: true, wire-count: wire-count, wire-stroke: wire-stroke, draw-function: draw-functions.draw-meter, label: label)
   }
 }
 
@@ -489,6 +498,10 @@
   /// -> int
   wire-count: 1,
 
+  /// How to stroke the optional control wire. 
+  /// -> auto | stroke
+  wire-stroke: auto,
+
   /// One or more labels to add to the control wire. See @mqgate.wire-label. 
   /// -> none | array | str | content | dictionary
   wire-label: none,
@@ -506,6 +519,7 @@
     box: false,
     draw-function: draw-functions.draw-targ,
     wire-count: wire-count,
+    wire-stroke: wire-stroke,
     fill: if fill == true {auto} else if fill == false {none} else {fill}, 
     data: (size: size), 
     label: label,
@@ -587,6 +601,10 @@
   /// -> none | array | str | content | dictionary
   wire-label: none,
 
+  /// How to stroke the control wire. 
+  /// -> auto | stroke
+  wire-stroke: auto,
+
   x: auto,
 
   y: auto
@@ -604,6 +622,7 @@
     box: false,
     draw-function: draw-functions.draw-swap,
     wire-count: wire-count,
+    wire-stroke: wire-stroke,
     data: (size: size),
     label: label,
     wire-label: wire-label
@@ -629,6 +648,10 @@
   /// Wire count for the control wire.  
   /// -> int
   wire-count: 1,
+
+  /// How to stroke the control wire. 
+  /// -> auto | stroke
+  wire-stroke: auto,
 
   /// Whether to draw an open dot. 
   /// -> bool
@@ -673,6 +696,7 @@
     fill: fill,
     data: (open: open, size: size, show-dot: show-dot),
     label: label,
-    wire-label: wire-label
+    wire-label: wire-label, 
+    wire-stroke: wire-stroke
   )
 }
