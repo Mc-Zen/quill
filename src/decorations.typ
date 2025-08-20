@@ -232,11 +232,11 @@
 /// them. 
 #let gategroup(
 
-  /// Number of wires to include.
+  /// Number of wires to include. If negative, the end is counted from the back. 
   /// -> int
   wires, 
 
-  /// Number of columns to include.
+  /// Number of columns to include. If negative, the end is counted from the bottom. 
   /// -> int
   steps, 
 

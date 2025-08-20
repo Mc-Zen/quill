@@ -365,6 +365,12 @@
     for (item, x, y) in meta-instructions {
       let (the-content, decoration-bounds) = (none, none)
       if item.qc-instr == "gategroup" {
+        if item.steps < 0 {
+          item.steps = num-cols - x + item.steps + 1
+        }
+        if item.wires < 0 {
+          item.wires = num-rows - y + item.wires + 1
+        }
         verifications.verify-gategroup(item, x, y, num-rows, num-cols)
         let (dy1, dy2) = layout.get-cell-coords(center-y-coords, row-heights, (y, y + item.wires - 1e-9))
         let (dx1, dx2) = layout.get-cell-coords(center-x-coords, col-widths, (x, x + item.steps - 1e-9))
