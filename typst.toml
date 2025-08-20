@@ -1,6 +1,6 @@
 [package]
 name = "quill"
-version = "0.7.1"
+version = "0.7.2"
 entrypoint = "src/quill.typ"
 authors = ["Mc-Zen <https://github.com/Mc-Zen>"]
 license = "MIT"
