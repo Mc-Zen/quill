@@ -232,11 +232,11 @@
 /// them. 
 #let gategroup(
 
-  /// Number of wires to include. If negative, the end is counted from the back. 
+  /// Number of wires to include. Is ignored if @gategroup.bottom is given. 
   /// -> int
   wires, 
 
-  /// Number of columns to include. If negative, the end is counted from the bottom. 
+  /// Number of columns to include. Is ignored if @gategroup.right is given. 
   /// -> int
   steps, 
 
@@ -247,6 +247,14 @@
   /// The starting wire of the gategroup. 
   /// -> auto | int
   y: auto, 
+
+  /// The column where the gategroup should end. 
+  /// -> auto | int
+  right: auto,
+
+  /// The row where the gategroup should end. 
+  /// -> auto | int
+  bottom: auto,
 
   /// The gategroup can be placed `"below"` or `"above"` the circuit. 
   /// -> "below" | "above"
@@ -282,6 +290,8 @@
   x: x, 
   y: y,
   z: z,
+  right: right, 
+  bottom: bottom,
   padding: process-args.process-padding-arg(padding),
   style: (fill: fill, stroke: stroke, radius: radius),
   labels: process-args.process-label-arg(label, default-pos: top)

@@ -11,8 +11,8 @@
 
 
 #quantum-circuit(
-  gategroup(1, -1), $X$, $Y$, $p$, [\ ],
-  gategroup(-1, -2), $X$, $Y$, $p$, [\ ],
+  gategroup(1, auto, right: 0), $X$, $Y$, $p$, [\ ],
+  gategroup(auto, auto, bottom: 0, right: 1), $X$, $Y$, $p$, [\ ],
   [\ ],
-  gategroup(x: 2, y: 1, -2, 1)
+  gategroup(x: 2, y: 1, auto, 1, bottom: 1)
 )
