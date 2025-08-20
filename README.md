@@ -151,6 +151,7 @@ This package uses [tytanic](https://github.com/tingerrr/tytanic) for running [te
 - Added a paremter `wire-stroke` to all controlled gates such as `mqgate`, `ctrl`, `targ`, `swap`, and `meter` that gives control over the stroke of the control wire(s). 
 - Added an optional label to `tequila.measure`. 
 - Fixed multiple and manually positioned labels with `meter`. 
+- Allow specifying the right/bottom end of a `gategroup` with two new parameter `gategroup.right` and `gategroup.bottom`. 
 
 ### v0.7.1
 - Added the parameter `wires` to `quantum-circuit` that allows defining the number of (qu)bits explicitly. This parameter also accepts an array of wire counts, e.g., `wires: (1,) * qubits + (2,) * clbits` which is useful to avoid having to many `setwire` commands. 
