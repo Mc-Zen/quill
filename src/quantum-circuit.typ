@@ -434,6 +434,30 @@
       return el.size.height
     }
 
+    
+    for (x, y, target, wire-style, labels) in vertical-wires {
+      let dx = center-x-coords.at(x)
+      let (dy1, dy2) = (center-y-coords.at(y), center-y-coords.at(y + target))
+      dy1 += get-anchor-height(x, y) / 2 * signum(target)
+      dy2 -= get-anchor-height(x, y + target) / 2 * signum(target)
+      
+      if labels.len() == 0 {
+        draw-functions.draw-vertical-wire(
+          dy1, dy2, dx, 
+          utility.update-stroke(wire, wire-style.stroke),
+          wire-count: wire-style.count,
+        )
+      } else {
+        let (result, gate-bounds) = draw-functions.draw-vertical-wire-with-labels(
+          dy1, dy2, dx, 
+          wire, wire-count: wire-style.count,
+          wire-labels: labels,
+          draw-params: draw-params
+        )
+        result
+        bounds = layout.update-bounds(bounds, gate-bounds)
+      }
+    }
 
     
     for (row, wire-in) in wire-instructions.enumerate() {
@@ -472,30 +496,6 @@
       }
     }
     
-    
-    for (x, y, target, wire-style, labels) in vertical-wires {
-      let dx = center-x-coords.at(x)
-      let (dy1, dy2) = (center-y-coords.at(y), center-y-coords.at(y + target))
-      dy1 += get-anchor-height(x, y) / 2 * signum(target)
-      dy2 -= get-anchor-height(x, y + target) / 2 * signum(target)
-      
-      if labels.len() == 0 {
-        draw-functions.draw-vertical-wire(
-          dy1, dy2, dx, 
-          utility.update-stroke(wire, wire-style.stroke),
-          wire-count: wire-style.count,
-        )
-      } else {
-        let (result, gate-bounds) = draw-functions.draw-vertical-wire-with-labels(
-          dy1, dy2, dx, 
-          wire, wire-count: wire-style.count,
-          wire-labels: labels,
-          draw-params: draw-params
-        )
-        result
-        bounds = layout.update-bounds(bounds, gate-bounds)
-      }
-    }
     
     
     for gate-info in single-qubit-gates {
