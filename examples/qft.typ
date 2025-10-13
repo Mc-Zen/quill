@@ -5,7 +5,7 @@
   row-spacing: 5pt,
   column-spacing: 8pt,
   lstick($|j_1〉$), $H$, $R_2$, midstick($ dots $),
-    $R_(n-1)$, $R_n$, 8, permute(4,3,2,1,0, wire-count: (1,1,0,1,1)),
+    $R_(n-1)$, $R_n$, 8, permute(4, 3, 2, 1, 0, wire-count: (1, 1, 0, 1, 1)),
     rstick($1/sqrt(2)(|0〉+e^(2pi i 0.j_n)|1〉)$),[\ ],
   lstick($|j_2〉$), 1, ctrl(-1), midstick($ dots $), 2, $H$, midstick($ dots $),
     $R_(n-2)$, $R_(n-1)$, midstick($ dots $), 4,
