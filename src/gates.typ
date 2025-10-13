@@ -428,7 +428,7 @@
   } else {
     stroke = (stroke,) * qubits.len()
   }
-  mqgate(none, n: qubits.len(), width: width, draw-function: draw-functions.draw-permutation-gate, data: (qubits: qubits, extent: 2pt, separation: separation, bend: bend, wire-count: wire-count, stroke: stroke))
+  mqgate(none, x: x, y: y, n: qubits.len(), width: width, draw-function: draw-functions.draw-permutation-gate, data: (qubits: qubits, extent: 2pt, separation: separation, bend: bend, wire-count: wire-count, stroke: stroke))
 }
 
 
