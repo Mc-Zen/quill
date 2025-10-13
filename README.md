@@ -133,9 +133,8 @@ Some show-off examples, loosely replicating figures from [Quantum Computation an
   <img alt="Quantum circuit for phase estimation" src="https://github.com/user-attachments/assets/1864a436-b09b-46ac-961d-f13f3a4616ec">
 </div>
 <div align="center">
-  <img alt="Quantum fourier transformation circuit" src="https://github.com/user-attachments/assets/6dabcd87-3dfe-4d4b-9758-798855c6fee7">
+  <img alt="Quantum fourier transformation circuit" src="https://github.com/user-attachments/assets/bdff94ce-f6b8-4d4b-98c1-5eb51d53e3bd">
 </div>
-
 
 ## Contribution
 
@@ -146,6 +145,7 @@ This package uses [tytanic](https://github.com/tingerrr/tytanic) for running [te
 
 
 ## Changelog
+
 
 ### v0.7.2
 - Added a paremter `wire-stroke` to all controlled gates such as `mqgate`, `ctrl`, `targ`, `swap`, and `meter` that gives control over the stroke of the control wire(s). 
