@@ -9,7 +9,7 @@
     ),
     outputs: (
       (qubit: 0, n: 2, label: $x$),
-      (qubit: 2, label: $y plus.circle f(x)$)
+      (qubit: 2, label: $y plus.o f(x)$)
     ),
   ), 1, [\ ], 3, [\ ], 3
 )
