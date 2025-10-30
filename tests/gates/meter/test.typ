@@ -28,7 +28,7 @@
 
 #quantum-circuit(
   1, meter(fill: yellow), meter(fill: yellow)[$P_1$ #meter-symbol], meter(n: 2, fill: yellow)[#meter-symbol \ $P$], meter(n: 2), [\ ],
-  1, meter[#place(super(baseline: -0.4em)[X]) #meter-symbol]
+  1, meter[#place(super(baseline: -0.5em)[X]) #meter-symbol]
 )
 
 #pagebreak()
