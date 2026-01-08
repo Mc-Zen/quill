@@ -310,6 +310,10 @@
   /// -> none | int
   target: none, 
 
+  /// How to stroke the meter. 
+  /// -> auto | stroke
+  stroke: auto,
+
   /// The number of qubits that the meter spans. 
   /// -> int
   n: 1,
@@ -346,9 +350,9 @@
   }
   label = process-args.process-label-arg(label, default-dy: 0.5em, default-pos: top)
   if target == none and n == 1 {
-    gate(body, x: x, y: y, fill: fill, radius: radius, draw-function: draw-functions.draw-meter, label: label)
+    gate(body, x: x, y: y, fill: fill, stroke: stroke, radius: radius, draw-function: draw-functions.draw-meter, label: label)
   } else {
-     mqgate(body, x: x, y: y, n: n, target: target, fill: fill, radius: radius, box: true, wire-count: wire-count, wire-stroke: wire-stroke, draw-function: draw-functions.draw-meter, label: label)
+     mqgate(body, x: x, y: y, n: n, target: target, fill: fill, stroke: stroke, radius: radius, box: true, wire-count: wire-count, wire-stroke: wire-stroke, draw-function: draw-functions.draw-meter, label: label)
   }
 }
 

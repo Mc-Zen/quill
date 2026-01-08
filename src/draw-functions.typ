@@ -153,6 +153,8 @@
     set align(top)
     set curve(stroke: draw-params.wire)
     set line(stroke: draw-params.wire)
+    set curve(stroke: gate.stroke) if gate.stroke != auto
+    set line(stroke: gate.stroke) if gate.stroke != auto
     set rect(width: width, height: height)
 
     utility.if-auto(gate.content, meter-symbol)
