@@ -547,7 +547,7 @@
   open: false,
 
   /// How to fill or stroke the circle if `open: true`. 
-  /// -> none | color | stroke
+  /// -> auto | none | color | stroke
   fill: auto,
 
   /// The radius of the circle. 
@@ -588,12 +588,18 @@
   /// How many wires up or down the target wire lives. 
   /// -> int
   ..n, 
-
+ 
+  /// Wire count for the control wire.  
+  /// -> int
   wire-count: 1, 
 
   /// The size of the target symbol. 
   /// -> length. 
   size: 7pt, 
+
+  /// How to stroke the swap gate. 
+  /// -> auto | stroke
+  stroke: auto,
 
   label: none, 
 
@@ -625,7 +631,8 @@
     wire-stroke: wire-stroke,
     data: (size: size),
     label: label,
-    wire-label: wire-label
+    wire-label: wire-label,
+    stroke: stroke
   )
 }
 

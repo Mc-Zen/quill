@@ -114,10 +114,11 @@
 #let draw-swap(gate, draw-params) = {
   box({
     let d = gate.data.size
-    let stroke = draw-params.wire
+    set line(stroke: draw-params.wire)
+    set line(stroke: gate.stroke) if gate.stroke != auto
     box(width: d, height: d, {
-      place(line(start: (-0pt, -0pt), end: (d, d), stroke: stroke))
-      place(line(start: (d, 0pt), end: (0pt, d), stroke: stroke))
+      place(line(start: (-0pt, -0pt), end: (d, d)))
+      place(line(start: (d, 0pt), end: (0pt, d)))
     })
   })
 }
