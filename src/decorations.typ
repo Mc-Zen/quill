@@ -3,13 +3,14 @@
 
 // align: "left" (for rstick) or "right" (for lstick)
 // brace: auto, none, "{", "}", "|", "[", ...
-#let lrstick(content, n, align, brace, label, pad: 0pt, x: auto, y: auto) = gate(
+#let lrstick(content, n, align, brace, label, pad: 0pt, x: auto, y: auto, fill: auto) = gate(
   content, 
   x: x, 
   y: y,
   draw-function: draw-functions.draw-lrstick, 
   size-hint: layout.lrstick-size-hint,
   box: false, 
+  fill: fill,
   floating: true,
   multi: if n == 1 { none } else { 
    (
@@ -64,6 +65,10 @@
   /// -> length
   pad: 0pt,
 
+  /// How to color the brace. 
+  /// -> auto | color
+  fill: auto,
+
   /// One or more labels to add to the gate. See @gate.label. 
   /// -> none | array | str | content | dictionary
   label: none, 
@@ -72,7 +77,7 @@
 
   y: auto
 
-) = lrstick(body, n, right, brace, label, pad: pad, x: x, y: y)
+) = lrstick(body, n, right, brace, label, pad: pad, x: x, y: y, fill: fill)
 
 
 
@@ -109,6 +114,10 @@
   /// -> length
   pad: 0pt, 
 
+  /// How to color the brace. 
+  /// -> auto | color
+  fill: auto,
+
   /// One or more labels to add to the gate. See @gate. 
   /// -> none | array | str | content | dictionary
   label: none, 
@@ -117,7 +126,7 @@
 
   y: auto
 
-) = lrstick(body, n, left, brace, label, pad: pad, x: x, y: y)
+) = lrstick(body, n, left, brace, label, pad: pad, x: x, y: y, fill: fill)
 
 
 

@@ -247,7 +247,10 @@
     if brace-symbol == auto and gate.multi == none {
       brace-symbol = none
     }
-    brace = utility.create-brace(brace-symbol, gate.data.align, brace-height)
+    brace = {
+      set text(gate.fill) if gate.fill != auto
+      utility.create-brace(brace-symbol, gate.data.align, brace-height)
+    }
   }
   
   let brace-size = measure(brace)
