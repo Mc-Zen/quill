@@ -555,9 +555,14 @@
   /// -> bool
   open: false,
 
-  /// How to fill or stroke the circle if `open: true`. 
-  /// -> auto | none | color | stroke
+  /// How to fill the circle. 
+  /// -> auto | none | color
   fill: auto,
+
+
+  /// How to stroke the circle if `open: true`. 
+  /// -> auto | stroke | color
+  stroke: auto,
 
   /// The radius of the circle. 
   /// -> length
@@ -577,6 +582,7 @@
     draw-functions.draw-ctrl(gate, draw-params)
   ),
   fill: fill,
+  stroke: stroke,
   data: (open: open, size: size),
   label: process-args.process-label-arg(label, default-pos: top + right, default-dx: -.5em)
 )
@@ -673,9 +679,14 @@
   /// -> bool
   open: false,
 
-  /// How to fill or stroke the circle if `open: true`. 
-  /// none | color
+  /// How to fill the circle. 
+  /// -> auto | none | color
   fill: auto,
+
+
+  /// How to stroke the circle if `open: true`. 
+  /// -> auto | stroke | color
+  stroke: auto,
 
   /// The radius of the control circle. 
   /// -> length
@@ -710,6 +721,7 @@
     draw-function: draw-functions.draw-ctrl,
     wire-count: wire-count,
     fill: fill,
+    stroke: stroke,
     data: (open: open, size: size, show-dot: show-dot),
     label: label,
     wire-label: wire-label, 

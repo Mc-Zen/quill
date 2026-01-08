@@ -107,8 +107,9 @@
   let color = utility.if-auto(gate.fill, draw-params.color)
   if "show-dot" in gate.data and not gate.data.show-dot { return none }
   if gate.data.open {
-    let stroke = utility.if-auto(gate.fill, draw-params.wire)
-    box(circle(stroke: stroke, fill: draw-params.background, radius: gate.data.size))
+    let stroke = utility.update-stroke(draw-params.wire, gate.stroke)
+    let fill = utility.if-auto(gate.fill, draw-params.background)
+    box(circle(stroke: stroke, fill: fill, radius: gate.data.size))
   } else {
     box(circle(fill: color, radius: gate.data.size))
   }
