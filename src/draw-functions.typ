@@ -90,13 +90,16 @@
 #let draw-targ(item, draw-params) = {
   let size = item.data.size
   box({
+    set circle(stroke: draw-params.wire)
+    set line(stroke: draw-params.wire)
+    set circle(stroke: item.stroke) if item.stroke != auto
+    set line(stroke: item.stroke) if item.stroke != auto
     circle(
       radius: size, 
-      stroke: draw-params.wire, 
       fill: utility.if-auto(item.fill, draw-params.background)
     )
-    place(line(start: (size, 0pt), length: 2*size, angle: -90deg, stroke: draw-params.wire))
-    place(line(start: (0pt, -size), length: 2*size, stroke: draw-params.wire))
+    place(line(start: (size, 0pt), length: 2*size, angle: -90deg))
+    place(line(start: (0pt, -size), length: 2*size))
   })
 }
 

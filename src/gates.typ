@@ -484,6 +484,10 @@
   /// -> none | auto | color | gradient | tiling
   fill: none,
 
+  /// How to stroke the target. 
+  /// -> auto | stroke
+  stroke: auto,
+
   /// Radius of the target symbol. 
   /// -> length
   size: 4.3pt,
@@ -521,6 +525,7 @@
     wire-count: wire-count,
     wire-stroke: wire-stroke,
     fill: if fill == true {auto} else if fill == false {none} else {fill}, 
+    stroke: stroke,
     data: (size: size), 
     label: label,
     wire-label: wire-label
