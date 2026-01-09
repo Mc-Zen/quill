@@ -90,13 +90,16 @@
 #let draw-targ(item, draw-params) = {
   let size = item.data.size
   box({
+    set circle(stroke: draw-params.wire)
+    set line(stroke: draw-params.wire)
+    set circle(stroke: item.stroke) if item.stroke != auto
+    set line(stroke: item.stroke) if item.stroke != auto
     circle(
       radius: size, 
-      stroke: draw-params.wire, 
       fill: utility.if-auto(item.fill, draw-params.background)
     )
-    place(line(start: (size, 0pt), length: 2*size, angle: -90deg, stroke: draw-params.wire))
-    place(line(start: (0pt, -size), length: 2*size, stroke: draw-params.wire))
+    place(line(start: (size, 0pt), length: 2*size, angle: -90deg))
+    place(line(start: (0pt, -size), length: 2*size))
   })
 }
 
@@ -104,8 +107,9 @@
   let color = utility.if-auto(gate.fill, draw-params.color)
   if "show-dot" in gate.data and not gate.data.show-dot { return none }
   if gate.data.open {
-    let stroke = utility.if-auto(gate.fill, draw-params.wire)
-    box(circle(stroke: stroke, fill: draw-params.background, radius: gate.data.size))
+    let stroke = utility.update-stroke(draw-params.wire, gate.stroke)
+    let fill = utility.if-auto(gate.fill, draw-params.background)
+    box(circle(stroke: stroke, fill: fill, radius: gate.data.size))
   } else {
     box(circle(fill: color, radius: gate.data.size))
   }
@@ -114,10 +118,11 @@
 #let draw-swap(gate, draw-params) = {
   box({
     let d = gate.data.size
-    let stroke = draw-params.wire
+    set line(stroke: draw-params.wire)
+    set line(stroke: gate.stroke) if gate.stroke != auto
     box(width: d, height: d, {
-      place(line(start: (-0pt, -0pt), end: (d, d), stroke: stroke))
-      place(line(start: (d, 0pt), end: (0pt, d), stroke: stroke))
+      place(line(start: (-0pt, -0pt), end: (d, d)))
+      place(line(start: (d, 0pt), end: (0pt, d)))
     })
   })
 }
@@ -149,6 +154,8 @@
     set align(top)
     set curve(stroke: draw-params.wire)
     set line(stroke: draw-params.wire)
+    set curve(stroke: gate.stroke) if gate.stroke != auto
+    set line(stroke: gate.stroke) if gate.stroke != auto
     set rect(width: width, height: height)
 
     utility.if-auto(gate.content, meter-symbol)
@@ -241,7 +248,10 @@
     if brace-symbol == auto and gate.multi == none {
       brace-symbol = none
     }
-    brace = utility.create-brace(brace-symbol, gate.data.align, brace-height)
+    brace = {
+      set text(gate.fill) if gate.fill != auto
+      utility.create-brace(brace-symbol, gate.data.align, brace-height)
+    }
   }
   
   let brace-size = measure(brace)

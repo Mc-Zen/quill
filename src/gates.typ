@@ -310,6 +310,10 @@
   /// -> none | int
   target: none, 
 
+  /// How to stroke the meter. 
+  /// -> auto | stroke
+  stroke: auto,
+
   /// The number of qubits that the meter spans. 
   /// -> int
   n: 1,
@@ -346,9 +350,9 @@
   }
   label = process-args.process-label-arg(label, default-dy: 0.5em, default-pos: top)
   if target == none and n == 1 {
-    gate(body, x: x, y: y, fill: fill, radius: radius, draw-function: draw-functions.draw-meter, label: label)
+    gate(body, x: x, y: y, fill: fill, stroke: stroke, radius: radius, draw-function: draw-functions.draw-meter, label: label)
   } else {
-     mqgate(body, x: x, y: y, n: n, target: target, fill: fill, radius: radius, box: true, wire-count: wire-count, wire-stroke: wire-stroke, draw-function: draw-functions.draw-meter, label: label)
+     mqgate(body, x: x, y: y, n: n, target: target, fill: fill, stroke: stroke, radius: radius, box: true, wire-count: wire-count, wire-stroke: wire-stroke, draw-function: draw-functions.draw-meter, label: label)
   }
 }
 
@@ -484,6 +488,10 @@
   /// -> none | auto | color | gradient | tiling
   fill: none,
 
+  /// How to stroke the target. 
+  /// -> auto | stroke
+  stroke: auto,
+
   /// Radius of the target symbol. 
   /// -> length
   size: 4.3pt,
@@ -521,6 +529,7 @@
     wire-count: wire-count,
     wire-stroke: wire-stroke,
     fill: if fill == true {auto} else if fill == false {none} else {fill}, 
+    stroke: stroke,
     data: (size: size), 
     label: label,
     wire-label: wire-label
@@ -546,9 +555,14 @@
   /// -> bool
   open: false,
 
-  /// How to fill or stroke the circle if `open: true`. 
-  /// -> none | color | stroke
+  /// How to fill the circle. 
+  /// -> auto | none | color
   fill: auto,
+
+
+  /// How to stroke the circle if `open: true`. 
+  /// -> auto | stroke | color
+  stroke: auto,
 
   /// The radius of the circle. 
   /// -> length
@@ -568,6 +582,7 @@
     draw-functions.draw-ctrl(gate, draw-params)
   ),
   fill: fill,
+  stroke: stroke,
   data: (open: open, size: size),
   label: process-args.process-label-arg(label, default-pos: top + right, default-dx: -.5em)
 )
@@ -588,12 +603,18 @@
   /// How many wires up or down the target wire lives. 
   /// -> int
   ..n, 
-
+ 
+  /// Wire count for the control wire.  
+  /// -> int
   wire-count: 1, 
 
   /// The size of the target symbol. 
   /// -> length. 
   size: 7pt, 
+
+  /// How to stroke the swap gate. 
+  /// -> auto | stroke
+  stroke: auto,
 
   label: none, 
 
@@ -625,7 +646,8 @@
     wire-stroke: wire-stroke,
     data: (size: size),
     label: label,
-    wire-label: wire-label
+    wire-label: wire-label,
+    stroke: stroke
   )
 }
 
@@ -657,9 +679,14 @@
   /// -> bool
   open: false,
 
-  /// How to fill or stroke the circle if `open: true`. 
-  /// none | color
+  /// How to fill the circle. 
+  /// -> auto | none | color
   fill: auto,
+
+
+  /// How to stroke the circle if `open: true`. 
+  /// -> auto | stroke | color
+  stroke: auto,
 
   /// The radius of the control circle. 
   /// -> length
@@ -694,6 +721,7 @@
     draw-function: draw-functions.draw-ctrl,
     wire-count: wire-count,
     fill: fill,
+    stroke: stroke,
     data: (open: open, size: size, show-dot: show-dot),
     label: label,
     wire-label: wire-label, 
