@@ -104,7 +104,7 @@
 }
 
 #let draw-ctrl(gate, draw-params) = {
-  let color = utility.if-auto(gate.fill, draw-params.color)
+  let color = utility.if-auto(gate.fill, draw-params.wire.paint)
   if "show-dot" in gate.data and not gate.data.show-dot { return none }
   if gate.data.open {
     let stroke = utility.update-stroke(draw-params.wire, gate.stroke)

@@ -48,12 +48,6 @@
   /// -> bool
   equal-row-heights: false, 
 
-  /// Foreground color, default for strokes, text, controls etc. If you want
-  /// to have dark-themed circuits, set this to white for instance and
-  /// update `wire` and `fill` accordingly.           
-  /// -> color
-  color: black,
-
   /// Default fill color for gates. 
   /// -> color
   fill: white,
@@ -100,7 +94,7 @@
   if children.named().len() > 0 { 
     panic("Unexpected named argument '" + children.named().keys().at(0) + "' for quantum-circuit()")
   }
-  if type(wire) == color { wire += .7pt }
+  if type(wire) == std.color { wire = .7pt }
   if type(wire) == length { wire += black }
 
   set text(wire.paint, size: font-size)
@@ -113,7 +107,6 @@
     wire: wire,
     padding: measure(line(length: gate-padding)).width,
     background: fill,
-    color: color,
     x-gate-size: none,
     multi: (wire-distance: 0pt)
   )

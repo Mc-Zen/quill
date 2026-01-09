@@ -279,13 +279,12 @@ The #ref-fn("quantum-circuit()") command provides several options for styling th
   ```
 )
 
-The `wire`, `color` and `fill` options provide means to customize line strokes and colors. This allows us to easily create "dark-mode" circuits:
+The `wire` and `fill` options provide means to customize line strokes and colors. This allows us to easily create "dark-mode" circuits:
 
 #example(
   ```typ
   #box(fill: black, quantum-circuit(
-    wire: .7pt + white, // Wire and stroke color
-    color: white,       // Default foreground and text color
+    wire: .7pt + white, // Wire, stroke, and text color
     fill: black,        // Gate fill color
     1, $X$, ctrl(1), rstick([*?*]), [\ ],
     1,1, targ(), meter(), 
