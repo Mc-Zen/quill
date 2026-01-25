@@ -4,7 +4,7 @@
 
 <div align="center">
 
-[![Typst Package](https://img.shields.io/badge/dynamic/toml?url=https%3A%2F%2Fraw.githubusercontent.com%2FMc-Zen%2Fquill%2Fv0.7.2%2Ftypst.toml&query=%24.package.version&prefix=v&logo=typst&label=package&color=239DAD)](https://typst.app/universe/package/quill)
+[![Typst Package](https://img.shields.io/badge/dynamic/toml?url=https%3A%2F%2Fraw.githubusercontent.com%2FMc-Zen%2Fquill%2Fv0.7.3%2Ftypst.toml&query=%24.package.version&prefix=v&logo=typst&label=package&color=239DAD)](https://typst.app/universe/package/quill)
 [![Test Status](https://github.com/Mc-Zen/quill/actions/workflows/run_tests.yml/badge.svg)](https://github.com/Mc-Zen/quill/actions/workflows/run_tests.yml)
 [![MIT License](https://img.shields.io/badge/license-MIT-blue)](https://github.com/Mc-Zen/quill/blob/main/LICENSE)
 [![User Manual](https://img.shields.io/badge/manual-.pdf-purple)][guide]
@@ -37,7 +37,7 @@ The function `quantum-circuit()` takes any number of positional gates and works 
 
 ```typ
 #{
-  import "@preview/quill:0.7.2": *
+  import "@preview/quill:0.7.3": *
 
   quantum-circuit(
     lstick($|0〉$), $H$, ctrl(1), rstick($(|00〉+|11〉)/√2$, n: 2), [\ ],
@@ -76,7 +76,7 @@ This gallery quickly showcases a large selection of possible gates and decoratio
 _Tequila_ is a submodule that adds a completely different way of building circuits. 
 
 ```typ
-#import "@preview/quill:0.7.2" as quill: tequila as tq
+#import "@preview/quill:0.7.3" as quill: tequila as tq
 
 #quill.quantum-circuit(
   ..tq.build(
@@ -145,6 +145,13 @@ This package uses [tytanic](https://github.com/tingerrr/tytanic) for running [te
 
 
 ## Changelog
+
+
+### v0.7.3
+- ⚠️ Removed the redundant parameter `quantum-circuit.color`. It was not even really used. 
+- Now, no empty `math.lr` are created anymore with `lstick` and `rstick`. 
+- Added styling parameters: `swap.stroke`, `targ.stroke`, `ctrl.stroke`, `phase.stroke`, `meter.stroke`, `lstick.fill`, and `rstick.fill`.
+- Fixed an issue with `permute.x` and `permute.y` being ignored.  
 
 
 ### v0.7.2
@@ -242,7 +249,7 @@ Note: Starting with this version, Typst 0.11.0 or higher is required.
 Initial Release
 
 
-[guide]: https://github.com/Mc-Zen/quill/releases/download/v0.7.2/quill-guide.pdf
+[guide]: https://github.com/Mc-Zen/quill/releases/download/v0.7.3/quill-guide.pdf
 [examples]: https://github.com/Mc-Zen/quill/tree/main/examples
 [tidy]: https://github.com/Mc-Zen/tidy
 [architecture]: https://github.com/Mc-Zen/quill/blob/main/docs/architecture.md
