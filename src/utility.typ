@@ -30,6 +30,9 @@
 // and "}" if alignment is left. Other possible values are 
 // "[", "]", "|", "{", and "}".
 #let create-brace(brace, alignment, length) = {
+  if brace == none { 
+    return none
+  }
   let lookup = (
     "{": ${$,
     "}": $}$,
