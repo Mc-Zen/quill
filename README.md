@@ -6,7 +6,7 @@
 
 [![Typst Package](https://img.shields.io/badge/dynamic/toml?url=https%3A%2F%2Fraw.githubusercontent.com%2FMc-Zen%2Fquill%2Fv0.7.3%2Ftypst.toml&query=%24.package.version&prefix=v&logo=typst&label=package&color=239DAD)](https://typst.app/universe/package/quill)
 [![Test Status](https://github.com/Mc-Zen/quill/actions/workflows/run_tests.yml/badge.svg)](https://github.com/Mc-Zen/quill/actions/workflows/run_tests.yml)
-[![MIT License](https://img.shields.io/badge/license-MIT-blue)](https://github.com/Mc-Zen/quill/blob/main/LICENSE)
+[![MIT License](https://img.shields.io/badge/license-MIT-blue)](https://github.com/Mc-Zen/quill/blob/v0.7.3/LICENSE)
 [![User Manual](https://img.shields.io/badge/manual-.pdf-purple)][guide]
 
 </div>
@@ -250,11 +250,8 @@ Initial Release
 
 
 [guide]: https://github.com/Mc-Zen/quill/releases/download/v0.7.3/quill-guide.pdf
-[examples]: https://github.com/Mc-Zen/quill/tree/main/examples
-[tests]: https://github.com/Mc-Zen/quill/tests/
+[examples]: https://github.com/Mc-Zen/quill/tree/v0.7.3/examples
+[tests]: https://github.com/Mc-Zen/quill/tree/v0.7.3/tests
 [tidy]: https://github.com/Mc-Zen/tidy
-[architecture]: https://github.com/Mc-Zen/quill/blob/main/docs/architecture.md
-
-
-
+[architecture]: https://github.com/Mc-Zen/quill/blob/v0.7.3/docs/architecture.md
 
