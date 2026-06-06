@@ -1,5 +1,5 @@
 <div align="center">
-  <img alt="Quill" src="https://github.com/user-attachments/assets/3cb87ef5-03e0-48a7-b00b-1b8277a03fe1" style="max-width: 100%; width: 300pt">
+  <img alt="Quill logo" src="https://github.com/user-attachments/assets/3cb87ef5-03e0-48a7-b00b-1b8277a03fe1" style="max-width: 100%; width: 300pt">
 </div>
 
 <div align="center">
@@ -62,7 +62,7 @@ This gallery quickly showcases a large selection of possible gates and decoratio
 
 <div align="center">
   
-  ![Gallery](https://github.com/user-attachments/assets/c7852e83-6652-4503-a52e-3a658c123a37)
+  ![Cheatsheet for common quantum gates](https://github.com/user-attachments/assets/c7852e83-6652-4503-a52e-3a658c123a37)
   
 </div>
 
@@ -118,7 +118,7 @@ The following example demonstrates how to compose multiple sub-circuits.
 )
 ```
 <div align="center">
-  <img alt="Gallery" src="https://github.com/user-attachments/assets/3a660b40-923f-4410-838e-322a673604e6" />
+  <img alt="Tequila example for composing circuits" src="https://github.com/user-attachments/assets/3a660b40-923f-4410-838e-322a673604e6" />
 </div>
 
 
@@ -141,7 +141,7 @@ Some show-off examples, loosely replicating figures from [Quantum Computation an
 If you spot an issue or have a suggestion, you are invited to [post it](https://github.com/Mc-Zen/quill/issues) or to contribute to this package. In [architecture.md][architecture], you can also find a description of the algorithm that forms the base of `quantum-circuit()`. 
 
 ## Tests
-This package uses [tytanic](https://github.com/tingerrr/tytanic) for running [tests](tests/). 
+This package uses [tytanic](https://github.com/tingerrr/tytanic) for running [tests][tests]. 
 
 
 ## Changelog
@@ -251,6 +251,7 @@ Initial Release
 
 [guide]: https://github.com/Mc-Zen/quill/releases/download/v0.7.3/quill-guide.pdf
 [examples]: https://github.com/Mc-Zen/quill/tree/main/examples
+[tests]: https://github.com/Mc-Zen/quill/tests/
 [tidy]: https://github.com/Mc-Zen/tidy
 [architecture]: https://github.com/Mc-Zen/quill/blob/main/docs/architecture.md
 
