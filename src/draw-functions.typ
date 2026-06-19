@@ -269,7 +269,7 @@
       return box(
         width: 2 * width, 
         height: 0pt, 
-        baseline: top,
+        baseline: if sys.version >= version(0, 15) {top} else {0pt},
         content, 
       ) 
     }
