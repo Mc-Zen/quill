@@ -265,7 +265,14 @@
   } else {
     let dy = draw-params.multi.wire-distance
     // at first (layout) stage:
-    if dy == 0pt { return box(width: 2 * width, height: 0pt, content) }
+    if dy == 0pt { 
+      return box(
+        width: 2 * width, 
+        height: 0pt, 
+        baseline: if sys.version >= version(0, 15) {top} else {0pt},
+        content, 
+      ) 
+    }
     height = dy
     content-offset-y = -size.height / 2 + height / 2
     brace-offset-y = -.25em
