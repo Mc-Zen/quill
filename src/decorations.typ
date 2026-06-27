@@ -306,6 +306,74 @@
   labels: process-args.process-label-arg(label, default-pos: top)
 )
 
+/// Annotate the repetition of part of the circuit. 
+/// ```example
+/// #quantum-circuit(
+///   1, repeat-block(2, label: $n$), $H$, $X$, meter()
+/// )
+/// ```
+#let repeat-block(
+
+  /// Number of columns to repeat. Is ignored if @repeat-block.right is given. 
+  /// -> int
+  steps, 
+
+  /// Number of wires to include. Is ignored if @repeat-block.bottom is given. 
+  /// -> auto | int
+  wires: auto, 
+  
+  /// The type of the brace to draw. Possible values are `"("`, `"["`, `"{"`, 
+  /// `"|"`, and `"||:"` (the latter displays a musical repetition symbol).
+  /// 
+  /// ```example
+  /// #quantum-circuit(
+  ///   1, repeat-block(2, label: $n$, brace: "||:"), $H$, $X$, 1
+  /// )
+  /// ```
+  /// -> str
+  brace: "[",
+
+  /// The starting column of the repeat block. 
+  /// -> auto | int
+  x: auto, 
+
+  /// The starting wire of the repeat block. 
+  /// -> auto | int
+  y: auto, 
+
+  /// The column where the repeat block should end. 
+  /// -> auto | int
+  right: auto,
+
+  /// The row where the repeat block should end. 
+  /// -> auto | int
+  bottom: auto,
+
+  /// The repeat block can be placed `"below"` or `"above"` the circuit. 
+  /// -> "below" | "above"
+  z: "above", 
+
+  /// Fill color for the brace.
+  /// -> color
+  fill: auto, 
+
+  /// One or more labels to add to the group. See @gate. 
+  /// -> none | array | str | content | dictionary
+  label: none
+
+) = (
+  qc-instr: "repeat-block",
+  wires: wires,
+  steps: steps,
+  x: x, 
+  y: y,
+  z: z,
+  right: right, 
+  bottom: bottom,
+  style: (fill: fill, brace: brace),
+  labels: process-args.process-label-arg(label, default-pos: top+std.right, default-dx: .1em, default-dy:.1em)
+)
+
 
 
 /// Slice the circuit vertically, showing a separation line between columns. 

@@ -311,6 +311,44 @@
   )
 }
 
+#let draw-repeat-block(x1, x2, y1, y2, item, draw-params) = {
+  let size = (width: x2 - x1, height: y2 - y1)
+  layout.place-with-labels(
+    dx: x1, dy: y1, 
+    labels: item.labels, 
+    size: size,
+    draw-params: draw-params, box(
+      width: size.width, height: size.height,
+      {
+        set text(item.style.fill) if item.style.fill != auto
+        let l 
+        let r
+        if item.style.brace == "||:" {
+          l = {
+            let color = utility.if-auto(item.style.fill, draw-params.wire.paint)
+            set line(stroke: color)
+            let line = std.line(angle: 90deg, length: size.height)
+            let circle = std.circle(radius: .1em, fill: color)
+            place(line, dx: -1pt)
+            set std.line(stroke: .4pt)
+            place(line, dx: .3pt)
+            let separation = .4em
+            place(horizon, dx: 1.5pt, dy: size.height / 2 - separation,circle)
+            place(horizon, dx: 1.5pt, dy: size.height / 2 + separation,circle)
+          }
+          r = scale(x: -100%, l, reflow: false)
+        } else {
+          l = utility.create-brace(item.style.brace, right, size.height)
+          r = utility.create-brace(item.style.brace, left, size.height)
+        }
+        place(place(center, l))
+        place(right, place(center, r))
+        
+      }
+    )
+  )
+}
+
 #let draw-slice(x, y1, y2, item, draw-params) = layout.place-with-labels(
   dx: x, dy: y1, 
   size: (width: 0pt, height: y2 - y1),
