@@ -305,8 +305,6 @@
 }
 
 #let draw-repeat-block(x1, x2, y1, y2, item, draw-params) = {
-  let p = item.padding
-  let (x1, x2, y1, y2) = (x1 - p.left, x2 + p.right, y1 - p.top, y2 + p.bottom)
   let size = (width: x2 - x1, height: y2 - y1)
   layout.place-with-labels(
     dx: x1, dy: y1, 

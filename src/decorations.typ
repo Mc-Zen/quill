@@ -353,10 +353,6 @@
   /// -> "below" | "above"
   z: "above", 
 
-  /// Padding of rectangle. 
-  /// -> length | dictionary
-  padding: 0pt, 
-
   /// Fill color for the brace.
   /// -> color
   fill: auto, 
@@ -374,7 +370,6 @@
   z: z,
   right: right, 
   bottom: bottom,
-  padding: process-args.process-padding-arg(padding),
   style: (fill: fill, brace: brace),
   labels: process-args.process-label-arg(label, default-pos: top+std.right, default-dx: .1em, default-dy:.1em)
 )
