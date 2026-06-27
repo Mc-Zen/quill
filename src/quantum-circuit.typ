@@ -368,6 +368,21 @@
         let (dy1, dy2) = layout.get-cell-coords(center-y-coords, row-heights, (y, y + item.wires - 1e-9))
         let (dx1, dx2) = layout.get-cell-coords(center-x-coords, col-widths, (x, x + item.steps - 1e-9))
         (the-content, decoration-bounds) = draw-functions.draw-gategroup(dx1, dx2, dy1, dy2, item, draw-params)
+      } else if item.qc-instr == "repeat-block" {
+        if item.right != auto {
+          item.steps = num-cols - x - item.right
+        }
+        if item.bottom != auto {
+          item.wires = num-rows - y - item.bottom
+        }
+        
+        if item.wires == auto {
+          item.wires = num-rows - y
+        }
+        verifications.verify-gategroup(item, x, y, num-rows, num-cols)
+        let (dy1, dy2) = layout.get-cell-coords(center-y-coords, row-heights, (y, y + item.wires - 1e-9))
+        let (dx1, dx2) = layout.get-cell-coords(center-x-coords, col-widths, (x, x + item.steps - 1e-9))
+        (the-content, decoration-bounds) = draw-functions.draw-repeat-block(dx1, dx2, dy1, dy2, item, draw-params)
       } else if item.qc-instr == "slice" {
         verifications.verify-slice(item, x, y, num-rows, num-cols)
         let end = if item.wires == 0 { row-heights.len() } else { y + item.wires }

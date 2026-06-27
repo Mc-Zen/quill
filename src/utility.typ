@@ -34,17 +34,19 @@
     return none
   }
   let lookup = (
-    "{": ${$,
-    "}": $}$,
-    "|": $|$,
-    "[": $[$,
-    "]": $]$,
+    "{": (${$, $}$),
+    "}": (${$, $}$),
+    "|": ($|$, $|$),
+    "[": ($[$, $]$),
+    "]": ($[$, $]$),
+    "(": ($($, $)$),
+    ")": ($($, $)$),
   )
   if brace == auto {
     brace = if alignment == right {${$} else {$}$} 
   } else if brace != none {
     assert(brace in lookup, message: "Unsupported brace " + repr(brace))
-    brace = lookup.at(brace)
+    brace = lookup.at(brace).at(if alignment == right { 0 } else { 1 })
   }
   return $ lr(#brace, size: length) $
 }
