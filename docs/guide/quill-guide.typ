@@ -468,10 +468,10 @@ Let's look at an example:
 #example(
   ```typ
   #quantum-circuit(
-    1, ctrl(1), $H$, meter(), [\ ],
+    1, ctrl(1), $H$, meter(), 1,[\ ],
     1, targ(), 1, meter(),
     annotate((2, 4), 0, ((x1, x2), y) => { 
-        let brace = math.lr($#block(height: x2 - x1)}$)
+        let brace = math.lr($}$, size: x2 - x1)
         place(dx: x1, dy: y, rotate(brace, -90deg, origin: top))
         let content = [Readout circuit]
         context {
