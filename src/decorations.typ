@@ -239,6 +239,11 @@
 
 /// Highlight a group of circuit elements by drawing a rectangular box around
 /// them. 
+/// ```example
+/// #quantum-circuit(
+///   1, gategroup(1, 2), $H$, $S$, 1
+/// )
+/// ```
 #let gategroup(
 
   /// Number of wires to include. Is ignored if @gategroup.bottom is given. 
@@ -377,6 +382,11 @@
 
 
 /// Slice the circuit vertically, showing a separation line between columns. 
+/// ```example
+/// #quantum-circuit(
+///   1, $X$, slice(), $H$, 1
+/// )
+/// ```
 #let slice(
 
   /// Number of wires to slice.
