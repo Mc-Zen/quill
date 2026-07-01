@@ -144,7 +144,7 @@ The `setwire()` command produces no cells and can be called at any point on the 
 
 #pagebreak()
 
-== Slices and Gate Groups
+== Slices, Repetitions, and Gate Groups
 
 In order to structure quantum circuits, you often want to mark sections to denote certain steps in the circuit. This can be easily achieved through the #ref-fn("slice()") and #ref-fn("gategroup()") commands. Both are inserted into the circuit where the slice or group should begin and allow an arbitrary number of labels through the `labels` argument (more on labels in @labels). The function `gategroup()` takes two positional integer arguments which specify the number of wires and steps the group should span. Slices reach down to the last wire by default but the number of sliced wires can also be set manually. 
 
@@ -162,6 +162,44 @@ In order to structure quantum circuits, you often want to mark sections to denot
       2, [\ ],
     2, targ(), 1, ctrl(1), 1, ctrl(), 3, [\ ], 
     4, targ(), targ(), meter(target: -2)
+  )
+  ```
+)
+
+Slices and groups are by default inserted at the position of the circuit where they are specified.
+As described more detailed in @gate-placement, the parameters `x` and `y` can be used to specify the position manually. This is especially useful when inserting multiple slices or groups in a systematic way or when you want to collect all of them at the bottom to get a cleaner source code for the circuit. 
+
+#example(
+  ```typ
+  #quantum-circuit(
+    1, $H$, $S$, $T$, 1, [\ ],
+    ..range(1, 5).map(i => slice(y: 0, x: i, n: 1)),
+    gategroup(1, 2, x: 2, y: 1)
+  )
+  ```
+)
+
+The function #ref-fn("repeat-block()") is useful to annotate the repetition of part of the circuit
+#example(
+  ```typ
+  #quantum-circuit(
+    1, repeat-block(2, label: $n$), gate($H$), ctrl(1), 1, [\ ],
+    2, targ(),
+  )
+  ```
+)
+Just as slices and groups, repeat blocks can be positioned explicitly and the same options for labels apply (again see @labels).
+#example(
+  ```typ
+  #quantum-circuit(
+    1, gate($H$), ctrl(1), 1, [\ ],
+    2, targ(),
+    repeat-block(
+      2, 
+      x: 1, y: 0, 
+      label: (content: [2 times], pos: bottom),
+      brace: "("
+    )
   )
   ```
 )
