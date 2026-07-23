@@ -126,6 +126,20 @@
     })
   })
 }
+#let draw-targ-y(item, draw-params) = {
+  let size = item.data.size
+  box({
+    rotate(
+      180deg,
+      polygon.regular(
+        fill: item.fill,
+        stroke: draw-params.wire,
+        size: size,
+        vertices: 3,
+      ),
+    )
+  })
+}
 
 
 #let meter-symbol = box(rect(
