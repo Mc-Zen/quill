@@ -1,5 +1,5 @@
 #import "utility.typ"
-#import "decorations.typ": lstick, rstick, midstick, nwire, annotate, slice, setwire, gategroup
+#import "decorations.typ": lstick, rstick, midstick, nwire, annotate, slice, setwire, gategroup, repeat-block
 #import "gates.typ": gate, mqgate, ctrl, swap, targ, targy, meter, phantom, permute, phase, draw-functions
 #import draw-functions: meter-symbol
 #import "quantum-circuit.typ": quantum-circuit

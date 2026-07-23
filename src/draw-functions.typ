@@ -90,22 +90,26 @@
 #let draw-targ(item, draw-params) = {
   let size = item.data.size
   box({
+    set circle(stroke: draw-params.wire)
+    set line(stroke: draw-params.wire)
+    set circle(stroke: item.stroke) if item.stroke != auto
+    set line(stroke: item.stroke) if item.stroke != auto
     circle(
       radius: size, 
-      stroke: draw-params.wire, 
       fill: utility.if-auto(item.fill, draw-params.background)
     )
-    place(line(start: (size, 0pt), length: 2*size, angle: -90deg, stroke: draw-params.wire))
-    place(line(start: (0pt, -size), length: 2*size, stroke: draw-params.wire))
+    place(line(start: (size, 0pt), length: 2*size, angle: -90deg))
+    place(line(start: (0pt, -size), length: 2*size))
   })
 }
 
 #let draw-ctrl(gate, draw-params) = {
-  let color = utility.if-auto(gate.fill, draw-params.color)
+  let color = utility.if-auto(gate.fill, draw-params.wire.paint)
   if "show-dot" in gate.data and not gate.data.show-dot { return none }
   if gate.data.open {
-    let stroke = utility.if-auto(gate.fill, draw-params.wire)
-    box(circle(stroke: stroke, fill: draw-params.background, radius: gate.data.size))
+    let stroke = utility.update-stroke(draw-params.wire, gate.stroke)
+    let fill = utility.if-auto(gate.fill, draw-params.background)
+    box(circle(stroke: stroke, fill: fill, radius: gate.data.size))
   } else {
     box(circle(fill: color, radius: gate.data.size))
   }
@@ -114,10 +118,11 @@
 #let draw-swap(gate, draw-params) = {
   box({
     let d = gate.data.size
-    let stroke = draw-params.wire
+    set line(stroke: draw-params.wire)
+    set line(stroke: gate.stroke) if gate.stroke != auto
     box(width: d, height: d, {
-      place(line(start: (-0pt, -0pt), end: (d, d), stroke: stroke))
-      place(line(start: (d, 0pt), end: (0pt, d), stroke: stroke))
+      place(line(start: (-0pt, -0pt), end: (d, d)))
+      place(line(start: (d, 0pt), end: (0pt, d)))
     })
   })
 }
@@ -163,6 +168,8 @@
     set align(top)
     set curve(stroke: draw-params.wire)
     set line(stroke: draw-params.wire)
+    set curve(stroke: gate.stroke) if gate.stroke != auto
+    set line(stroke: gate.stroke) if gate.stroke != auto
     set rect(width: width, height: height)
 
     utility.if-auto(gate.content, meter-symbol)
@@ -255,7 +262,10 @@
     if brace-symbol == auto and gate.multi == none {
       brace-symbol = none
     }
-    brace = utility.create-brace(brace-symbol, gate.data.align, brace-height)
+    brace = {
+      set text(gate.fill) if gate.fill != auto
+      utility.create-brace(brace-symbol, gate.data.align, brace-height)
+    }
   }
   
   let brace-size = measure(brace)
@@ -269,7 +279,14 @@
   } else {
     let dy = draw-params.multi.wire-distance
     // at first (layout) stage:
-    if dy == 0pt { return box(width: 2 * width, height: 0pt, content) }
+    if dy == 0pt { 
+      return box(
+        width: 2 * width, 
+        height: 0pt, 
+        baseline: if sys.version >= version(0, 15) {top} else {0pt},
+        content, 
+      ) 
+    }
     height = dy
     content-offset-y = -size.height / 2 + height / 2
     brace-offset-y = -.25em
@@ -304,6 +321,44 @@
       stroke: item.style.stroke,
       fill: item.style.fill,
       radius: item.style.radius
+    )
+  )
+}
+
+#let draw-repeat-block(x1, x2, y1, y2, item, draw-params) = {
+  let size = (width: x2 - x1, height: y2 - y1)
+  layout.place-with-labels(
+    dx: x1, dy: y1, 
+    labels: item.labels, 
+    size: size,
+    draw-params: draw-params, box(
+      width: size.width, height: size.height,
+      {
+        set text(item.style.fill) if item.style.fill != auto
+        let l 
+        let r
+        if item.style.brace == "||:" {
+          l = {
+            let color = utility.if-auto(item.style.fill, draw-params.wire.paint)
+            set line(stroke: color)
+            let line = std.line(angle: 90deg, length: size.height)
+            let circle = std.circle(radius: .1em, fill: color)
+            place(line, dx: -1pt)
+            set std.line(stroke: .4pt)
+            place(line, dx: .3pt)
+            let separation = .4em
+            place(horizon, dx: 1.5pt, dy: size.height / 2 - separation,circle)
+            place(horizon, dx: 1.5pt, dy: size.height / 2 + separation,circle)
+          }
+          r = scale(x: -100%, l, reflow: false)
+        } else {
+          l = utility.create-brace(item.style.brace, right, size.height)
+          r = utility.create-brace(item.style.brace, left, size.height)
+        }
+        place(place(center, l))
+        place(right, place(center, r))
+        
+      }
     )
   )
 }

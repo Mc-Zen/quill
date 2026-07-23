@@ -48,12 +48,6 @@
   /// -> bool
   equal-row-heights: false, 
 
-  /// Foreground color, default for strokes, text, controls etc. If you want
-  /// to have dark-themed circuits, set this to white for instance and
-  /// update `wire` and `fill` accordingly.           
-  /// -> color
-  color: black,
-
   /// Default fill color for gates. 
   /// -> color
   fill: white,
@@ -100,7 +94,7 @@
   if children.named().len() > 0 { 
     panic("Unexpected named argument '" + children.named().keys().at(0) + "' for quantum-circuit()")
   }
-  if type(wire) == color { wire += .7pt }
+  if type(wire) == std.color { wire = .7pt }
   if type(wire) == length { wire += black }
 
   set text(wire.paint, size: font-size)
@@ -113,7 +107,6 @@
     wire: wire,
     padding: measure(line(length: gate-padding)).width,
     background: fill,
-    color: color,
     x-gate-size: none,
     multi: (wire-distance: 0pt)
   )
@@ -297,7 +290,7 @@
         x: x, 
         y: y + diff, 
         target: multi.target - diff, 
-        wire-style: (count: multi.wire-count),
+        wire-style: (count: multi.wire-count, stroke: multi.wire-stroke),
         labels: multi.wire-label
       ))
     }
@@ -365,10 +358,31 @@
     for (item, x, y) in meta-instructions {
       let (the-content, decoration-bounds) = (none, none)
       if item.qc-instr == "gategroup" {
+        if item.right != auto {
+          item.steps = num-cols - x - item.right
+        }
+        if item.bottom != auto {
+          item.wires = num-rows - y - item.bottom
+        }
         verifications.verify-gategroup(item, x, y, num-rows, num-cols)
         let (dy1, dy2) = layout.get-cell-coords(center-y-coords, row-heights, (y, y + item.wires - 1e-9))
         let (dx1, dx2) = layout.get-cell-coords(center-x-coords, col-widths, (x, x + item.steps - 1e-9))
         (the-content, decoration-bounds) = draw-functions.draw-gategroup(dx1, dx2, dy1, dy2, item, draw-params)
+      } else if item.qc-instr == "repeat-block" {
+        if item.right != auto {
+          item.steps = num-cols - x - item.right
+        }
+        if item.bottom != auto {
+          item.wires = num-rows - y - item.bottom
+        }
+        
+        if item.wires == auto {
+          item.wires = num-rows - y
+        }
+        verifications.verify-gategroup(item, x, y, num-rows, num-cols)
+        let (dy1, dy2) = layout.get-cell-coords(center-y-coords, row-heights, (y, y + item.wires - 1e-9))
+        let (dx1, dx2) = layout.get-cell-coords(center-x-coords, col-widths, (x, x + item.steps - 1e-9))
+        (the-content, decoration-bounds) = draw-functions.draw-repeat-block(dx1, dx2, dy1, dy2, item, draw-params)
       } else if item.qc-instr == "slice" {
         verifications.verify-slice(item, x, y, num-rows, num-cols)
         let end = if item.wires == 0 { row-heights.len() } else { y + item.wires }
@@ -434,6 +448,30 @@
       return el.size.height
     }
 
+    
+    for (x, y, target, wire-style, labels) in vertical-wires {
+      let dx = center-x-coords.at(x)
+      let (dy1, dy2) = (center-y-coords.at(y), center-y-coords.at(y + target))
+      dy1 += get-anchor-height(x, y) / 2 * signum(target)
+      dy2 -= get-anchor-height(x, y + target) / 2 * signum(target)
+      
+      if labels.len() == 0 {
+        draw-functions.draw-vertical-wire(
+          dy1, dy2, dx, 
+          utility.update-stroke(wire, wire-style.stroke),
+          wire-count: wire-style.count,
+        )
+      } else {
+        let (result, gate-bounds) = draw-functions.draw-vertical-wire-with-labels(
+          dy1, dy2, dx, 
+          wire, wire-count: wire-style.count,
+          wire-labels: labels,
+          draw-params: draw-params
+        )
+        result
+        bounds = layout.update-bounds(bounds, gate-bounds)
+      }
+    }
 
     
     for (row, wire-in) in wire-instructions.enumerate() {
@@ -472,29 +510,6 @@
       }
     }
     
-    
-    for (x, y, target, wire-style, labels) in vertical-wires {
-      let dx = center-x-coords.at(x)
-      let (dy1, dy2) = (center-y-coords.at(y), center-y-coords.at(y + target))
-      dy1 += get-anchor-height(x, y) / 2 * signum(target)
-      dy2 -= get-anchor-height(x, y + target) / 2 * signum(target)
-      
-      if labels.len() == 0 {
-        draw-functions.draw-vertical-wire(
-          dy1, dy2, dx, 
-          wire, wire-count: wire-style.count,
-        )
-      } else {
-        let (result, gate-bounds) = draw-functions.draw-vertical-wire-with-labels(
-          dy1, dy2, dx, 
-          wire, wire-count: wire-style.count,
-          wire-labels: labels,
-          draw-params: draw-params
-        )
-        result
-        bounds = layout.update-bounds(bounds, gate-bounds)
-      }
-    }
     
     
     for gate-info in single-qubit-gates {

@@ -3,13 +3,14 @@
 
 // align: "left" (for rstick) or "right" (for lstick)
 // brace: auto, none, "{", "}", "|", "[", ...
-#let lrstick(content, n, align, brace, label, pad: 0pt, x: auto, y: auto) = gate(
+#let lrstick(content, n, align, brace, label, pad: 0pt, x: auto, y: auto, fill: auto) = gate(
   content, 
   x: x, 
   y: y,
   draw-function: draw-functions.draw-lrstick, 
   size-hint: layout.lrstick-size-hint,
   box: false, 
+  fill: fill,
   floating: true,
   multi: if n == 1 { none } else { 
    (
@@ -64,6 +65,10 @@
   /// -> length
   pad: 0pt,
 
+  /// How to color the brace. 
+  /// -> auto | color
+  fill: auto,
+
   /// One or more labels to add to the gate. See @gate.label. 
   /// -> none | array | str | content | dictionary
   label: none, 
@@ -72,7 +77,7 @@
 
   y: auto
 
-) = lrstick(body, n, right, brace, label, pad: pad, x: x, y: y)
+) = lrstick(body, n, right, brace, label, pad: pad, x: x, y: y, fill: fill)
 
 
 
@@ -109,6 +114,10 @@
   /// -> length
   pad: 0pt, 
 
+  /// How to color the brace. 
+  /// -> auto | color
+  fill: auto,
+
   /// One or more labels to add to the gate. See @gate. 
   /// -> none | array | str | content | dictionary
   label: none, 
@@ -117,7 +126,7 @@
 
   y: auto
 
-) = lrstick(body, n, left, brace, label, pad: pad, x: x, y: y)
+) = lrstick(body, n, left, brace, label, pad: pad, x: x, y: y, fill: fill)
 
 
 
@@ -230,13 +239,18 @@
 
 /// Highlight a group of circuit elements by drawing a rectangular box around
 /// them. 
+/// ```example
+/// #quantum-circuit(
+///   1, gategroup(1, 2), $H$, $S$, 1
+/// )
+/// ```
 #let gategroup(
 
-  /// Number of wires to include.
+  /// Number of wires to include. Is ignored if @gategroup.bottom is given. 
   /// -> int
   wires, 
 
-  /// Number of columns to include.
+  /// Number of columns to include. Is ignored if @gategroup.right is given. 
   /// -> int
   steps, 
 
@@ -247,6 +261,14 @@
   /// The starting wire of the gategroup. 
   /// -> auto | int
   y: auto, 
+
+  /// The column where the gategroup should end. 
+  /// -> auto | int
+  right: auto,
+
+  /// The row where the gategroup should end. 
+  /// -> auto | int
+  bottom: auto,
 
   /// The gategroup can be placed `"below"` or `"above"` the circuit. 
   /// -> "below" | "above"
@@ -282,14 +304,89 @@
   x: x, 
   y: y,
   z: z,
+  right: right, 
+  bottom: bottom,
   padding: process-args.process-padding-arg(padding),
   style: (fill: fill, stroke: stroke, radius: radius),
   labels: process-args.process-label-arg(label, default-pos: top)
 )
 
+/// Annotate the repetition of part of the circuit. 
+/// ```example
+/// #quantum-circuit(
+///   1, repeat-block(2, label: $n$), $H$, $X$, meter()
+/// )
+/// ```
+#let repeat-block(
+
+  /// Number of columns to repeat. Is ignored if @repeat-block.right is given. 
+  /// -> int
+  steps, 
+
+  /// Number of wires to include. Is ignored if @repeat-block.bottom is given. 
+  /// -> auto | int
+  wires: auto, 
+  
+  /// The type of the brace to draw. Possible values are `"("`, `"["`, `"{"`, 
+  /// `"|"`, and `"||:"` (the latter displays a musical repetition symbol).
+  /// 
+  /// ```example
+  /// #quantum-circuit(
+  ///   1, repeat-block(2, label: $n$, brace: "||:"), $H$, $X$, 1
+  /// )
+  /// ```
+  /// -> str
+  brace: "[",
+
+  /// The starting column of the repeat block. 
+  /// -> auto | int
+  x: auto, 
+
+  /// The starting wire of the repeat block. 
+  /// -> auto | int
+  y: auto, 
+
+  /// The column where the repeat block should end. 
+  /// -> auto | int
+  right: auto,
+
+  /// The row where the repeat block should end. 
+  /// -> auto | int
+  bottom: auto,
+
+  /// The repeat block can be placed `"below"` or `"above"` the circuit. 
+  /// -> "below" | "above"
+  z: "above", 
+
+  /// Fill color for the brace.
+  /// -> color
+  fill: auto, 
+
+  /// One or more labels to add to the group. See @gate. 
+  /// -> none | array | str | content | dictionary
+  label: none
+
+) = (
+  qc-instr: "repeat-block",
+  wires: wires,
+  steps: steps,
+  x: x, 
+  y: y,
+  z: z,
+  right: right, 
+  bottom: bottom,
+  style: (fill: fill, brace: brace),
+  labels: process-args.process-label-arg(label, default-pos: top+std.right, default-dx: .1em, default-dy:.1em)
+)
+
 
 
 /// Slice the circuit vertically, showing a separation line between columns. 
+/// ```example
+/// #quantum-circuit(
+///   1, $X$, slice(), $H$, 1
+/// )
+/// ```
 #let slice(
 
   /// Number of wires to slice.
