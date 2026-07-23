@@ -61,7 +61,7 @@
 }
 
 
-/// Generates a two-qubit gate with two qubits connected by a wire. 
+// Generates a two-qubit gate with two qubits connected by a wire. 
 #let construct-two-qubit-gate(
 
   /// Control qubit(s). 
