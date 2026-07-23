@@ -731,16 +731,16 @@
 
 
 
-#let targy(
+#let targ-y(
 
   /// How many wires up or down the target wire lives. 
   /// -> int
   ..n,
 
-  /// How to fill the target circle. If set to `auto`, the target is 
-  /// filled with the circuits background color.
-  /// -> none | auto | color | gradient | tiling
-  fill: none,
+  /// How to fill the target triangle. If set to `none`, the target is 
+  /// filled with the 60% lightened wire color.
+  /// -> none | color | gradient | tiling
+  fill: luma(60%),
 
   /// Radius of the target symbol. 
   /// -> length
@@ -761,7 +761,7 @@
   wire-label: none,
 
 ) = {
-  process-args.assert-no-named(n, fn: "targy")
+  process-args.assert-no-named(n, fn: "targ-y")
   n = n.pos()
   assert(n.len() <= 1, message: "Unexpected second positional argument for `targ`")
 
@@ -771,9 +771,9 @@
     y: y,
     target: n.at(0, default: 0),
     box: false,
-    draw-function: draw-functions.draw-targy,
+    draw-function: draw-functions.draw-targ-y,
     wire-count: wire-count,
-    fill: if fill == true {auto} else if fill == false {none} else {fill}, 
+    fill: fill,
     data: (size: size), 
     label: label,
     wire-label: wire-label

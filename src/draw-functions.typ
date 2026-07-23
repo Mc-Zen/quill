@@ -126,13 +126,13 @@
     })
   })
 }
-#let draw-targy(item, draw-params) = {
+#let draw-targ-y(item, draw-params) = {
   let size = item.data.size
   box({
     rotate(
       180deg,
       polygon.regular(
-        fill: draw-params.wire.paint.lighten(60%),
+        fill: item.fill,
         stroke: draw-params.wire,
         size: size,
         vertices: 3,
