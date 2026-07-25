@@ -728,3 +728,54 @@
     wire-stroke: wire-stroke
   )
 }
+
+
+
+#let targ-y(
+
+  /// How many wires up or down the target wire lives. 
+  /// -> int
+  ..n,
+
+  /// How to fill the target triangle. If set to `none`, the target is 
+  /// filled with the 60% lightened wire color.
+  /// -> none | color | gradient | tiling
+  fill: luma(60%),
+
+  /// Radius of the target symbol. 
+  /// -> length
+  size: 10pt,
+
+  label: none, 
+
+  x: auto,
+
+  y: auto,
+
+  /// Wire count for the control wire.  
+  /// -> int
+  wire-count: 1,
+
+  /// One or more labels to add to the control wire. See @mqgate.wire-label. 
+  /// -> none | array | str | content | dictionary
+  wire-label: none,
+
+) = {
+  process-args.assert-no-named(n, fn: "targ-y")
+  n = n.pos()
+  assert(n.len() <= 1, message: "Unexpected second positional argument for `targ`")
+
+  mqgate(
+    none,
+    x: x, 
+    y: y,
+    target: n.at(0, default: 0),
+    box: false,
+    draw-function: draw-functions.draw-targ-y,
+    wire-count: wire-count,
+    fill: fill,
+    data: (size: size), 
+    label: label,
+    wire-label: wire-label
+  )
+}
