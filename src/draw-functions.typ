@@ -357,6 +357,39 @@
   line(angle: 90deg, length: y2 - y1, stroke: item.style.stroke)
 )
 
+#let draw-break-line(y, x1, x2, item, draw-params) = layout.place-with-labels(
+  dx: x1, dy: y - item.gap/2, 
+  size: (width: 0pt, height: 0pt),
+  labels: item.labels, 
+  draw-params: draw-params, {
+    let thickness = item.style.thickness
+    let width = x2 - x1
+    let wavy = item.style.wavy
+    let gap = item.gap*wavy
+    let stroke = utility.if-auto(item.style.stroke, draw-params.wire)
+    let wave(dy) = (
+      curve.move((0pt, dy)),
+      curve.quad((width/8, dy - gap / 2), (width/4, dy - gap / 2)),
+      curve.quad(auto, (width/2, dy)),
+      curve.quad((5*width/8, dy + gap / 2), (3*width/4, dy + gap / 2)),
+      curve.quad(auto, (width, dy)),
+    )
+    place(
+      curve(fill: draw-params.background, 
+        ..wave(thickness/2), 
+        curve.line((width, -thickness/2)),
+        curve.quad((7*width/8, -thickness/2 + gap / 2), (3*width/4, -thickness/2 + gap / 2)),
+        curve.quad(auto, (width/2, -thickness/2)),
+        curve.quad((3 *width/8, -thickness/2 - gap / 2), (width/4, -thickness/2 - gap / 2)),
+        curve.quad(auto, (0pt, -thickness/2)),
+        curve.close(mode: "straight")
+      )
+    )
+    place(curve(stroke: stroke, ..wave(-thickness/2)))
+    place(curve(stroke: stroke, ..wave(thickness/2)))
+  
+  }
+)
 
 
 #let draw-horizontal-wire(x1, x2, y, stroke, wire-count, wire-distance: 1pt) = {

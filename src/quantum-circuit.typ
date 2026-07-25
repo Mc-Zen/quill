@@ -178,6 +178,12 @@
         // Visual meta instructions are handled later
         let (x, y) = (if-auto(item.x, col), if-auto(item.y, row))
         meta-instructions.push((x: x, y: y, item: item))
+        if item.qc-instr == "break-line" {
+          if row-gutter.len() < y {
+            row-gutter += ((0pt),) * (y - row-gutter.len())
+          }
+          row-gutter.at(y - 1) = calc.max(row-gutter.at(y - 1), item.gap)
+        }
       }
     } else if utility.is-circuit-drawable(item) {
       let gate = item
@@ -259,8 +265,9 @@
   for i in range(num-rows) {
     matrix.at(i) += (auto-cell,) * (num-cols - matrix.at(i).len())
   }
-  row-gutter += (0pt,) * (matrix.len() - row-gutter.len())
-
+  if row-gutter.len() < matrix.len() {
+    row-gutter += (0pt,) * (matrix.len() - row-gutter.len())
+  }
   if wire-instructions.len() != num-rows {
     let diff = num-rows - wire-instructions.len()
     wire-instructions += ((default-wire-style,),) * diff 
@@ -389,6 +396,12 @@
         let (dy1, dy2) = layout.get-cell-coords(center-y-coords, row-heights, (y, end))
         let dx = layout.get-cell-coords(center-x-coords, col-widths, x)
         (the-content, decoration-bounds) = draw-functions.draw-slice(dx, dy1, dy2, item, draw-params)
+      } else if item.qc-instr == "break-line" {
+        // verifications.verify-slice(item, x, y, num-rows, num-cols)
+        let end = if true { col-widths.len() } else { y + item.wires }
+        let (dx1, dx2) = layout.get-cell-coords(center-x-coords, col-widths, (item.start + .5, item.end + .5))
+        let dy = layout.get-cell-coords(center-y-coords, row-heights, y)
+        (the-content, decoration-bounds) = draw-functions.draw-break-line(dy, dx1, dx2, item, draw-params)
       } else if item.qc-instr == "annotate" {
         let rows = layout.get-cell-coords(center-y-coords, row-heights, item.rows)
         let cols = layout.get-cell-coords(center-x-coords, col-widths, item.columns)

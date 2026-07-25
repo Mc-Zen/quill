@@ -423,6 +423,73 @@
   labels: process-args.process-label-arg(label, default-pos: top)
 )
 
+/// Inserts a break line that marks the omission of quantum or classical wires.
+/// ```example
+/// #quantum-circuit(
+///   1, $X$, ctrl(1), 1, [\ ],
+///   break-line(), 
+///   1, $X$, targ(), 1, 
+/// )
+/// ```
+#let break-line(
+
+  /// The wire after which to insert to break line.
+  /// -> auto | int
+  y: auto,
+
+  /// At which column to start the break line.
+  /// -> int
+  start: 0,
+  
+  /// At which column to end the break line.
+  /// -> int
+  end: -1,
+  
+  /// The thickness of the break line.
+  /// -> length
+  thickness: 3pt,
+
+  /// The additional gap to introduce between the two separated wires. 
+  /// -> length
+  gap: 20pt,
+
+  /// How wavy the break lines is drawn.
+  /// ```example
+  /// #quantum-circuit(
+  ///   1, $X$, ctrl(1), 1, [\ ],
+  ///   break-line(wavy: 0%), 
+  ///   1, $X$, targ(), 1, 
+  /// )
+  /// ```
+  /// -> ratio
+  wavy: 40%,
+
+  /// The break line can be placed `"below"` or `"above"` the circuit. 
+  /// -> "below" | "above"
+  z: "above",
+
+  /// Line style of the break-line. If set to `auto`, the stroke is inherited 
+  /// from the wire stroke of the circuit.
+  /// -> auto | stroke
+  stroke: auto,
+
+  /// One or more labels to add to the break-line. See @gate. 
+  /// -> none | array | str | content | dictionary
+  label: none
+
+) = (
+  qc-instr: "break-line",
+  x: 0,
+  y: y,
+  z: z,
+  start: start,
+  end: end,
+  gap: gap,
+  style: (stroke: stroke, thickness: thickness, wavy: wavy),
+  labels: process-args.process-label-arg(label, default-pos: top)
+)
+
+
 
 
 /// Lower-level interface to the cell coordinates to create an arbitrary
