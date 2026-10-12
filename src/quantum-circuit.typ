@@ -94,7 +94,10 @@
   if children.named().len() > 0 { 
     panic("Unexpected named argument '" + children.named().keys().at(0) + "' for quantum-circuit()")
   }
-  if type(wire) == std.color { wire = .7pt }
+  if wire == none {
+    panic("The `wire` parameter of quantum-circuit() cannot be `none`")
+  }
+  if type(wire) == std.color { wire += .7pt }
   if type(wire) == length { wire += black }
 
   set text(wire.paint, size: font-size)
