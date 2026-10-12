@@ -12,10 +12,10 @@
   if arrow-color == auto { arrow-color = black }
   place(line(start: start, end: end))
   let dir = (end.at(0) - start.at(0), end.at(1) - start.at(1))
-  dir = dir.map(x => float(repr(x).slice(0,-2)))
-  // let angle = calc.atan2(dir.at(0), dir.at(1))
-  
+  dir = dir.map(x => x / 1pt)
+
   let len = calc.norm(..dir)
+  if len == 0 { panic("draw-arrow: start and end must not be equal") }
   dir = dir.map(x => x / len)
   let normal = (-dir.at(1), dir.at(0))
 
@@ -26,10 +26,3 @@
   let v2 = (arrow-start.at(0) + w*normal.at(0), arrow-start.at(1) + w*normal.at(1))
   polygon(arrow-end, v1, v2, fill: arrow-color)
 })
-
-#let test-arrow() = {
-  draw-arrow((0%, 0%), (50%, 10%))
-}
-
-
-#test-arrow()
