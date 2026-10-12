@@ -214,7 +214,7 @@
   if qubits.len() == 1 {
     construct-single-qubit-gate(qubits.first(), gates.meter.with(..args.named()))
   } else {
-    assert(qubits.len() == 2, message: "Expected a qubit and a classical, got more than three positional arguments")
+    assert(qubits.len() == 2, message: "Expected a qubit and a classical, got more than two positional arguments")
     construct-two-qubit-gate(
       qubits.last(), 
       qubits.first(), 

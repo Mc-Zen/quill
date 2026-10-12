@@ -26,7 +26,7 @@
 
 #let verify-slice(slice, x, y, circuit-rows, circuit-cols) = {
   if slice.wires < 0 {
-    assert(false, message: "`slice`: The number of wires needs to be > 0 (is " + str(slice.wires) + ")")
+    assert(false, message: "`slice`: The number of wires cannot be negative (is " + str(slice.wires) + ")")
   }
   if y + slice.wires > circuit-rows {
     assert(false, message: 
