@@ -56,7 +56,7 @@ A circuit can be created by calling the #ref-fn("quantum-circuit()") function wi
   ```
 )
 
-A quantum gate is created with the #ref-fn("gate()") command.  To make life easier, instead of calling `gate($H$)`, you can also just put in the gate's content `$H$`. Unlike `qcircuit` and `quantikz`, the math environment is not automatically entered for the content of the gate which allows for passing in any type of content (even images or tables). Use displaystyle math (for example `$ U_1 $` instead of `$U_1$` to enable appropriate scaling of the gate for more complex mathematical expressions like double subscripts etc. 
+A quantum gate is created with the #ref-fn("gate()") command.  To make life easier, instead of calling `gate($H$)`, you can also just put in the gate's content `$H$`. Unlike `qcircuit` and `quantikz`, the math environment is not automatically entered for the content of the gate which allows for passing in any type of content (even images or tables). Use displaystyle math (for example `$ U_1 $` instead of `$U_1$`) to enable appropriate scaling of the gate for more complex mathematical expressions like double subscripts etc. 
 
 #pagebreak()
 
