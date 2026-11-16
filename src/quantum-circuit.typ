@@ -418,7 +418,7 @@
             draw-params: draw-params
           )
         } else if type(annotation) in (symbol, content, str) {
-          layer-below-circuit += place(annotation)
+          the-content = place(annotation)
         } 
       }
       if decoration-bounds != none {
